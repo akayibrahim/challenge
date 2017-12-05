@@ -1,16 +1,11 @@
 package org.chl.controllers;
 
-import org.chl.models.Challenge;
-import org.chl.models.ChallengeAttendance;
-import org.chl.models.Like;
+import org.chl.models.*;
 import org.chl.services.ChallengeService;
-import org.chl.utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 public class ChallengeController {
@@ -25,72 +20,57 @@ public class ChallengeController {
         this.chlService = chlService;
     }
 
-    @RequestMapping(value = "/addChl")
-    public String addChallenge(@RequestBody Challenge chl) {
-        Challenge challenge = chlService.addChallenge(chl);
-        if(chl.getType().equals("private") && chl.getAttendanceRequestList().size() != 0)
-            for (String attandance: chl.getAttendanceRequestList()
-                 ) {
-                ChallengeAttendance  chlAtt = new ChallengeAttendance();
-                chlAtt.setMemberId(attandance);
-                chlAtt.setAskAcceptOrReject("true");
-                chlAtt.setChallengeId(chl.getId());
-                chlService.joinOrInviteForAttendaceToChallenge(chlAtt);
-                sendNotificationToMemberForAttendance();
-            }
-        return "1";
+    @RequestMapping(value = "/addJoinChallenge")
+    public String addJoinChallenge(@Valid @RequestBody JoinAndProofChallenge joinChl) {
+        Challenge challenge = chlService.addJoinChallenge(joinChl);
+        return challenge.getId();
     }
 
-    private void sendNotificationToMemberForAttendance() {
+    @RequestMapping(value = "/addVersusChallenge")
+    public String addVersusChallenge(@Valid @RequestBody VersusChallenge versusChl) {
+        Challenge challenge = chlService.addVersusChallenge(versusChl);
+        return challenge.getId();
     }
 
-    @RequestMapping(value = "/getChls")
-    public Iterable<Challenge> getChallenges() {
-        Iterable<Challenge> challenges = chlService.getChallenges();
-        for (Challenge chl: challenges) {
-            if(Constant.TYPE.PRIVATE.equals(chl.getType())) {
-                List<String> attendanceAcceptList = new ArrayList<>();
-                for (String request: chl.getAttendanceRequestList()) {
-                    ChallengeAttendance chlAtt = chlService.getAcceptAttendanceMemberId(request, chl.getId());
-                    if(Constant.ANSWER.ACCEPT.getAnswer().equals(chlAtt.getAcceptOrReject()))
-                        attendanceAcceptList.add(chlAtt.getMemberId());
-                }
-                chl.setAttendanceAcceptList(attendanceAcceptList);
-            } else if(Constant.TYPE.PUBLIC.equals(chl.getType())) {
-                List<ChallengeAttendance> chlAttList =  chlService.getJoinsToChallenge(chl.getId());
-                List<String> joinList = new ArrayList<>();
-                for (ChallengeAttendance chlAtt: chlAttList) {
-                    joinList.add(chlAtt.getMemberId());
-                }
-                chl.setJoinToChallengeList(joinList);
-            }
-        }
+    @RequestMapping(value = "/addSelfChallenge")
+    public String addSelfChallenge(@Valid @RequestBody SelfChallenge selfChl) {
+        Challenge challenge = chlService.addSelfChallenge(selfChl);
+        return challenge.getId();
+    }
+
+    @RequestMapping(value = "/updateProgressOrDoneForSelf")
+    public void updateProgressOrDoneForSelf(String challengeId, String score, Boolean done) {
+        chlService.updateProgressOrDoneForSelf(challengeId, score, done);
+    }
+
+    @RequestMapping(value = "/updateResultsOfVersus")
+    public void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore) {
+        chlService.updateResultsOfVersus(challengeId, firstTeamScore, secondTeamScore);
+    }
+
+    @RequestMapping(value = "/getChallenges")
+    public Iterable<Challenge> getChallenges(String memberId) {
+        Iterable<Challenge> challenges = chlService.getChallengesOfMember(memberId);
         return challenges;
     }
 
-    @RequestMapping(value = "/getChallengeLikes")
-    public Iterable<Like> getChallengeLikes(String challengeId) {
-        Iterable<Like> likes = chlService.getChallangeLikes(challengeId);
-        return likes;
+    @RequestMapping(value = "/deleteChallenge")
+    public void deleteChallenge(String challengeId) {
+        chlService.deleteChallenge(challengeId);
     }
 
     @RequestMapping(value = "/likeChallenge")
-    public void likeChallenge(@RequestBody Like like) {
+    public void likeChallenge(@Valid @RequestBody Like like) {
         chlService.likeChallange(like);
     }
 
     @RequestMapping(value = "/joinToChallenge")
-    public void joinToChallenge(@RequestBody ChallengeAttendance chlAtt) {
-        chlService.joinOrInviteForAttendaceToChallenge(chlAtt);
-    }
-
-    @RequestMapping(value = "/getAttendanceOfChls")
-    public List<ChallengeAttendance> getAttendanceOfChls() {
-        return chlService.getAttendanceOfChls();
+    public void joinToChallenge(@Valid @RequestBody JoinAttendance join) {
+        chlService.joinToChallenge(join);
     }
 
     @RequestMapping(value = "/acceptOrRejectChl")
-    public void acceptOrRejectChl(@RequestBody ChallengeAttendance chlAtt) {
+    public void acceptOrRejectChl(@Valid @RequestBody VersusAttendance chlAtt) {
         chlService.acceptOrRejectChl(chlAtt);
     }
 }

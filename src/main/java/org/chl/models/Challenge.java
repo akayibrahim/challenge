@@ -1,68 +1,71 @@
 package org.chl.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.validation.annotation.Validated;
 
-import java.math.BigInteger;
+import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created by ibrahim on 11/24/2017.
  */
+@Validated
 @Document
 public class Challenge {
     @Id
     private String id;
-
+    @NotEmpty(message="You need to pass the challengerId parameter")
     private String challengerId;
 
     private String thinksAboutChallenge;
-
+    @NotEmpty(message="You need to pass the challengeSubject parameter")
     private String challengeSubject;
+    @NotNull(message="You need to pass the chlDate parameter")
+    private Date chlDate;
+    @NotNull(message="You need to pass the untilDate parameter")
+    private Date untilDate;
+    @NotNull(message="You need to pass the done parameter")
+    @JsonProperty
+    private Boolean done;
 
-    private String chlDate;
-
-    private String untilDate;
-
-    private String type;
-
-    private List<String> attendanceRequestList;
-
-    private List<String> attendanceAcceptList;
-
-
-    private List<String> joinToChallengeList;
-
-    public List<String> getJoinToChallengeList() {
-        return joinToChallengeList;
+    public Boolean getDone() {
+        return done;
     }
 
-    public void setJoinToChallengeList(List<String> joinToChallengeList) {
-        this.joinToChallengeList = joinToChallengeList;
+    public void setDone(Boolean done) {
+        this.done = done;
     }
 
-    public List<String> getAttendanceAcceptList() {
-        return attendanceAcceptList;
+    private List<Like> likes;
+
+    private int countOfLike;
+
+    public int getCountOfLike() {
+        return countOfLike;
     }
 
-    public void setAttendanceAcceptList(List<String> attendanceAcceptList) {
-        this.attendanceAcceptList = attendanceAcceptList;
+    public void setCountOfLike(int countOfLike) {
+        this.countOfLike = countOfLike;
     }
 
-    public List<String> getAttendanceRequestList() {
-        return attendanceRequestList;
+    public List<Like> getLikes() {
+        return likes;
     }
 
-    public void setAttendanceRequestList(List<String> attendanceRequestList) {
-        this.attendanceRequestList = attendanceRequestList;
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
     }
 
-    public String getType() {
-        return type;
+    public String getId() {
+        return id;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getChallengerId() {
@@ -89,27 +92,19 @@ public class Challenge {
         this.challengeSubject = challengeSubject;
     }
 
-    public String getChlDate() {
+    public Date getChlDate() {
         return chlDate;
     }
 
-    public void setChlDate(String chlDate) {
+    public void setChlDate(Date chlDate) {
         this.chlDate = chlDate;
     }
 
-    public String getUntilDate() {
+    public Date getUntilDate() {
         return untilDate;
     }
 
-    public void setUntilDate(String untilDate) {
+    public void setUntilDate(Date untilDate) {
         this.untilDate = untilDate;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 }

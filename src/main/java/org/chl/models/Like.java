@@ -1,31 +1,24 @@
 package org.chl.models;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.validation.annotation.Validated;
 
 import java.math.BigInteger;
 
 /**
  * Created by ibrahim on 11/28/2017.
  */
+@Validated
 @Document
 public class Like {
     @Id
     private String id;
-
+    @NotEmpty(message="You need to pass the challengeId parameter")
     private String challengeId;
-
+    @NotEmpty(message="You need to pass the memberId parameter")
     private String memberId;
-
-    private Long countOfLike;
-
-    public Long getCountOfLike() {
-        return countOfLike;
-    }
-
-    public void setCountOfLike(Long countOfLike) {
-        this.countOfLike = countOfLike;
-    }
 
     public String getId() {
         return id;

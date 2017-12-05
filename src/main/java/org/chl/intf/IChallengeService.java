@@ -1,33 +1,35 @@
 package org.chl.intf;
 
-import org.chl.models.Challenge;
-import org.chl.models.ChallengeAttendance;
-import org.chl.models.Like;
+import org.chl.models.*;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
-import java.util.ListIterator;
+import javax.validation.Valid;
 
 /**
  * Created by ibrahim on 11/24/2017.
  */
+@Validated
 public interface IChallengeService {
-    Challenge addChallenge(Challenge chl);
+    VersusChallenge addVersusChallenge(VersusChallenge versusChl);
+
+    JoinAndProofChallenge addJoinChallenge(JoinAndProofChallenge joinChl);
+
+    SelfChallenge addSelfChallenge(SelfChallenge selfChl);
+
+    void updateProgressOrDoneForSelf(String challengeId, String score, Boolean done);
+
+    void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore);
 
     Iterable<Challenge> getChallenges();
 
+    Iterable<Challenge> getChallengesOfMember(@Valid @NotEmpty String memberId);
+
     void likeChallange(Like like);
 
-    Iterable<Like> getChallangeLikes(String challengeId);
+    JoinAttendance joinToChallenge(JoinAttendance join);
 
-    ChallengeAttendance joinOrInviteForAttendaceToChallenge(ChallengeAttendance chlAtt);
+    void acceptOrRejectChl(VersusAttendance chlAtt);
 
-    List<ChallengeAttendance> getAttendanceOfChls();
-
-    ChallengeAttendance getAcceptAttendanceMemberId(String memberId, String challengeId);
-
-    List<ChallengeAttendance> getAttendancesOfChallenge(String challengeId);
-
-    List<ChallengeAttendance> getJoinsToChallenge(String challengeId);
-
-    void acceptOrRejectChl(ChallengeAttendance chlAtt);
+    void deleteChallenge(@Valid @NotEmpty String challengeId);
 }

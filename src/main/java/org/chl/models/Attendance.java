@@ -1,28 +1,25 @@
 package org.chl.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.validation.annotation.Validated;
 
-import java.math.BigInteger;
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by ibrahim on 11/24/2017.
  */
+@Validated
 @Document
-public class ChallengeAttendance {
+public class Attendance {
     @Id
     private String id;
-
+    @NotEmpty(message="You need to pass the challengeId parameter")
     private String challengeId;
-
+    @NotEmpty(message="You need to pass the memberId parameter")
     private String memberId;
-
-    private String askAcceptOrReject;
-
-    private String acceptOrReject;
-
-    private String join;
 
     public String getId() {
         return id;
@@ -46,29 +43,5 @@ public class ChallengeAttendance {
 
     public void setMemberId(String memberId) {
         this.memberId = memberId;
-    }
-
-    public String getAskAcceptOrReject() {
-        return askAcceptOrReject;
-    }
-
-    public void setAskAcceptOrReject(String askAcceptOrReject) {
-        this.askAcceptOrReject = askAcceptOrReject;
-    }
-
-    public String getAcceptOrReject() {
-        return acceptOrReject;
-    }
-
-    public void setAcceptOrReject(String acceptOrReject) {
-        this.acceptOrReject = acceptOrReject;
-    }
-
-    public String getJoin() {
-        return join;
-    }
-
-    public void setJoin(String join) {
-        this.join = join;
     }
 }

@@ -1,21 +1,26 @@
 package org.chl.models;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Created by ibrahim on 11/28/2017.
  */
+@Validated
 @Document
 public class FriendList {
     @Id
     private String id;
-
+    @NotEmpty(message="You need to pass the memberId parameter")
     private String memberId;
-
+    @NotEmpty(message="You need to pass the friendMemberId parameter")
     private String friendMemberId;
 
     private Member friendMemberInfo;
+    @NotEmpty(message="You need to pass the isFollowed parameter")
+    private Boolean isFollowed;
 
     public Member getFriendMemberInfo() {
         return friendMemberInfo;
@@ -47,5 +52,13 @@ public class FriendList {
 
     public void setFriendMemberId(String friendMemberId) {
         this.friendMemberId = friendMemberId;
+    }
+
+    public Boolean getFollowed() {
+        return isFollowed;
+    }
+
+    public void setFollowed(Boolean followed) {
+        isFollowed = followed;
     }
 }

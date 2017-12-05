@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 public class MemberController {
     @Autowired
@@ -34,7 +36,7 @@ public class MemberController {
     }
 
     @RequestMapping(value = "/addMember")
-    public void addMember(@RequestBody Member member) {
+    public void addMember(@Valid @RequestBody Member member) {
         memberService.addMember(member);
     }
 

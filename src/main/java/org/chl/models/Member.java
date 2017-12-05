@@ -1,24 +1,29 @@
 package org.chl.models;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * Created by ibrahim on 11/28/2017.
  */
-
+@Validated
 @Document
 public class Member {
     @Id
     private String id;
-
+    @NotEmpty(message="You need to pass the name parameter")
     private String name;
-
+    @NotEmpty(message="You need to pass the surnameparameter")
     private String surname;
-
+    @NotEmpty(message="You need to pass the email parameter")
     private String email;
-
-    private String recordDate;
+    @NotNull(message="You need to pass the recordDate parameter")
+    private Date recordDate;
 
     public String getId() {
         return id;
@@ -52,11 +57,11 @@ public class Member {
         this.email = email;
     }
 
-    public String getRecordDate() {
+    public Date getRecordDate() {
         return recordDate;
     }
 
-    public void setRecordDate(String recordDate) {
+    public void setRecordDate(Date recordDate) {
         this.recordDate = recordDate;
     }
 }
