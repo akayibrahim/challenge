@@ -1,10 +1,10 @@
-package org.chl.services;
+package org.chl.service;
 
 import org.chl.intf.IMemberService;
-import org.chl.models.FriendList;
-import org.chl.models.Member;
-import org.chl.repos.FriendListRepository;
-import org.chl.repos.MemberRepository;
+import org.chl.model.FriendList;
+import org.chl.model.Member;
+import org.chl.repository.FriendListRepository;
+import org.chl.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

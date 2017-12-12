@@ -1,8 +1,8 @@
-package org.chl.controllers;
+package org.chl.controller;
 
-import org.chl.models.FriendList;
-import org.chl.models.Member;
-import org.chl.services.MemberService;
+import org.chl.model.FriendList;
+import org.chl.model.Member;
+import org.chl.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,15 +1,16 @@
-package org.chl.services;
+package org.chl.service;
 
 import org.chl.intf.IChallengeService;
-import org.chl.models.*;
-import org.chl.repos.JoinAndProofAttendanceRepository;
-import org.chl.repos.VersusAttendanceRepository;
-import org.chl.repos.ChallengeRepository;
-import org.chl.repos.LikeRepository;
-import org.chl.utils.Constant;
+import org.chl.model.*;
+import org.chl.repository.JoinAndProofAttendanceRepository;
+import org.chl.repository.VersusAttendanceRepository;
+import org.chl.repository.ChallengeRepository;
+import org.chl.repository.LikeRepository;
+import org.chl.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,13 +22,15 @@ public class ChallengeService implements IChallengeService {
     private LikeRepository likeRepo;
     private VersusAttendanceRepository versusRepo;
     private JoinAndProofAttendanceRepository joinAndProofRepo;
+    private NotificationService notificationService;
 
     @Autowired
-    public ChallengeService(ChallengeRepository chlRepo, LikeRepository likeRepo, VersusAttendanceRepository versusRepo, JoinAndProofAttendanceRepository joinAndProofRepo) {
+    public ChallengeService(ChallengeRepository chlRepo, LikeRepository likeRepo, VersusAttendanceRepository versusRepo, JoinAndProofAttendanceRepository joinAndProofRepo, NotificationService notificationService) {
         this.chlRepo = chlRepo;
         this.likeRepo = likeRepo;
         this.versusRepo = versusRepo;
         this.joinAndProofRepo = joinAndProofRepo;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -41,6 +44,7 @@ public class ChallengeService implements IChallengeService {
         for (VersusAttendance versusAtt:versusChl.getVersusAttendanceList()) {
             versusAtt.setChallengeId(versusChl.getId());
             versusRepo.save(versusAtt);
+            sendNotification(versusChl.getChallengerId(), versusAtt.getMemberId(), Constant.PUSH_NOTIFICATION.DONE, versusChl.getUntilDate());
         }
         return versusChl;
     }
@@ -127,5 +131,14 @@ public class ChallengeService implements IChallengeService {
             result.setAccept(versusAtt.getAccept());
             versusRepo.save(result);
         }
+    }
+
+    private void sendNotification(String challengeId, String memberId, Constant.PUSH_NOTIFICATION notificationType, Date untilDate) {
+        PushNotification notification = new PushNotification();
+        notification.setChallengeId(challengeId);
+        notification.setMemberId(memberId);
+        notification.setNotification(notificationType);
+        notification.setUntilDate(untilDate);
+        notificationService.send(notification);
     }
 }

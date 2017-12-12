@@ -1,4 +1,4 @@
-package org.chl.models;
+package org.chl.model;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;

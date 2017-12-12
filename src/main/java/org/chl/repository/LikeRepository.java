@@ -1,9 +1,8 @@
-package org.chl.repos;
+package org.chl.repository;
 
-import org.chl.models.Like;
+import org.chl.model.Like;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.math.BigInteger;
 import java.util.List;
 
 /**

@@ -1,8 +1,7 @@
 package org.chl.intf;
 
-import org.chl.models.FriendList;
-import org.chl.models.Like;
-import org.chl.models.Member;
+import org.chl.model.FriendList;
+import org.chl.model.Member;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
 

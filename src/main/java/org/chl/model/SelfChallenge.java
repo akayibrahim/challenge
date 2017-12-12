@@ -1,4 +1,4 @@
-package org.chl.models;
+package org.chl.model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.validation.annotation.Validated;

@@ -1,6 +1,6 @@
 package org.chl.intf;
 
-import org.chl.models.*;
+import org.chl.model.*;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
 

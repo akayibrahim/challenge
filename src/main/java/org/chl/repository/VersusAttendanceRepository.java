@@ -1,6 +1,6 @@
-package org.chl.repos;
+package org.chl.repository;
 
-import org.chl.models.VersusAttendance;
+import org.chl.model.VersusAttendance;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

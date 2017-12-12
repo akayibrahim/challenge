@@ -1,6 +1,6 @@
-package org.chl.repos;
+package org.chl.repository;
 
-import org.chl.models.Challenge;
+import org.chl.model.Challenge;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**

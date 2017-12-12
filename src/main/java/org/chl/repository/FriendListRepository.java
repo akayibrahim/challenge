@@ -1,7 +1,6 @@
-package org.chl.repos;
+package org.chl.repository;
 
-import org.chl.models.FriendList;
-import org.chl.models.Member;
+import org.chl.model.FriendList;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**

@@ -1,11 +1,9 @@
-package org.chl.models;
+package org.chl.model;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.validation.annotation.Validated;
-
-import java.math.BigInteger;
 
 /**
  * Created by ibrahim on 11/28/2017.
