@@ -1,5 +1,7 @@
 package org.chl.util;
 
+import java.util.Arrays;
+
 /**
  * Created by ibrahim on 11/28/2017.
  */
@@ -42,23 +44,6 @@ public class Constant {
 
         public String getMessage() {
             return message;
-        }
-    }
-
-    public enum SUBJECT {
-        RUN("run"),
-        READ_BOOK("read_book"),
-        SWIM("swim"),
-        PINBALL("pinball"),
-        PING_PONG("ping_pong"),
-        HOLIDAY("holiday"),
-        LEARN_LANGUAGE("learn_language"),
-        LOSING_WEIGHT("losing_weight");
-
-        private String name;
-
-        SUBJECT(String name) {
-            this.name = name;
         }
     }
 }

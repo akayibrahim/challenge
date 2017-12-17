@@ -2,6 +2,7 @@ package org.chl.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.chl.util.Constant;
+import org.chl.util.Subject;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -23,8 +24,9 @@ public class Challenge {
     private String challengerId;
 
     private String thinksAboutChallenge;
-    @NotEmpty(message="You need to pass the challengeSubject parameter")
-    private Constant.SUBJECT subject;
+    @NotNull(message="You need to pass the subject parameter")
+    @JsonProperty
+    private Subject subject;
     @NotNull(message="You need to pass the chlDate parameter")
     private Date chlDate;
     @NotNull(message="You need to pass the untilDate parameter")
@@ -141,11 +143,11 @@ public class Challenge {
         this.untilDate = untilDate;
     }
 
-    public Constant.SUBJECT getSubject() {
+    public Subject getSubject() {
         return subject;
     }
 
-    public void setSubject(Constant.SUBJECT subject) {
+    public void setSubject(Subject subject) {
         this.subject = subject;
     }
 }

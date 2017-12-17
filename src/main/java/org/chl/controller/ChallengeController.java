@@ -2,13 +2,12 @@ package org.chl.controller;
 
 import org.chl.model.*;
 import org.chl.service.ChallengeService;
+import org.chl.util.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jms.core.JmsTemplate;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Date;
 
 @RestController
 public class ChallengeController {
