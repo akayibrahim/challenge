@@ -2,14 +2,14 @@ package org.chl.service;
 
 import org.chl.intf.IChallengeService;
 import org.chl.model.*;
-import org.chl.repository.JoinAndProofAttendanceRepository;
-import org.chl.repository.VersusAttendanceRepository;
-import org.chl.repository.ChallengeRepository;
-import org.chl.repository.LikeRepository;
+import org.chl.repository.*;
 import org.chl.util.Constant;
+import org.chl.util.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,14 +23,18 @@ public class ChallengeService implements IChallengeService {
     private VersusAttendanceRepository versusRepo;
     private JoinAndProofAttendanceRepository joinAndProofRepo;
     private NotificationService notificationService;
+    private MemberService memberService;
+    private CommentRepository commentRepository;
 
     @Autowired
-    public ChallengeService(ChallengeRepository chlRepo, LikeRepository likeRepo, VersusAttendanceRepository versusRepo, JoinAndProofAttendanceRepository joinAndProofRepo, NotificationService notificationService) {
+    public ChallengeService(ChallengeRepository chlRepo, LikeRepository likeRepo, VersusAttendanceRepository versusRepo, JoinAndProofAttendanceRepository joinAndProofRepo, NotificationService notificationService, MemberService memberService, CommentRepository commentRepository) {
         this.chlRepo = chlRepo;
         this.likeRepo = likeRepo;
         this.versusRepo = versusRepo;
         this.joinAndProofRepo = joinAndProofRepo;
         this.notificationService = notificationService;
+        this.memberService = memberService;
+        this.commentRepository = commentRepository;
     }
 
     @Override
@@ -40,6 +44,8 @@ public class ChallengeService implements IChallengeService {
 
     @Override
     public VersusChallenge addVersusChallenge(VersusChallenge versusChl) {
+        Validation.doneValidationForVersus(versusChl.getDone(), versusChl.getFirstTeamScore(), versusChl.getSecondTeamScore());
+        versusChl.setType(Constant.TYPE.PRIVATE);
         chlRepo.save(versusChl);
         for (VersusAttendance versusAtt:versusChl.getVersusAttendanceList()) {
             versusAtt.setChallengeId(versusChl.getId());
@@ -51,6 +57,7 @@ public class ChallengeService implements IChallengeService {
 
     @Override
     public JoinAndProofChallenge addJoinChallenge(JoinAndProofChallenge joinChl) {
+        joinChl.setType(Constant.TYPE.PUBLIC);
         chlRepo.save(joinChl);
         for (JoinAttendance joinAtt:joinChl.getJoinAttendanceList()) {
             joinAtt.setChallengeId(joinChl.getId());
@@ -61,6 +68,7 @@ public class ChallengeService implements IChallengeService {
 
     @Override
     public SelfChallenge addSelfChallenge(SelfChallenge selfChl) {
+        selfChl.setType(Constant.TYPE.SELF);
         chlRepo.save(selfChl);
         return selfChl;
     }
@@ -72,18 +80,21 @@ public class ChallengeService implements IChallengeService {
         if(selfChl != null) {
             selfChl.setScore(score);
             selfChl.setDone(done);
+            selfChl.setUpdateDate(new Date());
             chlRepo.save(selfChl);
         }
     }
 
     @Override
     public void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore) {
+        Validation.doneValidationForVersus(true, firstTeamScore, secondTeamScore);
         Challenge chl = chlRepo.findOne(challengeId);
         VersusChallenge versusChl = (VersusChallenge) chl;
         if(versusChl != null) {
             versusChl.setFirstTeamScore(firstTeamScore);
             versusChl.setSecondTeamScore(secondTeamScore);
             versusChl.setDone(true);
+            versusChl.setUpdateDate(new Date());
             chlRepo.save(versusChl);
         }
     }
@@ -102,7 +113,8 @@ public class ChallengeService implements IChallengeService {
 
     @Override
     public Iterable<Challenge> getChallengesOfMember(String memberId) {
-        Iterable<Challenge> challenges = chlRepo.findAll(); // TODO
+        List<String> friendLists = memberService.getFriendList(memberId);
+        Iterable<Challenge> challenges = chlRepo.findChallenges(friendLists, Constant.TYPE.PUBLIC, new Sort(Sort.Direction.DESC,"order"));
         for (Challenge chl: challenges) {
             if(chl instanceof  VersusChallenge) {
                 VersusChallenge versusChl = (VersusChallenge) chl;
@@ -114,6 +126,9 @@ public class ChallengeService implements IChallengeService {
             List<Like> likes =  likeRepo.findByChallengeId(chl.getId());
             chl.setLikes(likes);
             chl.setCountOfLike(likes.size());
+            List<Comment> comments = commentRepository.findByChallengeId(chl.getId());
+            chl.setComments(comments);
+            chl.setCountOfComments(comments.size());
         }
         return challenges;
     }
@@ -140,5 +155,10 @@ public class ChallengeService implements IChallengeService {
         notification.setNotification(notificationType);
         notification.setUntilDate(untilDate);
         notificationService.send(notification);
+    }
+
+    @Override
+    public void commentAsTextToChallange(TextComment textComment) {
+        commentRepository.save(textComment);
     }
 }

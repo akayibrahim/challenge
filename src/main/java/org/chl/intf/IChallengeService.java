@@ -32,4 +32,6 @@ public interface IChallengeService {
     void acceptOrRejectChl(VersusAttendance chlAtt);
 
     void deleteChallenge(@Valid @NotEmpty String challengeId);
+
+    void commentAsTextToChallange(TextComment textComment);
 }

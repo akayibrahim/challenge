@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * Created by ibrahim on 11/24/2017.
@@ -22,5 +23,7 @@ public interface IMemberService {
 
     void addFriend(FriendList friendList);
 
-    Iterable<FriendList> getFriendList(@Valid @NotEmpty String memberId);
+    List<String> getFriendList(@Valid @NotEmpty String memberId);
+
+    Iterable<FriendList> getDetailFriendList(@Valid @NotEmpty String memberId);
 }

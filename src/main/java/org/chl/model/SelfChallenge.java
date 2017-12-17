@@ -1,5 +1,6 @@
 package org.chl.model;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.validation.annotation.Validated;
 
@@ -10,6 +11,8 @@ import org.springframework.validation.annotation.Validated;
 @Document
 public class SelfChallenge extends Challenge {
     private String score;
+    @NotEmpty(message="You need to pass the goal parameter")
+    private String goal;
 
     public String getScore() {
         return score;
@@ -17,5 +20,13 @@ public class SelfChallenge extends Challenge {
 
     public void setScore(String score) {
         this.score = score;
+    }
+
+    public String getGoal() {
+        return goal;
+    }
+
+    public void setGoal(String goal) {
+        this.goal = goal;
     }
 }

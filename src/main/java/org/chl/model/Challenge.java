@@ -1,6 +1,7 @@
 package org.chl.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.chl.util.Constant;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -23,7 +24,7 @@ public class Challenge {
 
     private String thinksAboutChallenge;
     @NotEmpty(message="You need to pass the challengeSubject parameter")
-    private String challengeSubject;
+    private Constant.SUBJECT subject;
     @NotNull(message="You need to pass the chlDate parameter")
     private Date chlDate;
     @NotNull(message="You need to pass the untilDate parameter")
@@ -31,6 +32,50 @@ public class Challenge {
     @NotNull(message="You need to pass the done parameter")
     @JsonProperty
     private Boolean done;
+    @NotNull(message="You need to pass the updateDate parameter")
+    private Date updateDate;
+
+    private List<Like> likes;
+
+    private int countOfLike;
+
+    private List<Comment> comments;
+
+    private int countOfComments;
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public int getCountOfComments() {
+        return countOfComments;
+    }
+
+    public void setCountOfComments(int countOfComments) {
+        this.countOfComments = countOfComments;
+    }
+
+    private Constant.TYPE type;
+
+    public Constant.TYPE getType() {
+        return type;
+    }
+
+    public void setType(Constant.TYPE type) {
+        this.type = type;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
 
     public Boolean getDone() {
         return done;
@@ -39,10 +84,6 @@ public class Challenge {
     public void setDone(Boolean done) {
         this.done = done;
     }
-
-    private List<Like> likes;
-
-    private int countOfLike;
 
     public int getCountOfLike() {
         return countOfLike;
@@ -84,14 +125,6 @@ public class Challenge {
         this.thinksAboutChallenge = thinksAboutChallenge;
     }
 
-    public String getChallengeSubject() {
-        return challengeSubject;
-    }
-
-    public void setChallengeSubject(String challengeSubject) {
-        this.challengeSubject = challengeSubject;
-    }
-
     public Date getChlDate() {
         return chlDate;
     }
@@ -106,5 +139,13 @@ public class Challenge {
 
     public void setUntilDate(Date untilDate) {
         this.untilDate = untilDate;
+    }
+
+    public Constant.SUBJECT getSubject() {
+        return subject;
+    }
+
+    public void setSubject(Constant.SUBJECT subject) {
+        this.subject = subject;
     }
 }

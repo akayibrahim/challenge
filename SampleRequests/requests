@@ -1,0 +1,183 @@
+http://localhost:8080/addJoinChallenge
+
+{
+	"challengerId":"5a344635b79afe21f052f636",
+	"thinksAboutChallenge": "Okuma?",
+	"challengeSubject": "10 Kitap!",
+	"chlDate": "2017-11-20",
+	"updateDate": "2017-11-20",
+	"untilDate": "2017-12-29",
+	"done": true,
+	"joinAttendanceList": [
+		{
+			"memberId":"5a344635b79afe21f052f636",
+			"join":true,
+			"proof":true
+		}
+	]
+}
+
+---------------------
+
+http://localhost:8080/addVersusChallenge
+
+{
+	"challengerId":"5a1f048318e6063778be8f78",
+	"thinksAboutChallenge": "Okuma?",
+	"challengeSubject": "10 Kitap!",
+	"chlDate": "2017-12-10",
+	"updateDate": "2017-11-20",
+	"untilDate": "2017-12-10",
+	"done": true,
+	"versusAttendanceList": [
+		{
+			"memberId":"5a1f048318e6063778be8f78",
+			"accept":false,
+			"firstTeamMember":true,
+			"secondTeamMember":false
+		},
+		{
+			"memberId":"5a1f04be18e6063778be8f79",
+			"accept":false,
+			"firstTeamMember":false,
+			"secondTeamMember":true
+		}
+	],
+    "firstTeamScore": "2",
+    "secondTeamScore": "3"
+}
+
+------------------
+
+http://localhost:8080/addSelfChallenge
+
+{
+	"challengerId":"5a1f048318e6063778be8f78",
+	"thinksAboutChallenge": "Dil Öğrenme?",
+	"challengeSubject": "Fransızca Öğrenme!",
+	"chlDate": "2017-11-20",
+	"updateDate": "2017-11-20",
+	"untilDate": "2017-12-29",
+	"done": true,
+	"score":"advance!"
+}
+
+----------------
+
+http://localhost:8080/joinToChallenge
+
+{
+	"challengeId":"5a2304aa3d35440a0c7b5779",
+	"memberId": "5a1f04be18e6063778be8f79",
+	"join": true,
+	"proof": false
+}
+
+-----------------
+
+http://localhost:8080/acceptOrRejectChl
+
+{
+	"challengeId":"5a23039c3d35440a0c7b5773",
+	"memberId": "5a1f048318e6063778be8f78",
+	"accept": true,
+    "firstTeamMember": true,
+    "secondTeamMember": false
+}
+
+------------------
+
+http://localhost:8080/addMember
+
+{
+	"name":"ibrahim",
+	"surname": "Akay",
+	"email": "ibrahim@hotmail.com",
+	"recordDate": "2017-11-20"
+}
+
+------------------
+
+http://localhost:8080/getFriendList
+
+[{"key":"memberId","value":"5a344635b79afe21f052f636","description":""}]
+
+-------------------
+
+http://localhost:8080/addFriend
+
+{
+	"memberId":"5a344635b79afe21f052f636",
+	"friendMemberId": "5a344627b79afe21f052f635"
+}
+
+--------------------
+
+http://localhost:8080/getMemberInfoByEmail
+
+[{"key":"email","value":"that_see@hotmail.com","description":""}]
+
+------------------
+
+http://localhost:8080/getMemberInfo
+
+------------------------------
+
+http://localhost:8080/getMembers
+
+--------------------
+
+http://localhost:8080/likeChallenge
+
+{
+	"challengeId":"5a23039c3d35440a0c7b5773",
+	"memberId": "5a1f04be18e6063778be8f79",
+	"date": "2017-11-20"
+}
+
+------------------
+
+http://localhost:8080/commentToChallange
+
+{
+	"challengeId":"5a34468ab79afe21f052f638",
+	"memberId": "5a344635b79afe21f052f636",
+	"date": "2017-11-20",
+	"text": "çok güzell!"
+}
+
+---------------------
+
+http://localhost:8080/getChallenges?memberId=5a344635b79afe21f052f636
+
+----------------------
+
+http://localhost:8080/updateProgressOrDoneForSelf
+
+[{"key":"challengeId","value":"5a265bfa3d3544265c119b0f","description":""},
+{"key":"score","value":"20","description":""},
+{"key":"done","value":"true","description":""}]
+
+---------------------
+
+http://localhost:8080/updateResultsOfVersus
+
+[{"key":"secondTeamScore","value":"2","description":""},
+{"key":"firstTeamScore","value":"3","description":""},
+{"key":"challengeId","value":"5a265b5d3d3544265c119b09","description":""}]
+
+----------------------------
+
+http://localhost:8080/deleteChallenge?challengeId=5a23043a3d35440a0c7b5776
+
+-------------------------
+
+http://localhost:8080/send
+
+{
+  "from":"you",
+  "to":"me",
+  "amount":200
+}
+
+----------------------

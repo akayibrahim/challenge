@@ -8,6 +8,9 @@ import org.chl.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by ibrahim on 11/24/2017.
  */
@@ -48,7 +51,17 @@ public class MemberService implements IMemberService {
     }
 
     @Override
-    public Iterable<FriendList> getFriendList(String memberId) {
+    public List<String> getFriendList(String memberId) {
+        Iterable<FriendList> friendLists = friendRepo.findByMemberId(memberId);
+        List<String> listOfFriend = new ArrayList<>();
+        for (FriendList friend:friendLists) {
+            listOfFriend.add(friend.getFriendMemberId());
+        }
+        return listOfFriend;
+    }
+
+    @Override
+    public Iterable<FriendList> getDetailFriendList(String memberId) {
         return friendRepo.findByMemberId(memberId);
     }
 }

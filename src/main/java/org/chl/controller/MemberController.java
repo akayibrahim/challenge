@@ -46,9 +46,9 @@ public class MemberController {
         return memberInfo;
     }
 
-    @RequestMapping(value = "/getFriendList")
-    public Iterable<FriendList> getFriendList(String memberId) {
-        Iterable<FriendList> friendList = memberService.getFriendList(memberId);
+    @RequestMapping(value = "/getDetailFriendList")
+    public Iterable<FriendList> getDetailFriendList(String memberId) {
+        Iterable<FriendList> friendList = memberService.getDetailFriendList(memberId);
         for (FriendList friend: friendList
              ) {
             friend.setFriendMemberInfo(memberService.getMemberInfo(friend.getFriendMemberId()));

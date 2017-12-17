@@ -76,4 +76,9 @@ public class ChallengeController {
     public void acceptOrRejectChl(@Valid @RequestBody VersusAttendance chlAtt) {
         chlService.acceptOrRejectChl(chlAtt);
     }
+
+    @RequestMapping(value = "/commentToChallange")
+    public void commentToChallange(@Valid @RequestBody TextComment textComment) {
+        chlService.commentAsTextToChallange(textComment);
+    }
 }

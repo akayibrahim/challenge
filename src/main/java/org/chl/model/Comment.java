@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Validated
 @Document
-public class Like {
+public class Comment {
     @Id
     private String id;
     @NotEmpty(message="You need to pass the challengeId parameter")

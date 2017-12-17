@@ -19,6 +19,12 @@ public class Constant {
         }
     }
 
+    public enum TYPE {
+        SELF,
+        PUBLIC,
+        PRIVATE;
+    }
+
     public enum PUSH_NOTIFICATION {
         DONE("Your challenge time is done!", "What is results?");
 
@@ -36,6 +42,23 @@ public class Constant {
 
         public String getMessage() {
             return message;
+        }
+    }
+
+    public enum SUBJECT {
+        RUN("run"),
+        READ_BOOK("read_book"),
+        SWIM("swim"),
+        PINBALL("pinball"),
+        PING_PONG("ping_pong"),
+        HOLIDAY("holiday"),
+        LEARN_LANGUAGE("learn_language"),
+        LOSING_WEIGHT("losing_weight");
+
+        private String name;
+
+        SUBJECT(String name) {
+            this.name = name;
         }
     }
 }
