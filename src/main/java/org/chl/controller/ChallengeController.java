@@ -40,6 +40,17 @@ public class ChallengeController {
         return challenge.getId();
     }
 
+    @RequestMapping(value = "/likeChallenge")
+    public void likeChallenge(@Valid @RequestBody Like like) {
+        chlService.likeChallange(like);
+    }
+
+    @RequestMapping(value = "/getChallenges")
+    public Iterable<Challenge> getChallenges(String memberId) {
+        Iterable<Challenge> challenges = chlService.getChallengesOfMember(memberId);
+        return challenges;
+    }
+    
     @RequestMapping(value = "/updateProgressOrDoneForSelf")
     public void updateProgressOrDoneForSelf(String challengeId, String score, Boolean done) {
         chlService.updateProgressOrDoneForSelf(challengeId, score, done);
@@ -50,20 +61,9 @@ public class ChallengeController {
         chlService.updateResultsOfVersus(challengeId, firstTeamScore, secondTeamScore);
     }
 
-    @RequestMapping(value = "/getChallenges")
-    public Iterable<Challenge> getChallenges(String memberId) {
-        Iterable<Challenge> challenges = chlService.getChallengesOfMember(memberId);
-        return challenges;
-    }
-
     @RequestMapping(value = "/deleteChallenge")
     public void deleteChallenge(String challengeId) {
         chlService.deleteChallenge(challengeId);
-    }
-
-    @RequestMapping(value = "/likeChallenge")
-    public void likeChallenge(@Valid @RequestBody Like like) {
-        chlService.likeChallange(like);
     }
 
     @RequestMapping(value = "/joinToChallenge")

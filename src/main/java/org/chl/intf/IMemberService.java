@@ -26,4 +26,6 @@ public interface IMemberService {
     List<String> getFriendList(@Valid @NotEmpty String memberId);
 
     Iterable<FriendList> getDetailFriendList(@Valid @NotEmpty String memberId);
+
+    Boolean checkMemberAvailable(String memberId);
 }

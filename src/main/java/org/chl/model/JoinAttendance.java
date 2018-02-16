@@ -18,6 +18,9 @@ public class JoinAttendance extends Attendance {
     @NotNull(message="You need to pass the proof parameter")
     @JsonProperty
     private Boolean proof;
+    @NotNull(message="You need to pass the challenger parameter")
+    @JsonProperty
+    private Boolean challenger;
 
     public Boolean getJoin() {
         return join;
@@ -33,5 +36,13 @@ public class JoinAttendance extends Attendance {
 
     public void setProof(Boolean proof) {
         this.proof = proof;
+    }
+
+    public Boolean getChallenger() {
+        return challenger;
+    }
+
+    public void setChallenger(Boolean challenger) {
+        this.challenger = challenger;
     }
 }

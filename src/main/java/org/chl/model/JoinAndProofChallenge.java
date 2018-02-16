@@ -13,6 +13,7 @@ import java.util.List;
 @Document
 public class JoinAndProofChallenge extends Challenge {
     private List<JoinAttendance> joinAttendanceList;
+
     @NotEmpty(message="You need to pass the goal parameter")
     private String goal;
 

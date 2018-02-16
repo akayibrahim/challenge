@@ -10,4 +10,18 @@ public class Validation {
         if(done & (StringUtils.isEmpty(firstTeamScore) || StringUtils.isEmpty(secondTeamScore)))
             Exception.throwDoneExceptionForVersus();
     }
+
+    public static void checkTeamCountEqual(String firstTeamCount, String secondTeamCount) {
+        if(!StringUtils.isEmpty(firstTeamCount) && !StringUtils.isEmpty(secondTeamCount) && !firstTeamCount.equals(secondTeamCount))
+            Exception.throwCheckEqualOfTeamCountExceptionForVersus();
+    }
+
+    public static void checkMemberAvaliable(Boolean isAvaliable) {
+        if(!isAvaliable)
+            Exception.throwMemberNotAvailable();
+    }
+
+    public static void challergerNotJoin() {
+            Exception.throwChallengerHasToJoin();
+    }
 }

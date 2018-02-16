@@ -26,8 +26,8 @@ public class NotificationService implements INotificationService {
     @Autowired
     private JmsTemplate jmsTemplate;
 
-    @Value("${jms.queue.destination}")
-    String destinationQueue;
+    @Value("${jms.queue.destination:CHL-QUEUE}")
+    private String destinationQueue;
 
     public void send(@RequestBody Notification notification) {
         if(notification instanceof PushNotification) {

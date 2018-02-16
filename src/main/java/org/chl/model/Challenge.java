@@ -22,6 +22,14 @@ public class Challenge {
     private String id;
     @NotEmpty(message="You need to pass the challengerId parameter")
     private String challengerId;
+    @NotEmpty(message="You need to pass the challengerId parameter")
+    private String challengerFBId;
+    @NotEmpty(message="You need to pass the challengerId parameter")
+    private String name;
+    @NotEmpty(message="You need to pass the challengerId parameter")
+    private String firstTeamCount;
+    @NotEmpty(message="You need to pass the challengerId parameter")
+    private String secondTeamCount;
 
     private String thinksAboutChallenge;
     @NotNull(message="You need to pass the subject parameter")
@@ -31,6 +39,8 @@ public class Challenge {
     private Date chlDate;
     @NotNull(message="You need to pass the untilDate parameter")
     private Date untilDate;
+
+    private String untilDateStr;
     @NotNull(message="You need to pass the done parameter")
     @JsonProperty
     private Boolean done;
@@ -149,5 +159,45 @@ public class Challenge {
 
     public void setSubject(Subject subject) {
         this.subject = subject;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getFirstTeamCount() {
+        return firstTeamCount;
+    }
+
+    public void setFirstTeamCount(String firstTeamCount) {
+        this.firstTeamCount = firstTeamCount;
+    }
+
+    public String getSecondTeamCount() {
+        return secondTeamCount;
+    }
+
+    public void setSecondTeamCount(String secondTeamCount) {
+        this.secondTeamCount = secondTeamCount;
+    }
+
+    public String getChallengerFBId() {
+        return challengerFBId;
+    }
+
+    public void setChallengerFBId(String challengerFBId) {
+        this.challengerFBId = challengerFBId;
+    }
+
+    public String getUntilDateStr() {
+        return untilDateStr;
+    }
+
+    public void setUntilDateStr(String untilDateStr) {
+        this.untilDateStr = untilDateStr;
     }
 }

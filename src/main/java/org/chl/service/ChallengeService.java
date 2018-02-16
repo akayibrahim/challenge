@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,17 +39,16 @@ public class ChallengeService implements IChallengeService {
     }
 
     @Override
-    public void likeChallange(Like like) {
-        likeRepo.save(like);
-    }
-
-    @Override
     public VersusChallenge addVersusChallenge(VersusChallenge versusChl) {
         Validation.doneValidationForVersus(versusChl.getDone(), versusChl.getFirstTeamScore(), versusChl.getSecondTeamScore());
+        Validation.checkTeamCountEqual(versusChl.getFirstTeamCount(), versusChl.getSecondTeamCount());
+        Validation.checkMemberAvaliable(memberService.checkMemberAvailable(versusChl.getChallengerId()));
         versusChl.setType(Constant.TYPE.PRIVATE);
         chlRepo.save(versusChl);
         for (VersusAttendance versusAtt:versusChl.getVersusAttendanceList()) {
+            Validation.checkMemberAvaliable(memberService.checkMemberAvailable(versusAtt.getMemberId()));
             versusAtt.setChallengeId(versusChl.getId());
+            versusAtt.setFacebookID(memberService.getMemberInfo(versusAtt.getMemberId()).getFacebookID());
             versusRepo.save(versusAtt);
             sendNotification(versusChl.getChallengerId(), versusAtt.getMemberId(), Constant.PUSH_NOTIFICATION.DONE, versusChl.getUntilDate());
         }
@@ -58,9 +58,15 @@ public class ChallengeService implements IChallengeService {
     @Override
     public JoinAndProofChallenge addJoinChallenge(JoinAndProofChallenge joinChl) {
         joinChl.setType(Constant.TYPE.PUBLIC);
+        Validation.checkMemberAvaliable(memberService.checkMemberAvailable(joinChl.getChallengerId()));
         chlRepo.save(joinChl);
         for (JoinAttendance joinAtt:joinChl.getJoinAttendanceList()) {
+            Validation.checkMemberAvaliable(memberService.checkMemberAvailable(joinAtt.getMemberId()));
             joinAtt.setChallengeId(joinChl.getId());
+            joinAtt.setFacebookID(memberService.getMemberInfo(joinAtt.getMemberId()).getFacebookID());
+            if(!joinChl.getChallengerId().equals(joinAtt.getMemberId()))
+                Validation.challergerNotJoin();
+            joinAtt.setChallenger(true);
             joinAndProofRepo.save(joinAtt);
         }
         return joinChl;
@@ -69,8 +75,14 @@ public class ChallengeService implements IChallengeService {
     @Override
     public SelfChallenge addSelfChallenge(SelfChallenge selfChl) {
         selfChl.setType(Constant.TYPE.SELF);
+        Validation.checkMemberAvaliable(memberService.checkMemberAvailable(selfChl.getChallengerId()));
         chlRepo.save(selfChl);
         return selfChl;
+    }
+
+    @Override
+    public void likeChallange(Like like) {
+        likeRepo.save(like);
     }
 
     @Override
@@ -119,9 +131,18 @@ public class ChallengeService implements IChallengeService {
             if(chl instanceof  VersusChallenge) {
                 VersusChallenge versusChl = (VersusChallenge) chl;
                 versusChl.setVersusAttendanceList(versusRepo.findByChallengeId(chl.getId()));
+                Integer teamSize = versusChl.getVersusAttendanceList().size() / 2;
+                versusChl.setFirstTeamCount(teamSize.toString());
+                versusChl.setSecondTeamCount(teamSize.toString());
             } else if(chl instanceof JoinAndProofChallenge) {
                 JoinAndProofChallenge joinChl = (JoinAndProofChallenge) chl;
                 joinChl.setJoinAttendanceList(joinAndProofRepo.findByChallengeId(chl.getId()));
+                Integer teamSize = joinChl.getJoinAttendanceList().size();
+                joinChl.setFirstTeamCount(BigDecimal.ONE.toString());
+                joinChl.setSecondTeamCount(teamSize.toString());
+            } else {
+                chl.setFirstTeamCount(BigDecimal.ONE.toString());
+                chl.setSecondTeamCount(BigDecimal.ZERO.toString());
             }
             List<Like> likes =  likeRepo.findByChallengeId(chl.getId());
             chl.setLikes(likes);
@@ -129,6 +150,10 @@ public class ChallengeService implements IChallengeService {
             List<Comment> comments = commentRepository.findByChallengeId(chl.getId());
             chl.setComments(comments);
             chl.setCountOfComments(comments.size());
+            Member memberInfo = memberService.getMemberInfo(chl.getChallengerId());
+            chl.setName(memberInfo.getName() + " " + memberInfo.getSurname());
+            chl.setChallengerFBId(memberInfo.getFacebookID());
+            chl.setUntilDateStr("LAST 14 DAYS!"); // TODO
         }
         return challenges;
     }

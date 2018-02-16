@@ -1,5 +1,6 @@
 package org.chl;
 
+import org.chl.controller.MemberController;
 import org.chl.model.FriendList;
 import org.chl.model.Member;
 import org.chl.repository.FriendListRepository;
@@ -26,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = MemberService.class)
 @SpringBootTest
-public class MemberTests {
+public class MemberControllerTests {
 
     @Autowired
     private MemberService memberService;
@@ -36,6 +37,9 @@ public class MemberTests {
 
     @MockBean
     private FriendListRepository friendListRepository;
+
+    @MockBean
+    private MemberController memberController;
 
     private static final String name = "ibrahim";
     private static final String surname = "akay";
@@ -51,8 +55,8 @@ public class MemberTests {
         member.setName(name);
         member.setSurname(surname);
         member.setEmail(email);
-        Mockito.when(memberRepo.findByEmail(member.getEmail())).thenReturn(member);
-        Mockito.when(memberRepo.findOne(member.getId())).thenReturn(member);
+        Mockito.when(memberController.getMemberInfoByEmail(member.getEmail())).thenReturn(member);
+        Mockito.when(memberController.getMemberInfo(member.getId())).thenReturn(member);
 
         FriendList friend = new FriendList();
         friend.setMemberId(memberId);
@@ -60,7 +64,7 @@ public class MemberTests {
         friend.setFollowed(true);
         List<FriendList> friendLists = new ArrayList<>();
         friendLists.add(friend);
-        Mockito.when(friendListRepository.findByMemberId(memberId)).thenReturn(friendLists);
+        Mockito.when(memberController.getDetailFriendList(memberId)).thenReturn(friendLists);
     }
 
     @Test
@@ -70,12 +74,12 @@ public class MemberTests {
         member.setName(name);
         member.setSurname(surname);
         member.setEmail(email);
-        memberService.addMember(member);
+        memberController.addMember(member);
     }
 
     @Test
     public void verifyGetMemberInfo() throws  Exception{
-        Member found = memberService.getMemberInfo(id);
+        Member found = memberController.getMemberInfo(id);
         assertThat(found.getEmail()).isEqualTo(email);
         assertThat(found.getName()).isEqualTo(name);
         assertThat(found.getSurname()).isEqualTo(surname);
@@ -84,10 +88,20 @@ public class MemberTests {
 
     @Test
     public void verifyGetMemberByEmail() throws  Exception{
-        Member found = memberService.getMemberInfoByEmail(email);
+        Member found = memberController.getMemberInfoByEmail(email);
         assertThat(found.getEmail()).isEqualTo(email);
         assertThat(found.getName()).isEqualTo(name);
         assertThat(found.getSurname()).isEqualTo(surname);
+    }
+
+    @Test
+    public void verifyGetFriendList() throws  Exception{
+        Iterable<FriendList> friendLists = memberController.getDetailFriendList(memberId);
+        for (FriendList friend:friendLists) {
+            assertThat(friend.getMemberId()).isEqualTo(memberId);
+            assertThat(friend.getFriendMemberId()).isEqualTo(friendMemberId);
+            assertThat(friend.getFollowed()).isEqualTo(true);
+        }
     }
 
     @Test
@@ -95,16 +109,6 @@ public class MemberTests {
         FriendList friendList = new FriendList();
         friendList.setMemberId(memberId);
         friendList.setFriendMemberId(friendMemberId);
-        friendListRepository.save(friendList);
-    }
-
-    @Test
-    public void verifyGetFriendList() throws  Exception{
-        Iterable<FriendList> friendLists = friendListRepository.findByMemberId(memberId);
-        for (FriendList friend:friendLists) {
-            assertThat(friend.getMemberId()).isEqualTo(memberId);
-            assertThat(friend.getFriendMemberId()).isEqualTo(friendMemberId);
-            assertThat(friend.getFollowed()).isEqualTo(true);
-        }
+        memberController.addFriend(friendList);
     }
 }

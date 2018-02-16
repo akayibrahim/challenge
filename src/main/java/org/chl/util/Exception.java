@@ -7,4 +7,16 @@ public class Exception {
     public static void throwDoneExceptionForVersus() {
         throw new IllegalArgumentException("if challange is done, teams Score are mandatory");
     }
+
+    public static void throwCheckEqualOfTeamCountExceptionForVersus() {
+        throw new IllegalArgumentException("Team count has to be equal.");
+    }
+
+    public static void throwMemberNotAvailable() {
+        throw new IllegalArgumentException("Member is not avaliable.");
+    }
+
+    public static void throwChallengerHasToJoin() {
+        throw new IllegalArgumentException("Challenger has to join.");
+    }
 }

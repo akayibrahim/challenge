@@ -17,6 +17,8 @@ public class Attendance {
     private String challengeId;
     @NotEmpty(message="You need to pass the memberId parameter")
     private String memberId;
+    @NotEmpty(message="You need to pass the recordDate parameter")
+    private String facebookID;
 
     public String getId() {
         return id;
@@ -40,5 +42,13 @@ public class Attendance {
 
     public void setMemberId(String memberId) {
         this.memberId = memberId;
+    }
+
+    public String getFacebookID() {
+        return facebookID;
+    }
+
+    public void setFacebookID(String facebookID) {
+        this.facebookID = facebookID;
     }
 }

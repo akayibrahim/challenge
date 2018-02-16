@@ -14,7 +14,9 @@ http://localhost:8080/addJoinChallenge
 			"join":true,
 			"proof":true
 		}
-	]
+	],
+	"goal": "10",
+	"subject": "read_book"
 }
 
 ---------------------

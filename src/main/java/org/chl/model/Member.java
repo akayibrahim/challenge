@@ -24,6 +24,8 @@ public class Member {
     private String email;
     @NotNull(message="You need to pass the recordDate parameter")
     private Date recordDate;
+    @NotEmpty(message="You need to pass the recordDate parameter")
+    private String facebookID;
 
     public String getId() {
         return id;
@@ -63,5 +65,13 @@ public class Member {
 
     public void setRecordDate(Date recordDate) {
         this.recordDate = recordDate;
+    }
+
+    public String getFacebookID() {
+        return facebookID;
+    }
+
+    public void setFacebookID(String facebookID) {
+        this.facebookID = facebookID;
     }
 }

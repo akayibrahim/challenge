@@ -64,4 +64,10 @@ public class MemberService implements IMemberService {
     public Iterable<FriendList> getDetailFriendList(String memberId) {
         return friendRepo.findByMemberId(memberId);
     }
+
+    @Override
+    public Boolean checkMemberAvailable(String memberId) {
+        Member member = memberRepo.findOne(memberId);
+        return member != null ? true : false;
+    }
 }
