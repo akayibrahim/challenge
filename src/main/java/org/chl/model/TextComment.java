@@ -1,10 +1,7 @@
 package org.chl.model;
 
-import org.chl.util.Constant;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 /**

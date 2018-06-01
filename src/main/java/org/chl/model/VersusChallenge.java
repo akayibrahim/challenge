@@ -12,24 +12,6 @@ import java.util.List;
 @Document
 public class VersusChallenge extends Challenge {
     private List<VersusAttendance> versusAttendanceList;
-    private String firstTeamScore;
-    private String secondTeamScore;
-
-    public String getFirstTeamScore() {
-        return firstTeamScore;
-    }
-
-    public void setFirstTeamScore(String firstTeamScore) {
-        this.firstTeamScore = firstTeamScore;
-    }
-
-    public String getSecondTeamScore() {
-        return secondTeamScore;
-    }
-
-    public void setSecondTeamScore(String secondTeamScore) {
-        this.secondTeamScore = secondTeamScore;
-    }
 
     public List<VersusAttendance> getVersusAttendanceList() {
         return versusAttendanceList;

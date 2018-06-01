@@ -36,31 +36,57 @@ public class Challenge {
     @JsonProperty
     private Subject subject;
     @NotNull(message="You need to pass the chlDate parameter")
-    private Date chlDate;
+    private Date chlDate; // use bg
     @NotNull(message="You need to pass the untilDate parameter")
-    private Date untilDate;
+    private Date untilDate; // use bg
 
     private String untilDateStr;
     @NotNull(message="You need to pass the done parameter")
     @JsonProperty
     private Boolean done;
     @NotNull(message="You need to pass the updateDate parameter")
-    private Date updateDate;
+    private Date updateDate; // use bg
+    @NotNull(message="You need to pass the isComeFromSelf parameter")
+    @JsonProperty
+    private Boolean comeFromSelf;
+    @JsonProperty
+    private Boolean supportFirstTeam;
+    @JsonProperty
+    private Boolean supportSecondTeam;
 
-    private List<Like> likes;
+    private int firstTeamSupportCount;
 
-    private int countOfLike;
+    private int secondTeamSupportCount;
 
-    private List<Comment> comments;
+    private int countOfProofs;
+
+    private String insertTime;
+
+    private String status;
+
+    @JsonProperty
+    private Boolean proofed;
 
     private int countOfComments;
 
-    public List<Comment> getComments() {
-        return comments;
+    private String firstTeamScore;
+
+    private String secondTeamScore;
+
+    public String getFirstTeamScore() {
+        return firstTeamScore;
     }
 
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
+    public void setFirstTeamScore(String firstTeamScore) {
+        this.firstTeamScore = firstTeamScore;
+    }
+
+    public String getSecondTeamScore() {
+        return secondTeamScore;
+    }
+
+    public void setSecondTeamScore(String secondTeamScore) {
+        this.secondTeamScore = secondTeamScore;
     }
 
     public int getCountOfComments() {
@@ -95,22 +121,6 @@ public class Challenge {
 
     public void setDone(Boolean done) {
         this.done = done;
-    }
-
-    public int getCountOfLike() {
-        return countOfLike;
-    }
-
-    public void setCountOfLike(int countOfLike) {
-        this.countOfLike = countOfLike;
-    }
-
-    public List<Like> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(List<Like> likes) {
-        this.likes = likes;
     }
 
     public String getId() {
@@ -199,5 +209,77 @@ public class Challenge {
 
     public void setUntilDateStr(String untilDateStr) {
         this.untilDateStr = untilDateStr;
+    }
+
+    public Boolean getSupportFirstTeam() {
+        return supportFirstTeam;
+    }
+
+    public void setSupportFirstTeam(Boolean supportFirstTeam) {
+        this.supportFirstTeam = supportFirstTeam;
+    }
+
+    public Boolean getSupportSecondTeam() {
+        return supportSecondTeam;
+    }
+
+    public void setSupportSecondTeam(Boolean supportSecondTeam) {
+        this.supportSecondTeam = supportSecondTeam;
+    }
+
+    public int getFirstTeamSupportCount() {
+        return firstTeamSupportCount;
+    }
+
+    public void setFirstTeamSupportCount(int firstTeamSupportCount) {
+        this.firstTeamSupportCount = firstTeamSupportCount;
+    }
+
+    public int getSecondTeamSupportCount() {
+        return secondTeamSupportCount;
+    }
+
+    public void setSecondTeamSupportCount(int secondTeamSupportCount) {
+        this.secondTeamSupportCount = secondTeamSupportCount;
+    }
+
+    public int getCountOfProofs() {
+        return countOfProofs;
+    }
+
+    public void setCountOfProofs(int countOfProofs) {
+        this.countOfProofs = countOfProofs;
+    }
+
+    public String getInsertTime() {
+        return insertTime;
+    }
+
+    public void setInsertTime(String insertTime) {
+        this.insertTime = insertTime;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Boolean getProofed() {
+        return proofed;
+    }
+
+    public void setProofed(Boolean proofed) {
+        this.proofed = proofed;
+    }
+
+    public Boolean getComeFromSelf() {
+        return comeFromSelf;
+    }
+
+    public void setComeFromSelf(Boolean comeFromSelf) {
+        this.comeFromSelf = comeFromSelf;
     }
 }

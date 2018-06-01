@@ -21,6 +21,23 @@ public class Constant {
         }
     }
 
+    public enum STATUS {
+        FINISH("has finished challenge"),
+        JOIN("has joined challenge"),
+        PROOF("has proofed challenge"),
+        NEW("has a new challenge");
+
+        private String status;
+
+        STATUS(String status) {
+            this.status = status;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+    }
+
     public enum TYPE {
         SELF,
         PUBLIC,

@@ -1,6 +1,7 @@
 killall mongod
 
 "/Users/iakay/software tools/mongodb/bin/mongod"
+"/Users/iakay/software tools/mongodb/bin/mongo"
 
 "/broker/bin/artemis" run
 

@@ -1,8 +1,10 @@
 package org.chl.service;
 
+import com.google.common.collect.Lists;
 import org.chl.intf.IChallengeService;
 import org.chl.model.*;
 import org.chl.repository.*;
+import org.chl.util.Calculations;
 import org.chl.util.Constant;
 import org.chl.util.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,7 @@ import java.util.List;
 @Service
 public class ChallengeService implements IChallengeService {
     private ChallengeRepository chlRepo;
-    private LikeRepository likeRepo;
+    private SupportRepository supoortRepo;
     private VersusAttendanceRepository versusRepo;
     private JoinAndProofAttendanceRepository joinAndProofRepo;
     private NotificationService notificationService;
@@ -28,14 +30,93 @@ public class ChallengeService implements IChallengeService {
     private CommentRepository commentRepository;
 
     @Autowired
-    public ChallengeService(ChallengeRepository chlRepo, LikeRepository likeRepo, VersusAttendanceRepository versusRepo, JoinAndProofAttendanceRepository joinAndProofRepo, NotificationService notificationService, MemberService memberService, CommentRepository commentRepository) {
+    public ChallengeService(ChallengeRepository chlRepo, SupportRepository supoortRepo, VersusAttendanceRepository versusRepo, JoinAndProofAttendanceRepository joinAndProofRepo, NotificationService notificationService, MemberService memberService, CommentRepository commentRepository) {
         this.chlRepo = chlRepo;
-        this.likeRepo = likeRepo;
+        this.supoortRepo = supoortRepo;
         this.versusRepo = versusRepo;
         this.joinAndProofRepo = joinAndProofRepo;
         this.notificationService = notificationService;
         this.memberService = memberService;
         this.commentRepository = commentRepository;
+    }
+
+    @Override
+    public Iterable<Challenge> getChallenges(String memberId) {
+        List<String> friendLists = memberService.getFriendList(memberId);
+        Iterable<Challenge> challenges = chlRepo.findChallenges(friendLists, Constant.TYPE.PUBLIC, new Sort(Sort.Direction.DESC,"order"));
+        prepareChallengesData(memberId, challenges);
+        return challenges;
+    }
+
+    @Override
+    public Iterable<Challenge> getChallengesOfMember(String memberId) {
+        Iterable<Challenge> challengesByMemberId = chlRepo.findChallengesByMemberId(memberId, new Sort(Sort.Direction.DESC,"order"));
+        List<Challenge> challenges = Lists.newArrayList(challengesByMemberId);
+        List<VersusAttendance> versusAttendanceList = versusRepo.findByMemberIdInAttendace(memberId);
+        List<JoinAttendance> joinAttendanceList = joinAndProofRepo.findByMemberIdInAttendace(memberId);
+        List<String> challangeIdList = new ArrayList<>();
+        for (VersusAttendance versus:  versusAttendanceList) {
+            challangeIdList.add(versus.getChallengeId());
+        }
+        for (JoinAttendance join:  joinAttendanceList) {
+            challangeIdList.add(join.getChallengeId());
+        }
+        Iterable<Challenge> restChallenges = chlRepo.findChallengesByChallengeIdList(challangeIdList, new Sort(Sort.Direction.DESC,"order"));
+        List<Challenge> restChallengeList = Lists.newArrayList(restChallenges);
+        challenges.addAll(restChallengeList);
+        prepareChallengesData(memberId, challenges);
+        return challenges;
+    }
+
+    private void prepareChallengesData(String memberId, Iterable<Challenge> challenges) {
+        for (Challenge chl: challenges) {
+            if(chl instanceof VersusChallenge) {
+                VersusChallenge versusChl = (VersusChallenge) chl;
+                versusChl.setVersusAttendanceList(versusRepo.findByChallengeId(chl.getId()));
+                Integer teamSize = versusChl.getVersusAttendanceList().size() / 2;
+                versusChl.setFirstTeamCount(teamSize.toString());
+                versusChl.setSecondTeamCount(teamSize.toString());
+            } else if(chl instanceof JoinAndProofChallenge) {
+                JoinAndProofChallenge joinChl = (JoinAndProofChallenge) chl;
+                joinChl.setJoinAttendanceList(joinAndProofRepo.findByChallengeId(chl.getId()));
+                Integer teamSize = joinChl.getJoinAttendanceList().size();
+                joinChl.setFirstTeamCount(BigDecimal.ONE.toString());
+                joinChl.setSecondTeamCount(teamSize.toString());
+            } else {
+                chl.setFirstTeamCount(BigDecimal.ONE.toString());
+                chl.setSecondTeamCount(BigDecimal.ZERO.toString());
+            }
+            List<TextComment> commentAndProofs = commentRepository.findByChallengeId(chl.getId());
+            chl.setCountOfComments(commentAndProofs.size());
+            Member memberInfo = memberService.getMemberInfo(chl.getChallengerId());
+            chl.setName(memberInfo.getName() + " " + memberInfo.getSurname());
+            chl.setChallengerFBId(memberInfo.getFacebookID());
+            chl.setComeFromSelf(false);
+            Support memberSupport =  supoortRepo.findByMemberId(memberId);
+            chl.setSupportFirstTeam(memberSupport != null ? memberSupport.getSupportFirstTeam() : false);
+            chl.setSupportSecondTeam(memberSupport != null ? memberSupport.getSupportSecondTeam() : false);
+            List<Support> supports =  supoortRepo.findByChallengeIdAndSupportFirstTeam(chl.getId(), true);
+            chl.setFirstTeamSupportCount(supports != null ? supports.size() : 0);
+            List<Support> supportSecondTeam =  supoortRepo.findByChallengeIdAndSupportSecondTeam(chl.getId(), true);
+            chl.setSecondTeamSupportCount(supportSecondTeam != null ? supportSecondTeam.size() : 0);
+            List<JoinAttendance> proofs = joinAndProofRepo.findByChallengeId(chl.getId());
+            chl.setCountOfProofs(proofs != null ? proofs.size() : 0);
+            JoinAttendance proofOfMember = joinAndProofRepo.findByChallengeIdAndMemberId(chl.getId(), memberId);
+            chl.setProofed(proofOfMember != null ? proofOfMember.getProof() : false);
+            chl.setFirstTeamScore(chl.getFirstTeamScore() != null ? chl.getFirstTeamScore() : "-");
+            chl.setSecondTeamScore(chl.getSecondTeamScore() != null ? chl.getSecondTeamScore() : "-");
+            chl.setUntilDateStr(Calculations.calculateUntilDate(chl.getUntilDate()));
+            chl.setInsertTime(Calculations.calculateInsertTime(chl.getChlDate()));
+            if (proofOfMember != null && proofOfMember.getProof()) {
+                chl.setStatus(Constant.STATUS.PROOF.getStatus());
+            } else if (proofOfMember != null && proofOfMember.getJoin()) {
+                chl.setStatus(Constant.STATUS.JOIN.getStatus());
+            } else if (!chl.getDone()) {
+                chl.setStatus(Constant.STATUS.NEW.getStatus());
+            } else if (chl.getDone()) {
+                chl.setStatus(Constant.STATUS.FINISH.getStatus());
+            }
+        }
     }
 
     @Override
@@ -81,8 +162,8 @@ public class ChallengeService implements IChallengeService {
     }
 
     @Override
-    public void likeChallange(Like like) {
-        likeRepo.save(like);
+    public void likeChallange(Support support) {
+        supoortRepo.save(support);
     }
 
     @Override
@@ -119,43 +200,8 @@ public class ChallengeService implements IChallengeService {
     }
 
     @Override
-    public Iterable<Challenge> getChallenges() {
+    public Iterable<Challenge> getAllChallenges() {
         return chlRepo.findAll();
-    }
-
-    @Override
-    public Iterable<Challenge> getChallengesOfMember(String memberId) {
-        List<String> friendLists = memberService.getFriendList(memberId);
-        Iterable<Challenge> challenges = chlRepo.findChallenges(friendLists, Constant.TYPE.PUBLIC, new Sort(Sort.Direction.DESC,"order"));
-        for (Challenge chl: challenges) {
-            if(chl instanceof  VersusChallenge) {
-                VersusChallenge versusChl = (VersusChallenge) chl;
-                versusChl.setVersusAttendanceList(versusRepo.findByChallengeId(chl.getId()));
-                Integer teamSize = versusChl.getVersusAttendanceList().size() / 2;
-                versusChl.setFirstTeamCount(teamSize.toString());
-                versusChl.setSecondTeamCount(teamSize.toString());
-            } else if(chl instanceof JoinAndProofChallenge) {
-                JoinAndProofChallenge joinChl = (JoinAndProofChallenge) chl;
-                joinChl.setJoinAttendanceList(joinAndProofRepo.findByChallengeId(chl.getId()));
-                Integer teamSize = joinChl.getJoinAttendanceList().size();
-                joinChl.setFirstTeamCount(BigDecimal.ONE.toString());
-                joinChl.setSecondTeamCount(teamSize.toString());
-            } else {
-                chl.setFirstTeamCount(BigDecimal.ONE.toString());
-                chl.setSecondTeamCount(BigDecimal.ZERO.toString());
-            }
-            List<Like> likes =  likeRepo.findByChallengeId(chl.getId());
-            chl.setLikes(likes);
-            chl.setCountOfLike(likes.size());
-            List<Comment> comments = commentRepository.findByChallengeId(chl.getId());
-            chl.setComments(comments);
-            chl.setCountOfComments(comments.size());
-            Member memberInfo = memberService.getMemberInfo(chl.getChallengerId());
-            chl.setName(memberInfo.getName() + " " + memberInfo.getSurname());
-            chl.setChallengerFBId(memberInfo.getFacebookID());
-            chl.setUntilDateStr("LAST 14 DAYS!"); // TODO
-        }
-        return challenges;
     }
 
     @Override

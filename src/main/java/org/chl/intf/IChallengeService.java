@@ -11,6 +11,10 @@ import javax.validation.Valid;
  */
 @Validated
 public interface IChallengeService {
+    Iterable<Challenge> getChallenges(@Valid @NotEmpty String memberId);
+
+    Iterable<Challenge> getChallengesOfMember(@Valid @NotEmpty String memberId);
+
     VersusChallenge addVersusChallenge(VersusChallenge versusChl);
 
     JoinAndProofChallenge addJoinChallenge(JoinAndProofChallenge joinChl);
@@ -21,11 +25,9 @@ public interface IChallengeService {
 
     void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore);
 
-    Iterable<Challenge> getChallenges();
+    Iterable<Challenge> getAllChallenges();
 
-    Iterable<Challenge> getChallengesOfMember(@Valid @NotEmpty String memberId);
-
-    void likeChallange(Like like);
+    void likeChallange(Support support);
 
     JoinAttendance joinToChallenge(JoinAttendance join);
 

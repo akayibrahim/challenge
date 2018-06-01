@@ -2,6 +2,7 @@ package org.chl.repository;
 
 import org.chl.model.VersusAttendance;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 
@@ -12,4 +13,7 @@ public interface VersusAttendanceRepository extends MongoRepository<VersusAttend
     VersusAttendance findByMemberIdAndChallengeId(String  memberId, String challengeId);
 
     List<VersusAttendance> findByChallengeId(String challengeId);
+
+    @Query(" {'memberId' : ?0 }" )
+    List<VersusAttendance> findByMemberIdInAttendace(String memberId);
 }

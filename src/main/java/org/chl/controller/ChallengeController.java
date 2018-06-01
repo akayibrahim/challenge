@@ -2,9 +2,7 @@ package org.chl.controller;
 
 import org.chl.model.*;
 import org.chl.service.ChallengeService;
-import org.chl.util.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -14,12 +12,16 @@ public class ChallengeController {
     @Autowired
     private ChallengeService chlService;
 
-    public ChallengeService getChlService() {
-        return chlService;
+    @RequestMapping(value = "/getChallenges")
+    public Iterable<Challenge> getChallenges(String memberId) {
+        Iterable<Challenge> challenges = chlService.getChallenges(memberId);
+        return challenges;
     }
 
-    public void setChlService(ChallengeService chlService) {
-        this.chlService = chlService;
+    @RequestMapping(value = "/getChallengesOfMember")
+    public Iterable<Challenge> getChallengesOfMember(String memberId) {
+        Iterable<Challenge> challenges = chlService.getChallengesOfMember(memberId);
+        return challenges;
     }
 
     @RequestMapping(value = "/addJoinChallenge")
@@ -41,16 +43,10 @@ public class ChallengeController {
     }
 
     @RequestMapping(value = "/likeChallenge")
-    public void likeChallenge(@Valid @RequestBody Like like) {
-        chlService.likeChallange(like);
+    public void likeChallenge(@Valid @RequestBody Support support) {
+        chlService.likeChallange(support);
     }
 
-    @RequestMapping(value = "/getChallenges")
-    public Iterable<Challenge> getChallenges(String memberId) {
-        Iterable<Challenge> challenges = chlService.getChallengesOfMember(memberId);
-        return challenges;
-    }
-    
     @RequestMapping(value = "/updateProgressOrDoneForSelf")
     public void updateProgressOrDoneForSelf(String challengeId, String score, Boolean done) {
         chlService.updateProgressOrDoneForSelf(challengeId, score, done);
@@ -79,5 +75,13 @@ public class ChallengeController {
     @RequestMapping(value = "/commentToChallange")
     public void commentToChallange(@Valid @RequestBody TextComment textComment) {
         chlService.commentAsTextToChallange(textComment);
+    }
+
+    public ChallengeService getChlService() {
+        return chlService;
+    }
+
+    public void setChlService(ChallengeService chlService) {
+        this.chlService = chlService;
     }
 }

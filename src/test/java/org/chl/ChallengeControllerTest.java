@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -42,7 +41,7 @@ public class ChallengeControllerTest {
     private ChallengeRepository challengeRepository;
 
     @MockBean
-    private LikeRepository likeRepo;
+    private SupportRepository likeRepo;
 
     @MockBean
     private VersusAttendanceRepository versusRepo;
@@ -87,11 +86,11 @@ public class ChallengeControllerTest {
 
     @Test
     public void verifyLikeChallenge() throws  Exception{
-        Like like = new Like();
-        like.setChallengeId(VERSUS_CHALLENGER_ID);
-        like.setDate(new Date());
-        like.setMemberId(memberId);
-        challengeController.likeChallenge(like);
+        Support support = new Support();
+        support.setChallengeId(VERSUS_CHALLENGER_ID);
+        support.setDate(new Date());
+        support.setMemberId(memberId);
+        challengeController.likeChallenge(support);
     }
 
     @Test
