@@ -1,5 +1,6 @@
 package org.chl.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,7 +14,7 @@ import java.util.Date;
  */
 @Validated
 @Document
-public class Like {
+public class Support {
     @Id
     private String id;
     @NotEmpty(message="You need to pass the challengeId parameter")
@@ -22,6 +23,26 @@ public class Like {
     private String memberId;
     @NotNull(message="You need to pass the date parameter")
     private Date date;
+    @JsonProperty
+    private Boolean supportFirstTeam;
+    @JsonProperty
+    private Boolean supportSecondTeam;
+
+    public Boolean getSupportFirstTeam() {
+        return supportFirstTeam;
+    }
+
+    public void setSupportFirstTeam(Boolean supportFirstTeam) {
+        this.supportFirstTeam = supportFirstTeam;
+    }
+
+    public Boolean getSupportSecondTeam() {
+        return supportSecondTeam;
+    }
+
+    public void setSupportSecondTeam(Boolean supportSecondTeam) {
+        this.supportSecondTeam = supportSecondTeam;
+    }
 
     public Date getDate() {
         return date;
