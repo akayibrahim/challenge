@@ -24,6 +24,18 @@ public class ChallengeController {
         return challenges;
     }
 
+    @RequestMapping(value = "/getExplorerChallenges")
+    public Iterable<Challenge> getExplorerChallenges(String memberId, String challengeId, Boolean addSimilarChallanges) {
+        Iterable<Challenge> challenges = chlService.getExplorerChallenges(memberId, challengeId, addSimilarChallanges);
+        return challenges;
+    }
+
+    @RequestMapping(value = "/getTrendChallenges")
+    public Iterable<Trends> getTrendsChallenges(String memberId) {
+        Iterable<Trends> trends = chlService.getTrendChallenges(memberId);
+        return trends;
+    }
+
     @RequestMapping(value = "/addJoinChallenge")
     public String addJoinChallenge(@Valid @RequestBody JoinAndProofChallenge joinChl) {
         Challenge challenge = chlService.addJoinChallenge(joinChl);

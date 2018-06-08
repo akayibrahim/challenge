@@ -17,7 +17,7 @@ public class Attendance {
     private String challengeId;
     @NotEmpty(message="You need to pass the memberId parameter")
     private String memberId;
-    @NotEmpty(message="You need to pass the recordDate parameter")
+    @NotEmpty(message="You need to pass the facebookID parameter")
     private String facebookID;
 
     public String getId() {

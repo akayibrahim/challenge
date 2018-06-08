@@ -12,29 +12,28 @@ import java.util.concurrent.TimeUnit;
 public class Calculations {
     public static String calculateUntilDate(Date untilDate) {
         String untilDateStr = "LAST ";
-        long diff = getDateDiff(untilDate, new Date(),TimeUnit.DAYS);
-        long modeOfDiff = diff % 7;
-        if (modeOfDiff == 0) {
+        long diff = getDateDiff(new Date(), untilDate,TimeUnit.DAYS);
+        if (diff <= 7) {
             untilDateStr += diff + " DAYS!";
         } else {
-            untilDateStr += modeOfDiff + " WEEKS!";
+            untilDateStr += diff / 7 + " WEEKS!";
         }
         return untilDateStr;
     }
 
     public static String calculateInsertTime(Date insertDate) {
         String insertDateStr = "";
-        long diff = getDateDiff(insertDate,new Date(),TimeUnit.DAYS);
+        long diff = getDateDiff(insertDate, new Date(),TimeUnit.DAYS);
         if (diff == 0) {
-            long diffOfHours = getDateDiff(insertDate,new Date(),TimeUnit.HOURS);
-            if (diffOfHours != 0) {
-                long diffOfMin = getDateDiff(insertDate,new Date(),TimeUnit.MINUTES);
+            long diffOfHours = getDateDiff(insertDate, new Date(),TimeUnit.HOURS);
+            if (diffOfHours == 0) {
+                long diffOfMin = getDateDiff(insertDate, new Date(), TimeUnit.MINUTES);
                 insertDateStr = diffOfMin + " MINUTES AGO";
             } else {
                 insertDateStr = diffOfHours + " HOURS AGO";
             }
         } else {
-            SimpleDateFormat dt1 = new SimpleDateFormat("dd-MMM-yyyyy");
+            SimpleDateFormat dt1 = new SimpleDateFormat("dd-MMM-yyyy");
             insertDateStr = dt1.format(insertDate);
         }
         return insertDateStr;

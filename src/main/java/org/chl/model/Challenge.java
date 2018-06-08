@@ -22,31 +22,31 @@ public class Challenge {
     private String id;
     @NotEmpty(message="You need to pass the challengerId parameter")
     private String challengerId;
-    @NotEmpty(message="You need to pass the challengerId parameter")
+    @NotEmpty(message="You need to pass the challengerFBId parameter")
     private String challengerFBId;
-    @NotEmpty(message="You need to pass the challengerId parameter")
+    @NotEmpty(message="You need to pass the name parameter")
     private String name;
-    @NotEmpty(message="You need to pass the challengerId parameter")
+    @NotEmpty(message="You need to pass the firstTeamCount parameter")
     private String firstTeamCount;
-    @NotEmpty(message="You need to pass the challengerId parameter")
+    @NotEmpty(message="You need to pass the secondTeamCount parameter")
     private String secondTeamCount;
 
     private String thinksAboutChallenge;
     @NotNull(message="You need to pass the subject parameter")
     @JsonProperty
     private Subject subject;
-    @NotNull(message="You need to pass the chlDate parameter")
+
     private Date chlDate; // use bg
     @NotNull(message="You need to pass the untilDate parameter")
-    private Date untilDate; // use bg
+    private String untilDate; // use bg
 
     private String untilDateStr;
     @NotNull(message="You need to pass the done parameter")
     @JsonProperty
     private Boolean done;
-    @NotNull(message="You need to pass the updateDate parameter")
+
     private Date updateDate; // use bg
-    @NotNull(message="You need to pass the isComeFromSelf parameter")
+
     @JsonProperty
     private Boolean comeFromSelf;
     @JsonProperty
@@ -155,11 +155,11 @@ public class Challenge {
         this.chlDate = chlDate;
     }
 
-    public Date getUntilDate() {
+    public String getUntilDate() {
         return untilDate;
     }
 
-    public void setUntilDate(Date untilDate) {
+    public void setUntilDate(String untilDate) {
         this.untilDate = untilDate;
     }
 

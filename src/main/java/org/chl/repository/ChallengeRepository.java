@@ -1,7 +1,6 @@
 package org.chl.repository;
 
 import org.chl.model.Challenge;
-import org.chl.model.Member;
 import org.chl.util.Constant;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -22,4 +21,6 @@ public interface ChallengeRepository extends MongoRepository<Challenge, String> 
 
     @Query(" { 'id' : {$in : ?0} }")
     Iterable<Challenge> findChallengesByChallengeIdList(List<String> challengeIdList, Sort sort);
+
+    Iterable<Challenge> findChallengesBySubjectAndType(String subject, Constant.TYPE type, Sort sort);
 }

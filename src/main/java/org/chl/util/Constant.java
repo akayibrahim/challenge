@@ -44,6 +44,11 @@ public class Constant {
         PRIVATE;
     }
 
+    public enum POPULARITY {
+        SUPPORT,
+        COMMENT
+    }
+
     public enum PUSH_NOTIFICATION {
         DONE("Your challenge time is done!", "What is results?");
 

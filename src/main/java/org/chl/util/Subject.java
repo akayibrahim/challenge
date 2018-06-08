@@ -9,18 +9,17 @@ import java.util.Arrays;
  * Created by ibrahim on 12/17/2017.
  */
 public enum Subject {
-    RUN("run"),
-    READ_BOOK("read_book"),
-    SWIM("swim"),
-    PINBALL("pinball"),
-    PING_PONG("ping_pong"),
-    HOLIDAY("holiday"),
-    LEARN_LANGUAGE("learn_language"),
-    LOSING_WEIGHT("losing_weight");
+    RUNNING,
+    READ_BOOK, // TODO change to READING
+    SWIMMING,
+    PINBALL,
+    PING_PONG,
+    HOLIDAY,
+    LEARNING_LANGUAGE,
+    LOSING_WEIGHT;
 
-    private String name;
-
-    Subject(String name) {
+    /*
+    Subject() {
         this.name = name;
     }
 
@@ -39,4 +38,5 @@ public enum Subject {
     public String toString() {
         return String.valueOf(name);
     }
+    */
 }

@@ -15,6 +15,10 @@ public interface IChallengeService {
 
     Iterable<Challenge> getChallengesOfMember(@Valid @NotEmpty String memberId);
 
+    Iterable<Challenge> getExplorerChallenges(@Valid @NotEmpty String memberId, String challengeId, Boolean addSimilarChallanges);
+
+    Iterable<Trends> getTrendChallenges(String memberId);
+
     VersusChallenge addVersusChallenge(VersusChallenge versusChl);
 
     JoinAndProofChallenge addJoinChallenge(JoinAndProofChallenge joinChl);

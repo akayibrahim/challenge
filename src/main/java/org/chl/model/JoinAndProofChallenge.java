@@ -14,22 +14,11 @@ import java.util.List;
 public class JoinAndProofChallenge extends Challenge {
     private List<JoinAttendance> joinAttendanceList;
 
-    @NotEmpty(message="You need to pass the goal parameter")
-    private String goal;
-
     public List<JoinAttendance> getJoinAttendanceList() {
         return joinAttendanceList;
     }
 
     public void setJoinAttendanceList(List<JoinAttendance> joinAttendanceList) {
         this.joinAttendanceList = joinAttendanceList;
-    }
-
-    public String getGoal() {
-        return goal;
-    }
-
-    public void setGoal(String goal) {
-        this.goal = goal;
     }
 }
