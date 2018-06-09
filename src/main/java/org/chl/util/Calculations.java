@@ -13,7 +13,10 @@ public class Calculations {
     public static String calculateUntilDate(Date untilDate) {
         String untilDateStr = "LAST ";
         long diff = getDateDiff(new Date(), untilDate,TimeUnit.DAYS);
-        if (diff <= 7) {
+        long diffOfHours = getDateDiff(new Date() ,untilDate ,TimeUnit.HOURS);
+        if (diff == 0) {
+            untilDateStr += diffOfHours + " HOURS!";
+        } else if (diff <= 7) {
             untilDateStr += diff + " DAYS!";
         } else {
             untilDateStr += diff / 7 + " WEEKS!";

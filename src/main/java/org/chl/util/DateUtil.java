@@ -7,7 +7,7 @@ import java.util.Date;
 public class DateUtil {
     public static Date covertToDate(String strDate) {
         try {
-            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm");
             Date date = formatter.parse(strDate);
             return date;
         } catch (ParseException e) {

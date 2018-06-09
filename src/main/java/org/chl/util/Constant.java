@@ -25,6 +25,7 @@ public class Constant {
         FINISH("has finished challenge"),
         JOIN("has joined challenge"),
         PROOF("has proofed challenge"),
+        NEW_PROOF("has a new proofed challenge"),
         NEW("has a new challenge");
 
         private String status;

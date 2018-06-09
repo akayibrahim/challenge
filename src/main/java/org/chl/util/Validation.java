@@ -19,9 +19,9 @@ public class Validation {
     public static boolean checkMemberAvaliable(Boolean isAvaliable) {
         if(!isAvaliable) {
             Exception.throwMemberNotAvailable();
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     public static void challergerNotJoin() {
