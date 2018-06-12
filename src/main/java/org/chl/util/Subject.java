@@ -9,20 +9,26 @@ import java.util.Arrays;
  * Created by ibrahim on 12/17/2017.
  */
 public enum Subject {
-    RUNNING,
-    READ_BOOK, // TODO change to READING
-    SWIMMING,
-    PINBALL,
-    PING_PONG,
-    HOLIDAY,
-    LEARNING_LANGUAGE,
-    LOSING_WEIGHT;
+    RUNNING(true),
+    READING(true),
+    WALKING(true),
+    SWIMMING(true),
+    PINBALL(false),
+    PING_PONG(false),
+    HOLIDAY(true),
+    LANGUAGE(true),
+    FOOTBALL(false),
+    BASKETBALL(false),
+    GOLF(false),
+    DRIVING(false),
+    LOSING_WEIGHT(true);
 
-    /*
-    Subject() {
-        this.name = name;
+    Boolean isSelf;
+
+    Subject(Boolean isSelf) {
+        this.isSelf= isSelf;
     }
-
+    /*
     @JsonCreator
     public static Subject fromName(String name) {
         for (Subject subject : values()) {

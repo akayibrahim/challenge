@@ -121,11 +121,9 @@ public class ChallengeControllerTest {
 
     @Test
     public void verifyJoinToChallenge() throws  Exception{
-        JoinAttendance att = new JoinAttendance();
+        JoinToChallenge att = new JoinToChallenge();
         att.setMemberId(memberId);
-        att.setFacebookID(CHALLENGER_FB_ID);
         att.setChallengeId(CHALLENGE_ID);
-        att.setProof(false);
         att.setJoin(true);
         challengeController.joinToChallenge(att);
     }
@@ -145,7 +143,7 @@ public class ChallengeControllerTest {
     @Test
     public void verifyCommentToChallange() throws  Exception{
         TextComment comment = new TextComment();
-        comment.setText("wonderfull!");
+        comment.setComment("wonderfull!");
         comment.setChallengeId(CHALLENGE_ID);
         comment.setDate(new Date());
         comment.setMemberId(memberId);
@@ -162,7 +160,7 @@ public class ChallengeControllerTest {
         selfChl.setSecondTeamCount("0");
         selfChl.setName("ibrahim akay");
         selfChl.setType(Constant.TYPE.SELF);
-        selfChl.setSubject(Subject.READ_BOOK);
+        selfChl.setSubject(Subject.READING);
         selfChl.setThinksAboutChallenge("read 10 book!");
         selfChl.setUntilDateStr("Last 14 days!");
         return selfChl;
@@ -203,7 +201,7 @@ public class ChallengeControllerTest {
         joinChl.setSecondTeamCount("2");
         joinChl.setName("ibrahim akay");
         joinChl.setType(Constant.TYPE.PUBLIC);
-        joinChl.setSubject(Subject.READ_BOOK);
+        joinChl.setSubject(Subject.READING);
         joinChl.setThinksAboutChallenge("read 10 book!");
         joinChl.setUntilDateStr("Last 14 days!");
         return joinChl;
@@ -253,7 +251,7 @@ public class ChallengeControllerTest {
         versusChl.setSecondTeamCount("2");
         versusChl.setName(CHALLANGER_NAME);
         versusChl.setType(Constant.TYPE.PRIVATE);
-        versusChl.setSubject(Subject.READ_BOOK);
+        versusChl.setSubject(Subject.READING);
         versusChl.setThinksAboutChallenge("read 10 book!");
         versusChl.setUntilDateStr("Last 14 days!");
         return versusChl;

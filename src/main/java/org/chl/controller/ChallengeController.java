@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Date;
 
 @RestController
 public class ChallengeController {
@@ -54,9 +55,35 @@ public class ChallengeController {
         return challenge.getId();
     }
 
-    @RequestMapping(value = "/likeChallenge")
+    @RequestMapping(value = "/getSubjects")
+    public Iterable<Subjects> getSubjects() {
+        return chlService.getSubjects(false);
+    }
+
+    @RequestMapping(value = "/getSelfSubjects")
+    public Iterable<Subjects> getSelfSubjects() {
+        return chlService.getSubjects(true);
+    }
+
+    @RequestMapping(value = "/commentToChallange")
+    public void commentToChallange(@Valid @RequestBody TextComment textComment) {
+        chlService.commentAsTextToChallange(textComment);
+    }
+
+    @RequestMapping(value = "/getComments")
+    public Iterable<TextComment> getComments(String challengeId) {
+        return chlService.getComments(challengeId);
+    }
+
+    @RequestMapping(value = "/supportChallenge")
     public void likeChallenge(@Valid @RequestBody Support support) {
-        chlService.likeChallange(support);
+        support.setDate(new Date());
+        chlService.supportChallange(support);
+    }
+
+    @RequestMapping(value = "/joinToChallenge")
+    public void joinToChallenge(@Valid @RequestBody JoinToChallenge joinToChallenge) {
+        chlService.joinToChallenge(joinToChallenge);
     }
 
     @RequestMapping(value = "/updateProgressOrDoneForSelf")
@@ -74,19 +101,9 @@ public class ChallengeController {
         chlService.deleteChallenge(challengeId);
     }
 
-    @RequestMapping(value = "/joinToChallenge")
-    public void joinToChallenge(@Valid @RequestBody JoinAttendance join) {
-        chlService.joinToChallenge(join);
-    }
-
     @RequestMapping(value = "/acceptOrRejectChl")
     public void acceptOrRejectChl(@Valid @RequestBody VersusAttendance chlAtt) {
         chlService.acceptOrRejectChl(chlAtt);
-    }
-
-    @RequestMapping(value = "/commentToChallange")
-    public void commentToChallange(@Valid @RequestBody TextComment textComment) {
-        chlService.commentAsTextToChallange(textComment);
     }
 
     public ChallengeService getChlService() {

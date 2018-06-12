@@ -16,14 +16,6 @@ public class Validation {
             Exception.throwCheckEqualOfTeamCountExceptionForVersus();
     }
 
-    public static boolean checkMemberAvaliable(Boolean isAvaliable) {
-        if(!isAvaliable) {
-            Exception.throwMemberNotAvailable();
-            return false;
-        }
-        return true;
-    }
-
     public static void challergerNotJoin() {
             Exception.throwChallengerHasToJoin();
     }

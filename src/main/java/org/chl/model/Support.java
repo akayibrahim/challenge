@@ -21,7 +21,7 @@ public class Support {
     private String challengeId;
     @NotEmpty(message="You need to pass the memberId parameter")
     private String memberId;
-    @NotNull(message="You need to pass the date parameter")
+
     private Date date;
     @JsonProperty
     private Boolean supportFirstTeam;

@@ -16,6 +16,10 @@ public class Exception {
         throw new IllegalArgumentException("Member is not avaliable.");
     }
 
+    public static void throwNotFoundRecord() {
+        throw new IllegalArgumentException("Record not found.");
+    }
+
     public static void throwChallengerHasToJoin() {
         throw new IllegalArgumentException("Challenger has to join.");
     }

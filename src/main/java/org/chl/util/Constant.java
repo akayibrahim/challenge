@@ -1,6 +1,10 @@
 package org.chl.util;
 
+import org.chl.model.Subjects;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by ibrahim on 11/28/2017.
@@ -68,5 +72,17 @@ public class Constant {
         public String getMessage() {
             return message;
         }
+    }
+
+    public static List<Subjects> toList(Subject[] values, boolean isSelf) {
+        List<Subjects> subjects = new ArrayList<>();
+        for (Subject subject : values) {
+            if (isSelf && !subject.isSelf)
+                continue;
+            Subjects sub = new Subjects();
+            sub.setName(subject.toString().replace("_", " "));
+            subjects.add(sub);
+        }
+        return subjects;
     }
 }

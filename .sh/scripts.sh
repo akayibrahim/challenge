@@ -34,4 +34,5 @@ killall mongod
 commands
     - use chl
     - show collections
-    -
+    - db.joinAttendance.update( { "_id": ObjectId("5b1fb4a21cb19924cc638840") }, { $set: {"join": true, "proof": false} } )
+    - db.challenge.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )

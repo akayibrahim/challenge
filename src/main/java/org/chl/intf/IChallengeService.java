@@ -25,15 +25,19 @@ public interface IChallengeService {
 
     SelfChallenge addSelfChallenge(SelfChallenge selfChl);
 
+    Iterable<Subjects> getSubjects(boolean isSelf);
+
+    Iterable<TextComment> getComments(String challengeId);
+
     void updateProgressOrDoneForSelf(String challengeId, String score, Boolean done);
 
     void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore);
 
     Iterable<Challenge> getAllChallenges();
 
-    void likeChallange(Support support);
+    void supportChallange(Support support);
 
-    JoinAttendance joinToChallenge(JoinAttendance join);
+    void joinToChallenge(JoinToChallenge joinToChallenge);
 
     void acceptOrRejectChl(VersusAttendance chlAtt);
 
