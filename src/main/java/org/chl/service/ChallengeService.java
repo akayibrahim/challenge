@@ -45,7 +45,7 @@ public class ChallengeService implements IChallengeService {
 
     @Override
     public Iterable<Challenge> getChallenges(String memberId) {
-        List<String> friendLists = memberService.getFriendList(memberId);
+        List<String> friendLists = memberService.getFollowingIdList(memberId);
         Iterable<Challenge> challenges = chlRepo.findChallenges(friendLists, Constant.TYPE.PUBLIC, new Sort(Sort.Direction.DESC,"id"));
         prepareChallengesData(memberId, challenges, false);
         return challenges;

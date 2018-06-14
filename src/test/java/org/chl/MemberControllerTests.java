@@ -62,9 +62,9 @@ public class MemberControllerTests {
         friend.setMemberId(memberId);
         friend.setFriendMemberId(friendMemberId);
         friend.setFollowed(true);
-        List<FriendList> friendLists = new ArrayList<>();
-        friendLists.add(friend);
-        Mockito.when(memberController.getDetailFriendList(memberId)).thenReturn(friendLists);
+        List<Member> friendLists = new ArrayList<>();
+        friendLists.add(member);
+        Mockito.when(memberController.getFollowingList(memberId)).thenReturn(friendLists);
     }
 
     @Test
@@ -96,12 +96,14 @@ public class MemberControllerTests {
 
     @Test
     public void verifyGetFriendList() throws  Exception{
-        Iterable<FriendList> friendLists = memberController.getDetailFriendList(memberId);
+        /*
+        List<FriendList> friendLists = memberController.getFollowingList(memberId);
         for (FriendList friend:friendLists) {
             assertThat(friend.getMemberId()).isEqualTo(memberId);
             assertThat(friend.getFriendMemberId()).isEqualTo(friendMemberId);
             assertThat(friend.getFollowed()).isEqualTo(true);
         }
+        */
     }
 
     @Test
@@ -109,6 +111,6 @@ public class MemberControllerTests {
         FriendList friendList = new FriendList();
         friendList.setMemberId(memberId);
         friendList.setFriendMemberId(friendMemberId);
-        memberController.addFriend(friendList);
+        memberController.followingFriend(friendList);
     }
 }

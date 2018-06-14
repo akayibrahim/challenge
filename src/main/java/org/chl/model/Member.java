@@ -18,7 +18,7 @@ public class Member {
     private String id;
     @NotEmpty(message="You need to pass the name parameter")
     private String name;
-    @NotEmpty(message="You need to pass the surnameparameter")
+    @NotEmpty(message="You need to pass the surname parameter")
     private String surname;
     @NotEmpty(message="You need to pass the email parameter")
     private String email;

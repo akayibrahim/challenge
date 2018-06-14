@@ -8,4 +8,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  */
 public interface FriendListRepository extends MongoRepository<FriendList, String> {
     Iterable<FriendList> findByMemberId(String  memberId);
+
+    Iterable<FriendList> findByMemberIdAndFollowed(String  memberId, Boolean followed);
 }

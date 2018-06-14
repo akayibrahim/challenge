@@ -21,11 +21,11 @@ public interface IMemberService {
 
     Iterable<Member> getMembers();
 
-    void addFriend(FriendList friendList);
+    void followingFriend(FriendList friendList);
 
-    List<String> getFriendList(@Valid @NotEmpty String memberId);
-
-    Iterable<FriendList> getDetailFriendList(@Valid @NotEmpty String memberId);
+    Iterable<FriendList> getFollowingList(@Valid @NotEmpty String memberId);
 
     Boolean checkMemberAvailable(String memberId);
+
+    List<FriendList> getSuggestionsForFollowing(String memberId);
 }

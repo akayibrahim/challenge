@@ -20,7 +20,15 @@ public class FriendList {
 
     private Member friendMemberInfo;
     @NotEmpty(message="You need to pass the isFollowed parameter")
-    private Boolean isFollowed;
+    private Boolean followed;
+
+    public Boolean getFollowed() {
+        return followed;
+    }
+
+    public void setFollowed(Boolean followed) {
+        this.followed = followed;
+    }
 
     public Member getFriendMemberInfo() {
         return friendMemberInfo;
@@ -54,11 +62,4 @@ public class FriendList {
         this.friendMemberId = friendMemberId;
     }
 
-    public Boolean getFollowed() {
-        return isFollowed;
-    }
-
-    public void setFollowed(Boolean followed) {
-        isFollowed = followed;
-    }
 }

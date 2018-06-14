@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class MemberController {
@@ -46,18 +48,28 @@ public class MemberController {
         return memberInfo;
     }
 
-    @RequestMapping(value = "/getDetailFriendList")
-    public Iterable<FriendList> getDetailFriendList(String memberId) {
-        Iterable<FriendList> friendList = memberService.getDetailFriendList(memberId);
-        for (FriendList friend: friendList
-             ) {
-            friend.setFriendMemberInfo(memberService.getMemberInfo(friend.getFriendMemberId()));
+    @RequestMapping(value = "/getFollowingList")
+    public List<Member> getFollowingList(String memberId) {
+        List<Member> memberList = new ArrayList<>();
+        Iterable<FriendList> friendList = memberService.getFollowingList(memberId);
+        for (FriendList friend: friendList) {
+            memberList.add(memberService.getMemberInfo(friend.getFriendMemberId()));
         }
-        return friendList;
+        return memberList;
     }
 
-    @RequestMapping(value = "/addFriend")
-    public void addFriend(@RequestBody FriendList friendList) {
-        memberService.addFriend(friendList);
+    @RequestMapping(value = "/followingFriend")
+    public void followingFriend(@RequestBody FriendList friendList) {
+        memberService.followingFriend(friendList);
+    }
+
+    @RequestMapping(value = "/getSuggestionsForFollowing")
+    public List<Member> getSuggestionsForFollowing(String memberId) {
+        List<Member> memberList = new ArrayList<>();
+        Iterable<FriendList> friendList = memberService.getSuggestionsForFollowing(memberId);
+        for (FriendList friend: friendList) {
+            memberList.add(memberService.getMemberInfo(friend.getFriendMemberId()));
+        }
+        return memberList;
     }
 }

@@ -1,5 +1,6 @@
 package org.chl.service;
 
+import com.google.common.collect.Lists;
 import org.chl.intf.IMemberService;
 import org.chl.model.FriendList;
 import org.chl.model.Member;
@@ -46,13 +47,18 @@ public class MemberService implements IMemberService {
     }
 
     @Override
-    public void addFriend(FriendList friendList) {
+    public void followingFriend(FriendList friendList) {
         friendRepo.save(friendList);
     }
 
     @Override
-    public List<String> getFriendList(String memberId) {
-        Iterable<FriendList> friendLists = friendRepo.findByMemberId(memberId);
+    public Iterable<FriendList> getFollowingList(String memberId) {
+        Iterable<FriendList> friendLists = friendRepo.findByMemberIdAndFollowed(memberId, true);
+        return friendLists;
+    }
+
+    public List<String> getFollowingIdList(String memberId) {
+        Iterable<FriendList> friendLists = friendRepo.findByMemberIdAndFollowed(memberId, true);
         List<String> listOfFriend = new ArrayList<>();
         for (FriendList friend:friendLists) {
             listOfFriend.add(friend.getFriendMemberId());
@@ -60,14 +66,17 @@ public class MemberService implements IMemberService {
         return listOfFriend;
     }
 
-    @Override
-    public Iterable<FriendList> getDetailFriendList(String memberId) {
-        return friendRepo.findByMemberId(memberId);
-    }
 
     @Override
     public Boolean checkMemberAvailable(String memberId) {
         Member member = memberRepo.findOne(memberId);
         return member != null ? true : false;
+    }
+
+    @Override
+    public List<FriendList> getSuggestionsForFollowing(String memberId) {
+        Iterable<FriendList> friendLists = friendRepo.findByMemberIdAndFollowed(memberId, false);
+        List<FriendList> friends = Lists.newArrayList(friendLists);
+        return friends;
     }
 }
