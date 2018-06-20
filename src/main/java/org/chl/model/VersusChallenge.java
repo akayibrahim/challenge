@@ -16,15 +16,24 @@ public class VersusChallenge extends Challenge {
 
     private int visibility;
 
-    @NotEmpty(message="You need to pass the score parameter")
-    private String score;
+    private String firstTeamScore;
 
-    public String getScore() {
-        return score;
+    private String secondTeamScore;
+
+    public String getFirstTeamScore() {
+        return firstTeamScore;
     }
 
-    public void setScore(String score) {
-        this.score = score;
+    public void setFirstTeamScore(String firstTeamScore) {
+        this.firstTeamScore = firstTeamScore;
+    }
+
+    public String getSecondTeamScore() {
+        return secondTeamScore;
+    }
+
+    public void setSecondTeamScore(String secondTeamScore) {
+        this.secondTeamScore = secondTeamScore;
     }
 
     public int getVisibility() {

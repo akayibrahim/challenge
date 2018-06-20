@@ -22,6 +22,17 @@ public class FriendList {
     @NotEmpty(message="You need to pass the isFollowed parameter")
     private Boolean followed;
 
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    private Boolean deleted;
+
+
     public Boolean getFollowed() {
         return followed;
     }

@@ -58,9 +58,24 @@ public class MemberController {
         return memberList;
     }
 
+    @RequestMapping(value = "/getFollowerList")
+    public List<Member> getFollowerList(String memberId) {
+        List<Member> memberList = new ArrayList<>();
+        Iterable<FriendList> friendList = memberService.getFollowerList(memberId);
+        for (FriendList friend: friendList) {
+            memberList.add(memberService.getMemberInfo(friend.getMemberId()));
+        }
+        return memberList;
+    }
+
     @RequestMapping(value = "/followingFriend")
-    public void followingFriend(@RequestBody FriendList friendList) {
-        memberService.followingFriend(friendList);
+    public void followingFriend(String friendMemberId, String memberId, Boolean follow) {
+        memberService.followingFriend(friendMemberId, memberId, follow);
+    }
+
+    @RequestMapping(value = "/deleteSuggestion")
+    public void deleteSuggestion(String friendMemberId, String memberId) {
+        memberService.deleteSuggestion(friendMemberId, memberId);
     }
 
     @RequestMapping(value = "/getSuggestionsForFollowing")

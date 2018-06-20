@@ -111,6 +111,6 @@ public class MemberControllerTests {
         FriendList friendList = new FriendList();
         friendList.setMemberId(memberId);
         friendList.setFriendMemberId(friendMemberId);
-        memberController.followingFriend(friendList);
+        memberController.followingFriend(friendMemberId ,memberId, true);
     }
 }

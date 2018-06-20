@@ -69,26 +69,6 @@ public class Challenge {
 
     private int countOfComments;
 
-    private String firstTeamScore;
-
-    private String secondTeamScore;
-
-    public String getFirstTeamScore() {
-        return firstTeamScore;
-    }
-
-    public void setFirstTeamScore(String firstTeamScore) {
-        this.firstTeamScore = firstTeamScore;
-    }
-
-    public String getSecondTeamScore() {
-        return secondTeamScore;
-    }
-
-    public void setSecondTeamScore(String secondTeamScore) {
-        this.secondTeamScore = secondTeamScore;
-    }
-
     public int getCountOfComments() {
         return countOfComments;
     }

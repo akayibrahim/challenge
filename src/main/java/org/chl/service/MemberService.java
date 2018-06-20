@@ -6,6 +6,7 @@ import org.chl.model.FriendList;
 import org.chl.model.Member;
 import org.chl.repository.FriendListRepository;
 import org.chl.repository.MemberRepository;
+import org.chl.util.Exception;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,13 +48,41 @@ public class MemberService implements IMemberService {
     }
 
     @Override
-    public void followingFriend(FriendList friendList) {
-        friendRepo.save(friendList);
+    public void followingFriend(String friendMemberId, String memberId, Boolean follow) {
+        FriendList exist = friendRepo.findByFriendMemberIdAndMemberId(friendMemberId, memberId);
+        if (exist != null) {
+            exist.setFollowed(follow);
+            friendRepo.save(exist);
+        } else {
+            FriendList friendList = new FriendList();
+            friendList.setDeleted(false);
+            friendList.setFollowed(follow);
+            friendList.setFriendMemberId(friendMemberId);
+            friendList.setMemberId(memberId);
+            friendRepo.save(friendList);
+        }
+    }
+
+    @Override
+    public void deleteSuggestion(String friendMemberId, String memberId) {
+        FriendList exist = friendRepo.findByFriendMemberIdAndMemberId(friendMemberId, memberId);
+        if (exist != null && !exist.getFollowed()) {
+            exist.setFollowed(false);
+            exist.setDeleted(true);
+            friendRepo.save(exist);
+        } else
+            Exception.throwNotFoundRecord();
     }
 
     @Override
     public Iterable<FriendList> getFollowingList(String memberId) {
         Iterable<FriendList> friendLists = friendRepo.findByMemberIdAndFollowed(memberId, true);
+        return friendLists;
+    }
+
+    @Override
+    public Iterable<FriendList> getFollowerList(String memberId) {
+        Iterable<FriendList> friendLists = friendRepo.findByFriendMemberIdAndFollowed(memberId, true);
         return friendLists;
     }
 

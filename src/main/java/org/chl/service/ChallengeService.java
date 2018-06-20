@@ -116,6 +116,8 @@ public class ChallengeService implements IChallengeService {
                 Integer teamSize = versusChl.getVersusAttendanceList().size() / 2;
                 versusChl.setFirstTeamCount((teamSize).toString());
                 versusChl.setSecondTeamCount(teamSize.toString());
+                versusChl.setFirstTeamScore(versusChl.getFirstTeamScore() != null ? versusChl.getFirstTeamScore() : "-");
+                versusChl.setSecondTeamScore(versusChl.getSecondTeamScore() != null ? versusChl.getSecondTeamScore() : "-");
             } else if(chl instanceof JoinAndProofChallenge) {
                 JoinAndProofChallenge joinChl = (JoinAndProofChallenge) chl;
                 joinChl.setJoinAttendanceList(joinAndProofRepo.findByChallengeId(chl.getId()));
@@ -143,8 +145,6 @@ public class ChallengeService implements IChallengeService {
             chl.setCountOfProofs(proofs != null ? proofs.size() : 0);
             JoinAttendance proofOfMember = joinAndProofRepo.findByChallengeIdAndMemberId(chl.getId(), memberId);
             chl.setProofed(proofOfMember != null ? proofOfMember.getProof() : false);
-            chl.setFirstTeamScore(chl.getFirstTeamScore() != null ? chl.getFirstTeamScore() : "-");
-            chl.setSecondTeamScore(chl.getSecondTeamScore() != null ? chl.getSecondTeamScore() : "-");
             chl.setUntilDateStr(Calculations.calculateUntilDate(DateUtil.covertToDate(chl.getUntilDate())));
             chl.setInsertTime(Calculations.calculateInsertTime(chl.getChlDate()));
             if (proofOfMember != null && proofOfMember.getProof() && proofOfMember.getChallenger()) {
@@ -173,6 +173,7 @@ public class ChallengeService implements IChallengeService {
             if (!memberService.checkMemberAvailable(versusAtt.getMemberId()))
                 Exception.throwMemberNotAvailable();
         }
+        versusChl.setChlDate(new Date());
         chlRepo.save(versusChl);
         for (VersusAttendance versusAtt:versusChl.getVersusAttendanceList()) {
             if (versusAtt.getMemberId().equals(versusChl.getChallengerId()))
@@ -259,15 +260,16 @@ public class ChallengeService implements IChallengeService {
     }
 
     @Override
-    public void updateProgressOrDoneForSelf(String challengeId, String score, Boolean done) {
+    public void updateProgressOrDoneForSelf(String challengeId, String result, Boolean done) {
         Challenge chl = chlRepo.findOne(challengeId);
         SelfChallenge selfChl = (SelfChallenge) chl;
-        if(selfChl != null) {
-            selfChl.setScore(score);
+        if(selfChl != null && !selfChl.getDone()) {
             selfChl.setDone(done);
+            selfChl.setResult(result);
             selfChl.setUpdateDate(new Date());
             chlRepo.save(selfChl);
-        }
+        } else
+            Exception.throwUpdateCannotForDone();
     }
 
     @Override
@@ -275,13 +277,14 @@ public class ChallengeService implements IChallengeService {
         Validation.doneValidationForVersus(true, firstTeamScore, secondTeamScore);
         Challenge chl = chlRepo.findOne(challengeId);
         VersusChallenge versusChl = (VersusChallenge) chl;
-        if(versusChl != null) {
+        if(versusChl != null && !versusChl.getDone()) {
             versusChl.setFirstTeamScore(firstTeamScore);
             versusChl.setSecondTeamScore(secondTeamScore);
             versusChl.setDone(true);
             versusChl.setUpdateDate(new Date());
             chlRepo.save(versusChl);
-        }
+        } else
+            Exception.throwUpdateCannotForDone();
     }
 
     @Override

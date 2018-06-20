@@ -87,8 +87,8 @@ public class ChallengeController {
     }
 
     @RequestMapping(value = "/updateProgressOrDoneForSelf")
-    public void updateProgressOrDoneForSelf(String challengeId, String score, Boolean done) {
-        chlService.updateProgressOrDoneForSelf(challengeId, score, done);
+    public void updateProgressOrDoneForSelf(String challengeId, String result, Boolean done) {
+        chlService.updateProgressOrDoneForSelf(challengeId, result, done);
     }
 
     @RequestMapping(value = "/updateResultsOfVersus")

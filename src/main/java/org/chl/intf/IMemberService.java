@@ -21,9 +21,13 @@ public interface IMemberService {
 
     Iterable<Member> getMembers();
 
-    void followingFriend(FriendList friendList);
+    void followingFriend(@Valid @NotEmpty String friendMemberId, String memberId, Boolean follow);
+
+    void deleteSuggestion(@Valid @NotEmpty String friendMemberId, String memberId);
 
     Iterable<FriendList> getFollowingList(@Valid @NotEmpty String memberId);
+
+    Iterable<FriendList> getFollowerList(String memberId);
 
     Boolean checkMemberAvailable(String memberId);
 

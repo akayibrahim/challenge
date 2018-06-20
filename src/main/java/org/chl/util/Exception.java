@@ -23,4 +23,8 @@ public class Exception {
     public static void throwChallengerHasToJoin() {
         throw new IllegalArgumentException("Challenger has to join.");
     }
+
+    public static void throwUpdateCannotForDone() {
+        throw new IllegalArgumentException("Done challenge cannot update.");
+    }
 }

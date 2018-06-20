@@ -10,13 +10,11 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @Document
 public class SelfChallenge extends Challenge {
-    private String score;
     @NotEmpty(message="You need to pass the goal parameter")
     private String goal;
 
     private int visibility;
 
-    @NotEmpty(message="You need to pass the result parameter")
     private String result;
 
     public String getResult() {
@@ -33,14 +31,6 @@ public class SelfChallenge extends Challenge {
 
     public void setVisibility(int visibility) {
         this.visibility = visibility;
-    }
-
-    public String getScore() {
-        return score;
-    }
-
-    public void setScore(String score) {
-        this.score = score;
     }
 
     public String getGoal() {
