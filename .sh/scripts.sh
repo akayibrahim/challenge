@@ -1,11 +1,12 @@
 killall mongod
 
 "/Users/iakay/software tools/mongodb/bin/mongod"
-"/Users/iakay/software tools/mongodb/bin/mongo"
 
 "/broker/bin/artemis" run
 
+"/Users/iakay/software tools/mongodb/bin/mongo"
 
+http://localhost:8080/downloadImage?challengeId=5b2cdaf41cb199833bc830ca&memberId=5b1a97bbcb353e79ca335a38
 
 > help
         db.help()                    help on db methods

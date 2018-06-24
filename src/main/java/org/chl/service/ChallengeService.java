@@ -78,7 +78,7 @@ public class ChallengeService implements IChallengeService {
     @Override
     public Iterable<Challenge> getExplorerChallenges(String memberId, String challengeId, Boolean addSimilarChallanges) {
         List<Challenge> challenges = new ArrayList<>();
-        Challenge explorerChallenge = chlRepo.findOne(challengeId);
+        Challenge explorerChallenge = chlRepo.findById(challengeId).get();
         challenges.add(explorerChallenge);
         if (addSimilarChallanges) {
             Iterable<Challenge> subjectChallenges = chlRepo.findChallengesBySubjectAndType(explorerChallenge.getSubject().toString(), Constant.TYPE.PUBLIC
@@ -96,7 +96,7 @@ public class ChallengeService implements IChallengeService {
         List<Trends> trendList = new ArrayList<>();
         Iterable<TrendChallenge> trendChallenges = trendChallengeRepository.findTrendChallengesByType(Constant.TYPE.PUBLIC, new Sort(Sort.Direction.DESC,"popularity"));
         for (TrendChallenge trendChallenge : trendChallenges) {
-            Challenge challenge = chlRepo.findOne(trendChallenge.getChallengeId());
+            Challenge challenge = chlRepo.findById(trendChallenge.getChallengeId()).get();
             Trends trend = new Trends();
             trend.setChallengeId(challenge.getId());
             trend.setName(challenge.getName());
@@ -245,7 +245,7 @@ public class ChallengeService implements IChallengeService {
             TrendChallenge newTrendChallenge = new TrendChallenge();
             newTrendChallenge.setPopularity(1);
             newTrendChallenge.setChallengeId(support.getChallengeId());
-            newTrendChallenge.setType(chlRepo.findOne(support.getChallengeId()).getType());
+            newTrendChallenge.setType(chlRepo.findById(support.getChallengeId()).get().getType());
             newTrendChallenge.setPopularityType(Constant.POPULARITY.SUPPORT);
             trendChallengeRepository.save(newTrendChallenge);
         }
@@ -261,7 +261,7 @@ public class ChallengeService implements IChallengeService {
 
     @Override
     public void updateProgressOrDoneForSelf(String challengeId, String result, Boolean done) {
-        Challenge chl = chlRepo.findOne(challengeId);
+        Challenge chl = chlRepo.findById(challengeId).get();
         SelfChallenge selfChl = (SelfChallenge) chl;
         if(selfChl != null && !selfChl.getDone()) {
             selfChl.setDone(done);
@@ -275,7 +275,7 @@ public class ChallengeService implements IChallengeService {
     @Override
     public void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore) {
         Validation.doneValidationForVersus(true, firstTeamScore, secondTeamScore);
-        Challenge chl = chlRepo.findOne(challengeId);
+        Challenge chl = chlRepo.findById(challengeId).get();
         VersusChallenge versusChl = (VersusChallenge) chl;
         if(versusChl != null && !versusChl.getDone()) {
             versusChl.setFirstTeamScore(firstTeamScore);
@@ -289,7 +289,7 @@ public class ChallengeService implements IChallengeService {
 
     @Override
     public void deleteChallenge(String challengeId) {
-        Challenge findChl = chlRepo.findOne(challengeId);
+        Challenge findChl = chlRepo.findById(challengeId).get();
         if(findChl != null)
             chlRepo.delete(findChl);
     }

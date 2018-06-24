@@ -2,7 +2,7 @@ package org.chl.intf;
 
 import org.chl.model.FriendList;
 import org.chl.model.Member;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;

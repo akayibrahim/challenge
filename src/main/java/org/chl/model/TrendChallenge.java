@@ -1,8 +1,7 @@
 package org.chl.model;
 
 import org.chl.util.Constant;
-import org.chl.util.Subject;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.validation.annotation.Validated;

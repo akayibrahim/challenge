@@ -34,7 +34,7 @@ public class MemberService implements IMemberService {
 
     @Override
     public Member getMemberInfo(String memberId) {
-        return memberRepo.findOne(memberId);
+        return memberRepo.findById(memberId).get();
     }
 
     @Override
@@ -98,7 +98,7 @@ public class MemberService implements IMemberService {
 
     @Override
     public Boolean checkMemberAvailable(String memberId) {
-        Member member = memberRepo.findOne(memberId);
+        Member member = memberRepo.findById(memberId).get();
         return member != null ? true : false;
     }
 
