@@ -6,7 +6,15 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import org.chl.model.JoinAttendance;
+import org.chl.model.Member;
+import org.chl.model.Proof;
+import org.chl.repository.JoinAndProofAttendanceRepository;
+import org.chl.repository.ProofRepository;
+import org.chl.service.MemberService;
+import org.chl.util.Exception;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
@@ -18,34 +26,54 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @RestController
 public class ProofController {
     @Autowired
     GridFsOperations gridOperations;
-
     @Autowired
     GridFSBucket gridFSBucket;
-
     @Autowired
     GridFsTemplate gridFsTemplate;
+    @Autowired
+    ProofRepository proofRepository;
+    @Autowired
+    JoinAndProofAttendanceRepository joinAndProofRepo;;
+    @Autowired
+    MemberService memberService;
 
     // this variable is used to store ImageId for other actions like: findOne or delete
     private String imageFileId = "";
 
     @RequestMapping(value = "/uploadImage")
     public String uploadImage(MultipartFile file, String challengeId, String memberId) throws IOException {
-        // Define metaData
+        JoinAttendance joinAttendance = joinAndProofRepo.findByChallengeIdAndMemberId(challengeId, memberId);
+        if (joinAttendance.getProof())
+            Exception.throwCannotAddProofAgain();
         DBObject metaData = new BasicDBObject();
         metaData.put("challengeId", challengeId);
         metaData.put("memberId", memberId);
-        InputStream iamgeStream = new FileInputStream("/Users/iakay/Downloads/multiply.png");
-
         InputStream inputStream = file.getInputStream();
         metaData.put("type", "image");
-
         imageFileId = gridFsTemplate.store(inputStream, file.getOriginalFilename(), file.getContentType(), metaData).toString();
+        addProof(challengeId, memberId, imageFileId);
         return "Done " + imageFileId;
+    }
+
+    private void addProof(String challengeId, String memberId, String objectId) {
+        JoinAttendance joinAttendance = joinAndProofRepo.findByChallengeIdAndMemberId(challengeId, memberId);
+        joinAttendance.setJoin(false);
+        joinAttendance.setProof(true);
+        joinAndProofRepo.save(joinAttendance);
+        Proof proof = new Proof();
+        proof.setProofObjectId(objectId);
+        proof.setChallengeId(challengeId);
+        proof.setMemberId(memberId);
+        proof.setInsertDate(new Date());
+        proofRepository.save(proof);
     }
 
     @RequestMapping(value = "/downloadImage", produces = MediaType.IMAGE_PNG_VALUE)
@@ -64,6 +92,41 @@ public class ProofController {
             downloadStream.close();
         }
         return bytesToWriteTo;
+    }
+
+    @RequestMapping(value = "/downloadProofImageByObjectId", produces = MediaType.IMAGE_PNG_VALUE)
+    public @ResponseBody
+    byte[] downloadProofImageByObjectId(String objectId) throws IOException {
+        GridFSFile file =  gridOperations.findOne(new Query(Criteria.where("_id").is(objectId)));
+        byte[] bytesToWriteTo = null;
+        if (file != null) {
+            GridFSDownloadStream downloadStream = gridFSBucket.openDownloadStream(file.getObjectId());
+            int fileLength = (int) downloadStream.getGridFSFile().getLength();
+            bytesToWriteTo = new byte[fileLength];
+            int streamDownloadPosition = 0;
+            while(streamDownloadPosition != -1) {
+                streamDownloadPosition += downloadStream.read(bytesToWriteTo, streamDownloadPosition, fileLength);
+            }
+            downloadStream.close();
+        }
+        return bytesToWriteTo;
+    }
+
+    @RequestMapping(value = "/getProofInfoListByChallenge")
+    public @ResponseBody List<Proof> getProofInfoListByChallenge(String challengeId) throws IOException {
+        Iterable<Proof>  proofIterable = proofRepository.findByChallengeId(challengeId, new Sort(Sort.Direction.DESC,"insertDate"));
+        List<Proof> proofs = new ArrayList<>();
+        proofIterable.forEach(file -> {
+            Proof proof = new Proof();
+            proof.setChallengeId(challengeId);
+            proof.setProofObjectId(file.getProofObjectId());
+            proof.setMemberId(file.getMemberId());
+            Member member = memberService.getMemberInfo(file.getMemberId());
+            proof.setName(member.getName() + " " + member.getSurname());
+            proof.setFbID(member.getFacebookID());
+            proofs.add(proof);
+        });
+        return proofs;
     }
 
     public static byte[] getBytesFromInputStream(InputStream is) throws IOException {

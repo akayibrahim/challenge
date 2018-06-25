@@ -16,6 +16,8 @@ public interface JoinAndProofAttendanceRepository extends MongoRepository<JoinAt
 
     List<JoinAttendance> findByChallengeId(String challengeId);
 
+    List<JoinAttendance> findByChallengeIdAndProof(String challengeId, Boolean proof);
+
     @Query(" {'memberId' : ?0 }")
     List<JoinAttendance> findByMemberIdInAttendace(String memberId);
 }

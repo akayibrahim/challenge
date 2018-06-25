@@ -79,13 +79,21 @@ public class ChallengeService implements IChallengeService {
     public Iterable<Challenge> getExplorerChallenges(String memberId, String challengeId, Boolean addSimilarChallanges) {
         List<Challenge> challenges = new ArrayList<>();
         Challenge explorerChallenge = chlRepo.findById(challengeId).get();
-        challenges.add(explorerChallenge);
+        boolean isExist = false;
         if (addSimilarChallanges) {
             Iterable<Challenge> subjectChallenges = chlRepo.findChallengesBySubjectAndType(explorerChallenge.getSubject().toString(), Constant.TYPE.PUBLIC
                     , new Sort(Sort.Direction.DESC,"id"));
             List<Challenge> subjectChallengeList = Lists.newArrayList(subjectChallenges);
             challenges.addAll(subjectChallengeList);
+            for (Challenge chl : subjectChallengeList) {
+                if (explorerChallenge.getId().equals(chl.getId())) {
+                    isExist = true;
+                    break;
+                }
+            }
         }
+        if (!isExist)
+            challenges.add(explorerChallenge);
         prepareChallengesData(memberId, challenges, false);
         Iterable<Challenge> challengeIterable = challenges;
         return challengeIterable;
@@ -141,7 +149,7 @@ public class ChallengeService implements IChallengeService {
             chl.setFirstTeamSupportCount(supports != null ? supports.size() : 0);
             List<Support> supportSecondTeam =  supportRepository.findByChallengeIdAndSupportSecondTeam(chl.getId(), true);
             chl.setSecondTeamSupportCount(supportSecondTeam != null ? supportSecondTeam.size() : 0);
-            List<JoinAttendance> proofs = joinAndProofRepo.findByChallengeId(chl.getId());
+            List<JoinAttendance> proofs = joinAndProofRepo.findByChallengeIdAndProof(chl.getId(), true);
             chl.setCountOfProofs(proofs != null ? proofs.size() : 0);
             JoinAttendance proofOfMember = joinAndProofRepo.findByChallengeIdAndMemberId(chl.getId(), memberId);
             chl.setProofed(proofOfMember != null ? proofOfMember.getProof() : false);
@@ -212,6 +220,7 @@ public class ChallengeService implements IChallengeService {
                 continue;
             if (!joinAtt.getChallenger())
                 joinAtt.setChallenger(false);
+            joinAtt.setProof(false);
             joinAtt.setChallengeId(joinChl.getId());
             joinAtt.setFacebookID(memberService.getMemberInfo(joinAtt.getMemberId()).getFacebookID());
             joinAndProofRepo.save(joinAtt);

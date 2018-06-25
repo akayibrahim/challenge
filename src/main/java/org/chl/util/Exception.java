@@ -27,4 +27,8 @@ public class Exception {
     public static void throwUpdateCannotForDone() {
         throw new IllegalArgumentException("Done challenge cannot update.");
     }
+
+    public static void throwCannotAddProofAgain() {
+        throw new IllegalArgumentException("Already, you proofed it.");
+    }
 }
