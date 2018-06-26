@@ -28,8 +28,12 @@ public class MemberService implements IMemberService {
     }
 
     @Override
-    public void addMember(Member member) {
+    public String addMember(Member member) {
+        Member exist = memberRepo.findByEmail(member.getEmail());
+        if (exist != null)
+            return exist.getId();
         memberRepo.save(member);
+        return member.getId();
     }
 
     @Override

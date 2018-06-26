@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Validated
 public interface IMemberService {
-    void addMember(Member member);
+    String addMember(Member member);
 
     Member getMemberInfo(@Valid @NotEmpty String memberId);
 

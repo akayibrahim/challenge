@@ -38,8 +38,8 @@ public class MemberController {
     }
 
     @RequestMapping(value = "/addMember")
-    public void addMember(@Valid @RequestBody Member member) {
-        memberService.addMember(member);
+    public String addMember(@Valid @RequestBody Member member) {
+        return memberService.addMember(member);
     }
 
     @RequestMapping(value = "/getMembers")

@@ -22,7 +22,7 @@ public class Member {
     private String surname;
     @NotEmpty(message="You need to pass the email parameter")
     private String email;
-    @NotNull(message="You need to pass the recordDate parameter")
+
     private Date recordDate;
     @NotEmpty(message="You need to pass the recordDate parameter")
     private String facebookID;
