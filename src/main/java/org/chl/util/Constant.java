@@ -10,6 +10,19 @@ import java.util.List;
  * Created by ibrahim on 11/28/2017.
  */
 public class Constant {
+    public static final String ACCEPT = "accept";
+    public static final String REJECT = "reject";
+    public static final String YOUR_TEAM = "support your team.";
+    public static final String YOUR_OPPONENT_TEAM = "support your opponent team.";
+    public static final String SPACE = " ";
+    public static final String ACCEPT_REQUEST = "request you for accept of %s challenge.";
+    public static final String JOIN_REQUEST_CONTENT = "request you for join to %s challenge.";
+    public static final String JOINED_TO_CHALLENGE = "joined to %s challenge.";
+    public static final String COMMENTED = "commented: ";
+    public static final String PROOFED_CHALLENGE = "proofed %s challenge.";
+    public static final String START_TO_FOLLOWING = "start to following %s.";
+    public static final String START_TO_FOLLOW_YOU = "start to follow you.";
+
     public enum ANSWER {
         ACCEPT("1"),
         REJECT("0");
@@ -84,5 +97,20 @@ public class Constant {
             subjects.add(sub);
         }
         return subjects;
+    }
+
+    public enum ACTIVITY {
+        COMMENT,
+        PROOF,
+        SUPPORT,
+        FOLLOWING,
+        FOLLOWER,
+        JOIN,
+        ACCEPT;
+    }
+
+    public enum REQUEST_TYPE {
+        JOIN,
+        ACCEPT;
     }
 }

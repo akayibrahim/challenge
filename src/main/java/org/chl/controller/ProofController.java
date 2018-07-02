@@ -6,13 +6,18 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import org.chl.model.Challenge;
 import org.chl.model.JoinAttendance;
 import org.chl.model.Member;
 import org.chl.model.Proof;
 import org.chl.repository.JoinAndProofAttendanceRepository;
 import org.chl.repository.ProofRepository;
+import org.chl.service.ActivityService;
+import org.chl.service.ChallengeService;
 import org.chl.service.MemberService;
+import org.chl.util.Constant;
 import org.chl.util.Exception;
+import org.chl.util.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -33,17 +38,21 @@ import java.util.List;
 @RestController
 public class ProofController {
     @Autowired
-    GridFsOperations gridOperations;
+    private GridFsOperations gridOperations;
     @Autowired
-    GridFSBucket gridFSBucket;
+    private GridFSBucket gridFSBucket;
     @Autowired
-    GridFsTemplate gridFsTemplate;
+    private GridFsTemplate gridFsTemplate;
     @Autowired
-    ProofRepository proofRepository;
+    private ProofRepository proofRepository;
     @Autowired
-    JoinAndProofAttendanceRepository joinAndProofRepo;;
+    private JoinAndProofAttendanceRepository joinAndProofRepo;;
     @Autowired
-    MemberService memberService;
+    private MemberService memberService;
+    @Autowired
+    private ActivityService activityService;
+    @Autowired
+    private ChallengeService challengeService;
 
     // this variable is used to store ImageId for other actions like: findOne or delete
     private String imageFileId = "";
@@ -74,6 +83,9 @@ public class ProofController {
         proof.setMemberId(memberId);
         proof.setInsertDate(new Date());
         proofRepository.save(proof);
+        Challenge challenge = challengeService.getChallengeById(challengeId);
+        if (!memberId.equals(challenge.getChallengerId()))
+            activityService.createActivity(Mappers.prepareActivity(joinAttendance.getId(), challengeId, memberId, challenge.getChallengerId(), Constant.ACTIVITY.PROOF));
     }
 
     @RequestMapping(value = "/downloadImage", produces = MediaType.IMAGE_PNG_VALUE)

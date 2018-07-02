@@ -23,8 +23,8 @@ public class NotificationService implements INotificationService {
     private static final long oneHour = 60 * 60 * 1000;
     private static final long oneMinute = 60 * 1000;
 
-    @Autowired
-    private JmsTemplate jmsTemplate;
+    // @Autowired
+    // private JmsTemplate jmsTemplate;
 
     @Value("${jms.queue.destination:CHL-QUEUE}")
     private String destinationQueue;
@@ -35,10 +35,10 @@ public class NotificationService implements INotificationService {
             LocalDate today = LocalDate.now();
             LocalDate untilDate = pushNotification.getUntilDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             long diff = Duration.between(untilDate.atStartOfDay(), today.atStartOfDay()).toDays();
-            jmsTemplate.setDeliveryDelay(diff * oneDay);
+            // jmsTemplate.setDeliveryDelay(diff * oneDay);
             notification.setMessageTitle(pushNotification.getNotification().getMessageTitle());
             notification.setMessage(pushNotification.getNotification().getMessage());
         }
-        jmsTemplate.convertAndSend(destinationQueue, notification);
+        // jmsTemplate.convertAndSend(destinationQueue, notification);
     }
 }

@@ -16,4 +16,7 @@ public interface VersusAttendanceRepository extends MongoRepository<VersusAttend
 
     @Query(" {'memberId' : ?0 }" )
     List<VersusAttendance> findByMemberIdInAttendace(String memberId);
+
+    @Query(" {'memberId' : ?0, 'accept': {$in: [null, false]}, 'reject': false }" )
+    List<VersusAttendance> findChallengeRequests(String memberId);
 }

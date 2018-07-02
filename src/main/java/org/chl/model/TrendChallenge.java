@@ -22,6 +22,16 @@ public class TrendChallenge {
     private Constant.TYPE type;
 
     private Constant.POPULARITY popularityType;
+    @NotEmpty(message="You need to pass the subject parameter")
+    private String subject;
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
 
     public Constant.POPULARITY getPopularityType() {
         return popularityType;

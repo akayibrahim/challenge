@@ -1,6 +1,8 @@
 package org.chl.model;
 
 import javax.validation.constraints.NotEmpty;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.validation.annotation.Validated;
@@ -17,8 +19,19 @@ public class Attendance {
     private String challengeId;
     @NotEmpty(message="You need to pass the memberId parameter")
     private String memberId;
-    @NotEmpty(message="You need to pass the facebookID parameter")
+
     private String facebookID;
+
+    public Boolean getReject() {
+        return reject;
+    }
+
+    public void setReject(Boolean reject) {
+        this.reject = reject;
+    }
+
+    @JsonProperty
+    private Boolean reject;
 
     public String getId() {
         return id;

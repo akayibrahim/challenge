@@ -6,7 +6,9 @@ import org.chl.model.FriendList;
 import org.chl.model.Member;
 import org.chl.repository.FriendListRepository;
 import org.chl.repository.MemberRepository;
+import org.chl.util.Constant;
 import org.chl.util.Exception;
+import org.chl.util.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +22,13 @@ import java.util.List;
 public class MemberService implements IMemberService {
     private MemberRepository memberRepo;
     private FriendListRepository friendRepo;
+    private ActivityService activityService;
 
     @Autowired
-    public MemberService(MemberRepository memberRepo, FriendListRepository friendRepo) {
+    public MemberService(MemberRepository memberRepo, FriendListRepository friendRepo, ActivityService activityService) {
         this.memberRepo = memberRepo;
         this.friendRepo = friendRepo;
+        this.activityService = activityService;
     }
 
     @Override
@@ -54,9 +58,11 @@ public class MemberService implements IMemberService {
     @Override
     public void followingFriend(String friendMemberId, String memberId, Boolean follow) {
         FriendList exist = friendRepo.findByFriendMemberIdAndMemberId(friendMemberId, memberId);
+        String activityTableId;
         if (exist != null) {
             exist.setFollowed(follow);
             friendRepo.save(exist);
+            activityTableId = exist.getId();
         } else {
             FriendList friendList = new FriendList();
             friendList.setDeleted(false);
@@ -64,7 +70,10 @@ public class MemberService implements IMemberService {
             friendList.setFriendMemberId(friendMemberId);
             friendList.setMemberId(memberId);
             friendRepo.save(friendList);
+            activityTableId = friendList.getId();
         }
+        activityService.createActivity(Mappers.prepareActivity(activityTableId, null, friendMemberId, memberId, Constant.ACTIVITY.FOLLOWING));
+        activityService.createActivity(Mappers.prepareActivity(activityTableId, null, memberId, friendMemberId, Constant.ACTIVITY.FOLLOWER));
     }
 
     @Override

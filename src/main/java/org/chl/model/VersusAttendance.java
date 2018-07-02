@@ -15,10 +15,10 @@ public class VersusAttendance extends Attendance {
     @NotNull(message="You need to pass the isAccept parameter")
     @JsonProperty
     private Boolean accept;
-    @NotNull(message="You need to pass the isFirstTeamMember parameter")
+
     @JsonProperty
     private Boolean firstTeamMember;
-    @NotNull(message="You need to pass the isSecondTeamMember parameter")
+
     @JsonProperty
     private Boolean secondTeamMember;
 

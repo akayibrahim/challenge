@@ -69,6 +69,18 @@ public class Challenge {
 
     private int countOfComments;
 
+    private Constant.TYPE type;
+
+    private Boolean deleted;
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+
     public int getCountOfComments() {
         return countOfComments;
     }
@@ -76,8 +88,6 @@ public class Challenge {
     public void setCountOfComments(int countOfComments) {
         this.countOfComments = countOfComments;
     }
-
-    private Constant.TYPE type;
 
     public Constant.TYPE getType() {
         return type;

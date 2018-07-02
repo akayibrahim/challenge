@@ -13,4 +13,6 @@ import java.util.List;
  */
 public interface ProofRepository extends MongoRepository<Proof, String> {
     Iterable<Proof> findByChallengeId(String challengeId, Sort sort);
+    
+    Proof findByChallengeIdAndMemberId(String challengeId, String memberId);
 }

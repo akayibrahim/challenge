@@ -1,6 +1,7 @@
 package org.chl.controller;
 
 import org.chl.model.*;
+import org.chl.service.ActivityService;
 import org.chl.service.ChallengeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -9,11 +10,14 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.annotation.MultipartConfig;
 import javax.validation.Valid;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 public class ChallengeController {
     @Autowired
     private ChallengeService chlService;
+    @Autowired
+    private ActivityService activityService;
 
     @RequestMapping(value = "/getChallenges")
     public Iterable<Challenge> getChallenges(String memberId) {
@@ -34,8 +38,8 @@ public class ChallengeController {
     }
 
     @RequestMapping(value = "/getTrendChallenges")
-    public Iterable<Trends> getTrendsChallenges(String memberId) {
-        Iterable<Trends> trends = chlService.getTrendChallenges(memberId);
+    public Iterable<Trends> getTrendsChallenges(String memberId, String subjectSearchKey) {
+        Iterable<Trends> trends = chlService.getTrendChallenges(memberId, subjectSearchKey);
         return trends;
     }
 
@@ -106,6 +110,16 @@ public class ChallengeController {
     @RequestMapping(value = "/acceptOrRejectChl")
     public void acceptOrRejectChl(@Valid @RequestBody VersusAttendance chlAtt) {
         chlService.acceptOrRejectChl(chlAtt);
+    }
+
+    @RequestMapping(value = "/getActivities")
+    public List<Activity> getActivities(String toMemberId) {
+        return activityService.getActivities(toMemberId);
+    }
+
+    @RequestMapping(value = "/getChallengeRequest")
+    public List<ChallengeRequest> getChallengeRequest(String memberId) {
+        return chlService.getChallengeRequests(memberId);
     }
 
     public ChallengeService getChlService() {

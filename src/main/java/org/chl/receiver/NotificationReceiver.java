@@ -19,7 +19,7 @@ public class NotificationReceiver {
     @Autowired
     NotificationRepository notificationRepository;
 
-    @JmsListener(destination = "${jms.queue.destination:CHL-QUEUE}")
+    // @JmsListener(destination = "${jms.queue.destination:CHL-QUEUE}")
     public void receiveNotification(Notification notification) {
         if(notification instanceof PushNotification) {
             // TODO call notificationServiceOfIOS

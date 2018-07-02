@@ -33,7 +33,35 @@ http://localhost:8080/downloadImage?challengeId=5b2cdaf41cb199833bc830ca&memberI
         exit                         quit the mongo shell
 
 commands
-    - use chl
-    - show collections
-    - db.joinAttendance.update( { "_id": ObjectId("5b1fb4a21cb19924cc638840") }, { $set: {"join": true, "proof": false} } )
-    - db.challenge.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
+    use chl
+    show collections
+    db.joinAttendance.find()
+    db.joinAttendance.remove({})
+    db.joinAttendance.update( { "_id": ObjectId("5b1fb4a21cb19924cc638840") }, { $set: {"join": true, "proof": false} } )
+    db.joinAttendance.remove( { "_id": ObjectId("5b39b3c11cb1997e50a35cda") })
+    db.versusAttendance.find()
+    db.versusAttendance.remove({})
+    db.versusAttendance.update( { "_id": ObjectId("5b1fb4a21cb19924cc638840") }, { $set: {"join": true, "proof": false} } )
+    db.versusAttendance.remove( { "_id": ObjectId("5b363e4e1cb1994c04001cf4") })
+    db.challenge.find()
+    db.challenge.remove({})
+    db.challenge.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
+    db.challenge.remove( { "_id": ObjectId("5b362e621cb1994131444089") })
+    db.activity.find()
+    db.activity.remove({})
+    db.activity.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
+    db.activity.remove( { "_id": ObjectId("5b37be761cb19960037e831e") })
+    db.friendList.find()
+    db.friendList.remove({})
+    db.friendList.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
+    db.friendList.remove( { "_id": ObjectId("5b37be761cb19960037e831d") })
+
+    db.challenge.find()
+    db.challenge.remove({})
+    db.challenge.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
+    db.challenge.remove( { "_id": ObjectId("5b39b3c11cb1997e50a35cd8") })
+
+    db.trendChallenge.find()
+    db.trendChallenge.remove({})
+    db.trendChallenge.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
+    db.trendChallenge.remove( { "_id": ObjectId("5b39b3c11cb1997e50a35cd8") })
