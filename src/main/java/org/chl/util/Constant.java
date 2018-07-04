@@ -68,7 +68,14 @@ public class Constant {
     }
 
     public enum PUSH_NOTIFICATION {
-        DONE("Your challenge time is done!", "What is results?");
+        DONE("Your challenge time is done!", "What is results?"),
+        COMMENT("A new comment!", ""),
+        PROOF("A new proof!", ""),
+        SUPPORT("Someone supports u!", ""),
+        ACCEPT("Accept it!", ""),
+        JOIN("Join it!", ""),
+        FOLLOWER("A new follower!", ""),
+        FOLLOWING("A new following!", "");
 
         private String messageTitle;
         private String message;

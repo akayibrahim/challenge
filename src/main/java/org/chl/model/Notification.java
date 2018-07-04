@@ -1,6 +1,7 @@
 package org.chl.model;
 
 import org.chl.util.Constant;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -8,6 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document
 public class Notification {
+    @Id
+    private String id;
     private String memberId;
     private String challengeId;
     private String messageTitle;
@@ -52,5 +55,13 @@ public class Notification {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

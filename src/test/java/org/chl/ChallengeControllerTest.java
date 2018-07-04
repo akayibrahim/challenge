@@ -160,7 +160,7 @@ public class ChallengeControllerTest {
         selfChl.setSecondTeamCount("0");
         selfChl.setName("ibrahim akay");
         selfChl.setType(Constant.TYPE.SELF);
-        selfChl.setSubject(Subject.READING);
+        selfChl.setSubject(Subject.READING.toString());
         selfChl.setThinksAboutChallenge("read 10 book!");
         selfChl.setUntilDateStr("Last 14 days!");
         return selfChl;
@@ -201,7 +201,7 @@ public class ChallengeControllerTest {
         joinChl.setSecondTeamCount("2");
         joinChl.setName("ibrahim akay");
         joinChl.setType(Constant.TYPE.PUBLIC);
-        joinChl.setSubject(Subject.READING);
+        joinChl.setSubject(Subject.READING.toString());
         joinChl.setThinksAboutChallenge("read 10 book!");
         joinChl.setUntilDateStr("Last 14 days!");
         return joinChl;
@@ -251,7 +251,7 @@ public class ChallengeControllerTest {
         versusChl.setSecondTeamCount("2");
         versusChl.setName(CHALLANGER_NAME);
         versusChl.setType(Constant.TYPE.PRIVATE);
-        versusChl.setSubject(Subject.READING);
+        versusChl.setSubject(Subject.READING.toString());
         versusChl.setThinksAboutChallenge("read 10 book!");
         versusChl.setUntilDateStr("Last 14 days!");
         return versusChl;

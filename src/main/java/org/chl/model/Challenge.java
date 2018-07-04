@@ -34,7 +34,7 @@ public class Challenge {
     private String thinksAboutChallenge;
     @NotNull(message="You need to pass the subject parameter")
     @JsonProperty
-    private Subject subject;
+    private String subject;
 
     private Date chlDate; // use bg
     @NotNull(message="You need to pass the untilDate parameter")
@@ -153,11 +153,11 @@ public class Challenge {
         this.untilDate = untilDate;
     }
 
-    public Subject getSubject() {
+    public String getSubject() {
         return subject;
     }
 
-    public void setSubject(Subject subject) {
+    public void setSubject(String subject) {
         this.subject = subject;
     }
 

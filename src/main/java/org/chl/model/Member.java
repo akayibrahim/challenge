@@ -27,6 +27,26 @@ public class Member {
     @NotEmpty(message="You need to pass the recordDate parameter")
     private String facebookID;
 
+    private String phoneModel;
+
+    private String region;
+
+    public String getPhoneModel() {
+        return phoneModel;
+    }
+
+    public void setPhoneModel(String phoneModel) {
+        this.phoneModel = phoneModel;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
     public String getId() {
         return id;
     }

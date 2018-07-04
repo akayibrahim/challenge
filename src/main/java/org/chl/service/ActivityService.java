@@ -33,6 +33,8 @@ public class ActivityService implements IActivityService {
     private SupportRepository supportRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    NotificationRepository notificationRepository;
 
     @Override
     public void createActivity(Activity activity) {
@@ -42,10 +44,63 @@ public class ActivityService implements IActivityService {
             if (exist != null) {
                 exist.setType(Constant.ACTIVITY.PROOF);
                 activityRepo.save(exist);
+                createNotification(exist.getType(), exist.getActivityTableId(), exist.getFromMemberId(), exist.getToMemberId(),exist.getChallengeId());
                 return;
             }
         }
         activityRepo.save(activity);
+        createNotification(activity.getType(), activity.getActivityTableId(), activity.getFromMemberId(), activity.getToMemberId(),activity.getChallengeId());
+    }
+
+    private void createNotification(Constant.ACTIVITY type, String activityTableId, String fromMemberId, String toMemberId, String challengeId) {
+        Member member = memberRepository.findById(fromMemberId).get();
+        Member toMember = memberRepository.findById(toMemberId).get();
+        String nameSurname = member.getName() + Constant.SPACE + member.getSurname() + Constant.SPACE;
+        String title = null;
+        String content = null;
+        switch (type) {
+            case COMMENT:
+                title = Constant.PUSH_NOTIFICATION.COMMENT.getMessageTitle();
+                content = nameSurname + getCommentMessageContent(activityTableId);
+                break;
+            case PROOF:
+                title = Constant.PUSH_NOTIFICATION.PROOF.getMessageTitle();
+                content = nameSurname + getProofMessageContent(activityTableId);
+                break;
+            case SUPPORT:
+                title = Constant.PUSH_NOTIFICATION.SUPPORT.getMessageTitle();
+                content = nameSurname + getSupportMessageContent(activityTableId);
+                break;
+            case ACCEPT:
+                title = Constant.PUSH_NOTIFICATION.ACCEPT.getMessageTitle();
+                content = nameSurname + getAcceptMessageContent(activityTableId);
+                break;
+            case JOIN:
+                title = Constant.PUSH_NOTIFICATION.JOIN.getMessageTitle();
+                content = nameSurname + getJoinMessageContent(activityTableId);
+                break;
+            case FOLLOWER:
+                title = Constant.PUSH_NOTIFICATION.FOLLOWER.getMessageTitle();
+                content = nameSurname + getFollowerMessageContent(activityTableId);
+                break;
+            case FOLLOWING:
+                title = Constant.PUSH_NOTIFICATION.FOLLOWING.getMessageTitle();
+                nameSurname = toMember.getName() + Constant.SPACE + toMember.getSurname() + Constant.SPACE;
+                content = nameSurname + getFollowingMessageContent(member.getName(), member.getSurname());
+                break;
+            default:
+        }
+        sendNotification(challengeId, fromMemberId, title, content);
+    }
+
+    private void sendNotification(String challengeId, String memberId, String title, String content) {
+        PushNotification notification = new PushNotification();
+        notification.setChallengeId(challengeId);
+        notification.setMemberId(memberId);
+        notification.setUntilDate(new Date());
+        notification.setMessageTitle(title);
+        notification.setMessage(content);
+        notificationRepository.save(notification);
     }
 
     @Override
@@ -58,48 +113,77 @@ public class ActivityService implements IActivityService {
             activity.setName(member.getName() + Constant.SPACE + member.getSurname());
             switch (activity.getType()) {
                 case COMMENT:
-                    Optional<TextComment> textComment = commentRepository.findById(activity.getActivityTableId());
-                    activity.setContent(Constant.COMMENTED + textComment.get().getComment());
+                    activity.setContent(getCommentMessageContent(activity.getActivityTableId()));
                     break;
                 case PROOF:
                     JoinAttendance proofAttendance = joinAndProofAttendanceRepository.findById(activity.getActivityTableId()).get();
                     Proof proof = proofRepository.findByChallengeIdAndMemberId(proofAttendance.getChallengeId(), proofAttendance.getMemberId());
-                    Optional<Challenge> challengeOfProof = challengeRepository.findById(proofAttendance.getChallengeId());
-                    activity.setContent(String.format(Constant.PROOFED_CHALLENGE, challengeOfProof.get().getSubject().toString()));
                     activity.setMediaObjectId(proof.getProofObjectId());
+                    activity.setContent(getProofMessageContent(activity.getActivityTableId()));
                     break;
                 case SUPPORT:
-                    Optional<Support> support = supportRepository.findById(activity.getActivityTableId());
-                    activity.setContent(support.get().getSupportFirstTeam() ? Constant.YOUR_TEAM : Constant.YOUR_OPPONENT_TEAM);
+                    activity.setContent(getSupportMessageContent(activity.getActivityTableId()));
                     break;
                 case ACCEPT:
-                    Optional<VersusAttendance> versusAttendance = versusAttendanceRepository.findById(activity.getActivityTableId());
-                    Optional<Challenge> challengeOfVersus = challengeRepository.findById(versusAttendance.get().getChallengeId());
-                    if (versusAttendance.get().getAccept() != null)
-                        activity.setContent((versusAttendance.get().getAccept() ? Constant.ACCEPT : Constant.REJECT) + Constant.SPACE + challengeOfVersus.get().getSubject().toString()); // TODO
-                    else
-                        activity.setContent(String.format(Constant.ACCEPT_REQUEST, challengeOfVersus.get().getSubject().toString()));
+                    activity.setContent(getAcceptMessageContent(activity.getActivityTableId()));
                     break;
                 case JOIN:
-                    Optional<JoinAttendance> joinAttendance = joinAndProofAttendanceRepository.findById(activity.getActivityTableId());
-                    Challenge challengeOfJoin = challengeRepository.findById(joinAttendance.get().getChallengeId()).get();
-                    if (joinAttendance.get().getJoin())
-                        activity.setContent(String.format(Constant.JOINED_TO_CHALLENGE, challengeOfJoin.getSubject().toString()));
-                    else
-                        activity.setContent(String.format(Constant.JOIN_REQUEST_CONTENT, challengeOfJoin.getSubject().toString()));
+                    activity.setContent(getJoinMessageContent(activity.getActivityTableId()));
                     break;
                 case FOLLOWER:
-                    activity.setContent(Constant.START_TO_FOLLOW_YOU);
+                    activity.setContent(getFollowerMessageContent(activity.getActivityTableId()));
                     break;
                 case FOLLOWING:
                     activity.setFacebookID(toMember.getFacebookID());
                     activity.setName(toMember.getName() + Constant.SPACE + member.getSurname());
-                    activity.setContent(String.format(Constant.START_TO_FOLLOWING, member.getName() + Constant.SPACE + member.getSurname()));
+                    activity.setContent(getFollowingMessageContent(member.getName(), member.getSurname()));
                     break;
                 default:
 
             }
         });
         return activities;
+    }
+
+    private String getFollowingMessageContent(String name, String surname) {
+        return String.format(Constant.START_TO_FOLLOWING, name + Constant.SPACE + surname);
+    }
+
+    private String getFollowerMessageContent(String activityTableId) {
+        return Constant.START_TO_FOLLOW_YOU;
+    }
+
+    private String getJoinMessageContent(String activityTableId) {
+        Optional<JoinAttendance> joinAttendance = joinAndProofAttendanceRepository.findById(activityTableId);
+        Challenge challengeOfJoin = challengeRepository.findById(joinAttendance.get().getChallengeId()).get();
+        if (joinAttendance.get().getJoin())
+            return String.format(Constant.JOINED_TO_CHALLENGE, challengeOfJoin.getSubject().toString());
+        else
+            return String.format(Constant.JOIN_REQUEST_CONTENT, challengeOfJoin.getSubject().toString());
+    }
+
+    private String getAcceptMessageContent(String activityTableId) {
+        Optional<VersusAttendance> versusAttendance = versusAttendanceRepository.findById(activityTableId);
+        Optional<Challenge> challengeOfVersus = challengeRepository.findById(versusAttendance.get().getChallengeId());
+        if (versusAttendance.get().getAccept() != null)
+            return (versusAttendance.get().getAccept() ? Constant.ACCEPT : Constant.REJECT) + Constant.SPACE + challengeOfVersus.get().getSubject().toString();
+        else
+            return String.format(Constant.ACCEPT_REQUEST, challengeOfVersus.get().getSubject().toString());
+    }
+
+    private String getSupportMessageContent(String activityTableId) {
+        Optional<Support> support = supportRepository.findById(activityTableId);
+        return support.get().getSupportFirstTeam() ? Constant.YOUR_TEAM : Constant.YOUR_OPPONENT_TEAM;
+    }
+
+    private String getProofMessageContent(String activityTableId) {
+        JoinAttendance proofAttendance = joinAndProofAttendanceRepository.findById(activityTableId).get();
+        Optional<Challenge> challengeOfProof = challengeRepository.findById(proofAttendance.getChallengeId());
+        return String.format(Constant.PROOFED_CHALLENGE, challengeOfProof.get().getSubject().toString());
+    }
+
+    private String getCommentMessageContent(String activityTableId) {
+        Optional<TextComment> textComment = commentRepository.findById(activityTableId);
+        return Constant.COMMENTED + textComment.get().getComment();
     }
 }
