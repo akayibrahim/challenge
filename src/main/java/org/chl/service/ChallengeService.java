@@ -53,7 +53,7 @@ public class ChallengeService implements IChallengeService {
     @Override
     public Iterable<Challenge> getChallenges(String memberId) {
         List<String> friendLists = memberService.getFollowingIdList(memberId);
-        Iterable<Challenge> challenges = chlRepo.findChallenges(friendLists, Constant.TYPE.PUBLIC, new Sort(Sort.Direction.DESC,"updateDate"));
+        Iterable<Challenge> challenges = chlRepo.findChallenges(friendLists, Constant.TYPE.PUBLIC, new Date(), new Sort(Sort.Direction.DESC,"updateDate"));
         prepareChallengesData(memberId, challenges, false);
         return challenges;
     }
@@ -102,7 +102,7 @@ public class ChallengeService implements IChallengeService {
         boolean isExist = false;
         if (addSimilarChallanges) {
             Iterable<Challenge> subjectChallenges = chlRepo.findChallengesBySubjectAndType(explorerChallenge.getSubject().toString(), Constant.TYPE.PUBLIC
-                    , new Sort(Sort.Direction.DESC,"id"));
+                    , new Date(), new Sort(Sort.Direction.DESC,"id"));
             List<Challenge> subjectChallengeList = Lists.newArrayList(subjectChallenges);
             challenges.addAll(subjectChallengeList);
             for (Challenge chl : subjectChallengeList) {
@@ -209,6 +209,7 @@ public class ChallengeService implements IChallengeService {
             Exception.throwMemberNotAvailable();
         versusChl.setType(Constant.TYPE.PRIVATE);
         versusChl.setChlDate(new Date());
+        versusChl.setDateOfUntil(DateUtil.covertToDate(versusChl.getUntilDate()));
         for (VersusAttendance versusAtt:versusChl.getVersusAttendanceList()) {
             if (!memberService.checkMemberAvailable(versusAtt.getMemberId()))
                 Exception.throwMemberNotAvailable();
@@ -237,6 +238,7 @@ public class ChallengeService implements IChallengeService {
         if (!memberService.checkMemberAvailable(joinChl.getChallengerId()))
             Exception.throwMemberNotAvailable();
         joinChl.setChlDate(new Date());
+        joinChl.setDateOfUntil(DateUtil.covertToDate(joinChl.getUntilDate()));
         if (joinChl.getJoinAttendanceList() == null)
             joinChl.setJoinAttendanceList(new ArrayList<JoinAttendance>());
         JoinAttendance attendance = new JoinAttendance();
@@ -274,6 +276,7 @@ public class ChallengeService implements IChallengeService {
         if (!memberService.checkMemberAvailable(selfChl.getChallengerId()))
             Exception.throwMemberNotAvailable();
         selfChl.setChlDate(new Date());
+        selfChl.setDateOfUntil(DateUtil.covertToDate(selfChl.getUntilDate()));
         chlRepo.save(selfChl);
         return selfChl;
     }

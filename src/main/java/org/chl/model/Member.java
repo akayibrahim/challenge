@@ -31,6 +31,16 @@ public class Member {
 
     private String region;
 
+    private String language;
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
     public String getPhoneModel() {
         return phoneModel;
     }

@@ -40,6 +40,8 @@ public class Challenge {
     @NotNull(message="You need to pass the untilDate parameter")
     private String untilDate; // use bg
 
+    private Date dateOfUntil;
+
     private String untilDateStr;
     @NotNull(message="You need to pass the done parameter")
     @JsonProperty
@@ -271,5 +273,13 @@ public class Challenge {
 
     public void setComeFromSelf(Boolean comeFromSelf) {
         this.comeFromSelf = comeFromSelf;
+    }
+
+    public Date getDateOfUntil() {
+        return dateOfUntil;
+    }
+
+    public void setDateOfUntil(Date dateOfUntil) {
+        this.dateOfUntil = dateOfUntil;
     }
 }

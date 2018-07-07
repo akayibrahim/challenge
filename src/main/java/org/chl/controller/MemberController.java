@@ -1,7 +1,9 @@
 package org.chl.controller;
 
+import org.chl.model.Error;
 import org.chl.model.FriendList;
 import org.chl.model.Member;
+import org.chl.repository.ErrorRepository;
 import org.chl.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +18,8 @@ import java.util.List;
 public class MemberController {
     @Autowired
     private MemberService memberService;
+    @Autowired
+    private ErrorRepository errorRepository;
 
     public MemberService getMemberService() {
         return memberService;
@@ -86,5 +90,10 @@ public class MemberController {
             memberList.add(memberService.getMemberInfo(friend.getFriendMemberId()));
         }
         return memberList;
+    }
+
+    @RequestMapping(value = "/errorLog")
+    public void errorLog(@Valid @RequestBody Error error) {
+        errorRepository.save(error);
     }
 }
