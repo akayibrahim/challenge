@@ -14,8 +14,8 @@ import java.util.List;
  */
 public interface ChallengeRepository extends MongoRepository<Challenge, String> {
     // cal with new Sort(Direction.ASC/DESC,"order")
-    @Query(" { 'challengerId' : ?0, 'deleted': {$in: [null, false]} }")
-    Iterable<Challenge> findChallengesByMemberId(String memberId, Sort sort);
+    @Query(" { 'challengerId' : ?0, 'deleted': {$in: [null, false]}, 'visibility': {$in: ?1} }")
+    Iterable<Challenge> findChallengesByMemberId(String memberId, List<String> visibilities, Sort sort);
 
     @Query("{ '$or' : [ { '$or' : [{'challengerId' : {$in : ?0} }, {'type' : ?1} ], 'deleted': {$in: [null, false]}, 'dateOfUntil': {'$gte': ?2}, 'done': false }, " +
                        "{ '$or' : [{'challengerId' : {$in : ?0} }, {'type' : ?1} ], 'deleted': {$in: [null, false]}, 'done': true } ] }")

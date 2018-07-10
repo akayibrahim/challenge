@@ -32,4 +32,6 @@ public interface IMemberService {
     Boolean checkMemberAvailable(String memberId);
 
     List<FriendList> getSuggestionsForFollowing(String memberId);
+
+    Boolean isMyFriend(String memberId, String friendMemberId);
 }

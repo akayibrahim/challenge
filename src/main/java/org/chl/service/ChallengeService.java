@@ -61,7 +61,31 @@ public class ChallengeService implements IChallengeService {
     @Override
     public Iterable<Challenge> getChallengesOfMember(String memberId) {
         setToDoneForPastChallenge(memberId);
-        Iterable<Challenge> challengesByMemberId = chlRepo.findChallengesByMemberId(memberId, new Sort(Sort.Direction.DESC,"updateDate"));
+        List<String> visibilities = fullVisibility();
+        List<Challenge> challenges = findMemberChallenges(memberId, visibilities);
+        return challenges;
+    }
+
+    private List<String> fullVisibility() {
+        List<String> visibilities = new ArrayList<>();
+        visibilities.add(Constant.VISIBILITY.EVERYONE.getCode());
+        visibilities.add(Constant.VISIBILITY.FRIENDS.getCode());
+        visibilities.add(Constant.VISIBILITY.JUST.getCode());
+        return visibilities;
+    }
+
+    @Override
+    public Iterable<Challenge> getChallengesOfFriend(String memberId, String friendMemberId) {
+        List<String> visibilities = new ArrayList<>();
+        visibilities.add(Constant.VISIBILITY.EVERYONE.getCode());
+        if (memberService.isMyFriend(memberId, friendMemberId))
+            visibilities.add(Constant.VISIBILITY.FRIENDS.getCode());
+        List<Challenge> challenges = findMemberChallenges(friendMemberId, visibilities);
+        return challenges;
+    }
+
+    private List<Challenge> findMemberChallenges(String memberId, List<String> visibilities) {
+        Iterable<Challenge> challengesByMemberId = chlRepo.findChallengesByMemberId(memberId, visibilities,new Sort(Sort.Direction.DESC,"updateDate"));
         List<Challenge> challenges = Lists.newArrayList(challengesByMemberId);
         List<VersusAttendance> versusAttendanceList = versusRepo.findByMemberIdInAttendace(memberId);
         List<JoinAttendance> joinAttendanceList = joinAndProofRepo.findByMemberIdInAttendace(memberId);
@@ -84,7 +108,8 @@ public class ChallengeService implements IChallengeService {
     }
 
     private void setToDoneForPastChallenge(String memberId) {
-        Iterable<Challenge> challengesByMemberId = chlRepo.findChallengesByMemberId(memberId, new Sort(Sort.Direction.DESC,"updateDate"));
+        List<String> visibilities = fullVisibility();
+        Iterable<Challenge> challengesByMemberId = chlRepo.findChallengesByMemberId(memberId, visibilities, new Sort(Sort.Direction.DESC,"updateDate"));
         challengesByMemberId.forEach(challenge -> {
             if (DateUtil.covertToDate(challenge.getUntilDate()).compareTo(new Date()) <= 0) {
                 Challenge exist = chlRepo.findById(challenge.getId()).get();
@@ -145,6 +170,7 @@ public class ChallengeService implements IChallengeService {
         trend.setProoferFbID(challenge.getChallengerFBId());
         trend.setSubject(challenge.getSubject().toString());
         trend.setProof("steve"); // TODO
+        trend.setChallengerId(challenge.getChallengerId());
         return trend;
     }
 

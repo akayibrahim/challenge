@@ -21,6 +21,16 @@ public class Trends {
     @NotEmpty(message = "You need to pass the subject parameter")
     private String subject;
 
+    private String challengerId;
+
+    public String getChallengerId() {
+        return challengerId;
+    }
+
+    public void setChallengerId(String challengerId) {
+        this.challengerId = challengerId;
+    }
+
     public String getChallengeId() {
         return challengeId;
     }

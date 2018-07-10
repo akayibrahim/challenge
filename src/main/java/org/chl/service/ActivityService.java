@@ -135,7 +135,7 @@ public class ActivityService implements IActivityService {
                     break;
                 case FOLLOWING:
                     activity.setFacebookID(toMember.getFacebookID());
-                    activity.setName(toMember.getName() + Constant.SPACE + member.getSurname());
+                    activity.setName(toMember.getName() + Constant.SPACE + toMember.getSurname());
                     activity.setContent(getFollowingMessageContent(member.getName(), member.getSurname()));
                     break;
                 default:

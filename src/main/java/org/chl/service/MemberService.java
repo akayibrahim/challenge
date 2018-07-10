@@ -36,6 +36,7 @@ public class MemberService implements IMemberService {
         Member exist = memberRepo.findByEmail(member.getEmail());
         if (exist != null)
             return exist.getId();
+        member.setPrivateMember(false);
         memberRepo.save(member);
         return member.getId();
     }
@@ -113,6 +114,12 @@ public class MemberService implements IMemberService {
     public Boolean checkMemberAvailable(String memberId) {
         Member member = memberRepo.findById(memberId).get();
         return member != null ? true : false;
+    }
+
+    @Override
+    public Boolean isMyFriend(String memberId, String friendMemberId) {
+        FriendList friend = friendRepo.findByFriendMemberIdAndMemberId(friendMemberId, memberId);
+        return friend != null ? friend.getFollowed() : false;
     }
 
     @Override

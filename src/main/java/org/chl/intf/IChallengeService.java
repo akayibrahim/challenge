@@ -18,6 +18,8 @@ public interface IChallengeService {
 
     Iterable<Challenge> getChallengesOfMember(@Valid @NotEmpty String memberId);
 
+    Iterable<Challenge> getChallengesOfFriend(@Valid @NotEmpty String memberId, String friendMemberId);
+
     Iterable<Challenge> getExplorerChallenges(@Valid @NotEmpty String memberId, String challengeId, Boolean addSimilarChallanges);
 
     Iterable<Trends> getTrendChallenges(String memberId, String subjectSearchKey);

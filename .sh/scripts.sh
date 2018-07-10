@@ -38,7 +38,7 @@ commands
 
     db.member.find()
     db.member.remove({})
-    db.member.update( { "_id": ObjectId("5b1fb4a21cb19924cc638840") }, { $set: {"join": true, "proof": false} } )
+    db.member.update( { "_id": ObjectId("5b3152821cb199f1fadc0fab") }, { $set: {"privateMember": false} } )
     db.member.remove( { "_id": ObjectId("5b3152701cb199f1fadc0faa") })
 
     db.joinAttendance.find()
@@ -68,10 +68,10 @@ commands
     db.notification.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
     db.notification.remove( { "_id": ObjectId("5b37be761cb19960037e831e") })
 
-    db.friendList.find()
-    db.friendList.remove({})
+    db.friendList.find({ "memberId": "5b3152821cb199f1fadc0fab" })
+    db.friendList.remove({ "friendMemberId": "5b36283d1cb199413144407e" })
     db.friendList.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
-    db.friendList.remove( { "_id": ObjectId("5b37be761cb19960037e831d") })
+    db.friendList.remove( { "friendMemberId": "5b3152701cb199f1fadc0faa" })
 
     db.challenge.find()
     db.challenge.remove({})

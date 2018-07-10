@@ -33,6 +33,36 @@ public class Member {
 
     private String language;
 
+    private int followerCount;
+
+    private int followingCount;
+
+    public Boolean getPrivateMember() {
+        return privateMember;
+    }
+
+    public void setPrivateMember(Boolean privateMember) {
+        this.privateMember = privateMember;
+    }
+
+    private Boolean privateMember;
+
+    public int getFollowerCount() {
+        return followerCount;
+    }
+
+    public void setFollowerCount(int followerCount) {
+        this.followerCount = followerCount;
+    }
+
+    public int getFollowingCount() {
+        return followingCount;
+    }
+
+    public void setFollowingCount(int followingCount) {
+        this.followingCount = followingCount;
+    }
+
     public String getLanguage() {
         return language;
     }

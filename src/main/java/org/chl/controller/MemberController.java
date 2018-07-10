@@ -21,17 +21,11 @@ public class MemberController {
     @Autowired
     private ErrorRepository errorRepository;
 
-    public MemberService getMemberService() {
-        return memberService;
-    }
-
-    public void setMemberService(MemberService memberService) {
-        this.memberService = memberService;
-    }
-
     @RequestMapping(value = "/getMemberInfo")
     public Member getMemberInfo(String memberId) {
         Member memberInfo = memberService.getMemberInfo(memberId);
+        memberInfo.setFollowerCount(getFollowerList(memberId).size());
+        memberInfo.setFollowingCount(getFollowingList(memberId).size());
         return memberInfo;
     }
 
@@ -80,6 +74,11 @@ public class MemberController {
     @RequestMapping(value = "/deleteSuggestion")
     public void deleteSuggestion(String friendMemberId, String memberId) {
         memberService.deleteSuggestion(friendMemberId, memberId);
+    }
+
+    @RequestMapping(value = "/isMyFriend")
+    public Boolean isMyFriend(String friendMemberId, String memberId) {
+        return memberService.isMyFriend(friendMemberId, memberId);
     }
 
     @RequestMapping(value = "/getSuggestionsForFollowing")

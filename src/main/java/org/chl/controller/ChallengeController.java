@@ -31,6 +31,12 @@ public class ChallengeController {
         return challenges;
     }
 
+    @RequestMapping(value = "/getChallengesOfFriend")
+    public Iterable<Challenge> getChallengesOfFriend(String memberId, String friendMemberId) {
+        Iterable<Challenge> challenges = chlService.getChallengesOfFriend(memberId, friendMemberId);
+        return challenges;
+    }
+
     @RequestMapping(value = "/getExplorerChallenges")
     public Iterable<Challenge> getExplorerChallenges(String memberId, String challengeId, Boolean addSimilarChallanges) {
         Iterable<Challenge> challenges = chlService.getExplorerChallenges(memberId, challengeId, addSimilarChallanges);

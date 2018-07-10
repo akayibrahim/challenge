@@ -19,7 +19,7 @@ public class Constant {
     public static final String JOIN_REQUEST_CONTENT = "request you for join to %s challenge.";
     public static final String JOINED_TO_CHALLENGE = "joined to %s challenge.";
     public static final String COMMENTED = "commented: ";
-    public static final String PROOFED_CHALLENGE = "proofed %s challenge.";
+    public static final String PROOFED_CHALLENGE = "proved %s challenge.";
     public static final String START_TO_FOLLOWING = "start to following %s.";
     public static final String START_TO_FOLLOW_YOU = "start to follow you.";
 
@@ -41,8 +41,8 @@ public class Constant {
     public enum STATUS {
         FINISH("has finished challenge"),
         JOIN("has joined challenge"),
-        PROOF("has proofed challenge"),
-        NEW_PROOF("has a new proofed challenge"),
+        PROOF("has proved challenge"),
+        NEW_PROOF("has a new proved challenge"),
         NEW("has a new challenge");
 
         private String status;
@@ -53,6 +53,22 @@ public class Constant {
 
         public String getStatus() {
             return status;
+        }
+    }
+
+    public enum VISIBILITY {
+        JUST("3"),
+        FRIENDS("2"),
+        EVERYONE("1");
+
+        private String code;
+
+        VISIBILITY(String code) {
+            this.code = code;
+        }
+
+        public String getCode() {
+            return code;
         }
     }
 
