@@ -24,7 +24,7 @@ public interface ChallengeRepository extends MongoRepository<Challenge, String> 
     @Query(" { 'id' : {$in : ?0} , 'deleted': {$in: [null, false]}, 'visibility': {$in: [null, 1, 2]} }")
     Iterable<Challenge> findChallengesByChallengeIdList(List<String> challengeIdList, Sort sort);
 
-    @Query("{ '$or' : [ { 'subject' : ?0 , type: ?1,'deleted': {$in: [null, false]}, 'visibility': {$in: [null, 1, 2]}, 'dateOfUntil': {'$gte': ?2}, 'done': false, 'active': true }, " +
-            "           { 'subject' : ?0 , type: ?1,'deleted': {$in: [null, false]}, 'visibility': {$in: [null, 1, 2]}, 'done': true, 'active': true } ] }")
+    @Query("{ '$or' : [ { 'subject' : ?0, 'type': ?1, 'deleted': {$in: [null, false]}, 'visibility': {$in: [null, 1, 2]}, 'done': false, 'active': true, 'dateOfUntil': {'$gte': ?2} }, " +
+            "           { 'subject' : ?0, 'type': ?1, 'deleted': {$in: [null, false]}, 'visibility': {$in: [null, 1, 2]}, 'done': true, 'active': true } ] }")
     Iterable<Challenge> findChallengesBySubjectAndType(String subject, Constant.TYPE type, Date sysdate, Sort sort);
 }

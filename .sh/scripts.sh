@@ -87,3 +87,9 @@ commands
     db.activityCount.remove({})
     db.activityCount.update( { "memberId": "5b32959a1cb19909e464f6f5" }, { $set: {"count": "1"} } )
     db.activityCount.remove( { "_id": ObjectId("5b363e4e1cb1994c04001cf4") })
+
+    db.fs.files.find()
+    db.fs.files.find({ "metadata.challengeId": "5b4870f28d39663e146975de" })
+    db.fs.files.remove({})
+    db.fs.files.update( { "memberId": "5b32959a1cb19909e464f6f5" }, { $set: {"count": "1"} } )
+    db.fs.files.remove( { "_id": ObjectId("5b363e4e1cb1994c04001cf4") })
