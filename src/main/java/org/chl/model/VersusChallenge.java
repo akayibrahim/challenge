@@ -13,7 +13,6 @@ import java.util.List;
 public class VersusChallenge extends Challenge {
     private List<VersusAttendance> versusAttendanceList;
 
-    private int visibility;
 
     private String firstTeamScore;
 
@@ -33,14 +32,6 @@ public class VersusChallenge extends Challenge {
 
     public void setSecondTeamScore(String secondTeamScore) {
         this.secondTeamScore = secondTeamScore;
-    }
-
-    public int getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(int visibility) {
-        this.visibility = visibility;
     }
 
     public List<VersusAttendance> getVersusAttendanceList() {

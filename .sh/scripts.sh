@@ -52,8 +52,9 @@ commands
     db.versusAttendance.remove( { "challengeId": "5b3e310c1cb1995e53e42a63" })
 
     db.challenge.find()
+    db.challenge.find({ "challengerId": "5b3152d31cb199f1fadc0fb0" })
     db.challenge.remove({})
-    db.challenge.update( { "_id": ObjectId("5b3f7de51cb1999daf603fbd") }, { $set: {"active": true} } )
+    db.challenge.update( { "done": true }, { $set: {"visibility": "1"} } )
     db.challenge.remove( { "_id": ObjectId("5b3e30651cb1995e53e42a5e") })
     db.challenge.find({"untilDate": {"$lt": new Date()} })
     db.challenge.find({ '$or' : [ { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'dateOfUntil': {'$gte': new Date()}, 'done': false }, { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'done': true } ] })

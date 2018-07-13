@@ -122,9 +122,9 @@ public class MemberController {
     }
 
     @RequestMapping(value = "/isMyFriend")
-    public Boolean isMyFriend(String friendMemberId, String memberId) {
+    public Boolean isMyFriend(String memberId, String friendMemberId) {
         try {
-            return memberService.isMyFriend(friendMemberId, memberId);
+            return memberService.isMyFriend(memberId, friendMemberId);
         } catch (Exception e) {
             logError(null, memberId, "isMyFriend", e, "memberId=" + memberId + "&friendMemberId=" + friendMemberId);
         }

@@ -62,8 +62,7 @@ public class ActivityService implements IActivityService {
         if (exist != null) {
             String countStr = exist.getCount();
             Integer countInt = Integer.valueOf(countStr);
-            Integer count = countInt++;
-            exist.setCount(count.toString());
+            exist.setCount((++countInt).toString());
             activityCountRepository.save(exist);
         } else {
             ActivityCount activityCount = new ActivityCount();
