@@ -49,12 +49,12 @@ commands
     db.versusAttendance.find()
     db.versusAttendance.remove({})
     db.versusAttendance.update( { "_id": ObjectId("5b1fb4a21cb19924cc638840") }, { $set: {"join": true, "proof": false} } )
-    db.versusAttendance.remove( { "_id": ObjectId("5b363e4e1cb1994c04001cf4") })
+    db.versusAttendance.remove( { "challengeId": "5b3e310c1cb1995e53e42a63" })
 
     db.challenge.find()
     db.challenge.remove({})
-    db.challenge.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
-    db.challenge.remove( { "_id": ObjectId("5b3e31231cb1995e53e42a68") })
+    db.challenge.update( { "_id": ObjectId("5b3f7de51cb1999daf603fbd") }, { $set: {"active": true} } )
+    db.challenge.remove( { "_id": ObjectId("5b3e30651cb1995e53e42a5e") })
     db.challenge.find({"untilDate": {"$lt": new Date()} })
     db.challenge.find({ '$or' : [ { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'dateOfUntil': {'$gte': new Date()}, 'done': false }, { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'done': true } ] })
 
@@ -73,11 +73,6 @@ commands
     db.friendList.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
     db.friendList.remove( { "friendMemberId": "5b3152701cb199f1fadc0faa" })
 
-    db.challenge.find()
-    db.challenge.remove({})
-    db.challenge.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
-    db.challenge.remove( { "_id": ObjectId("5b39b3c11cb1997e50a35cd8") })
-
     db.trendChallenge.find()
     db.trendChallenge.remove({})
     db.trendChallenge.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
@@ -87,3 +82,8 @@ commands
     db.error.remove({})
     db.error.update( { "_id": ObjectId("5b1fb4a21cb19924cc638840") }, { $set: {"join": true, "proof": false} } )
     db.error.remove( { "_id": ObjectId("5b363e4e1cb1994c04001cf4") })
+
+    db.activityCount.find()
+    db.activityCount.remove({})
+    db.activityCount.update( { "memberId": "5b32959a1cb19909e464f6f5" }, { $set: {"count": "1"} } )
+    db.activityCount.remove( { "_id": ObjectId("5b363e4e1cb1994c04001cf4") })

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -211,7 +213,8 @@ public class ChallengeService implements IChallengeService {
             chl.setCountOfProofs(proofs != null ? proofs.size() : 0);
             JoinAttendance proofOfMember = joinAndProofRepo.findByChallengeIdAndMemberId(chl.getId(), memberId);
             chl.setProofed(proofOfMember != null ? proofOfMember.getProof() : false);
-            chl.setUntilDateStr(Calculations.calculateUntilDate(DateUtil.covertToDate(chl.getUntilDate())));
+            if (chl.getActive())
+                chl.setUntilDateStr(Calculations.calculateUntilDate(DateUtil.covertToDate(chl.getUntilDate())));
             chl.setInsertTime(Calculations.calculateInsertTime(chl.getChlDate()));
             if (proofOfMember != null && proofOfMember.getProof() && proofOfMember.getChallenger()) {
                 chl.setStatus(Constant.STATUS.NEW_PROOF.getStatus());
@@ -233,14 +236,15 @@ public class ChallengeService implements IChallengeService {
         Validation.checkTeamCountEqual(versusChl.getFirstTeamCount(), versusChl.getSecondTeamCount());
         if (!memberService.checkMemberAvailable(versusChl.getChallengerId()))
             Exception.throwMemberNotAvailable();
+        versusChl.setActive(false);
         versusChl.setType(Constant.TYPE.PRIVATE);
         versusChl.setChlDate(new Date());
-        versusChl.setDateOfUntil(DateUtil.covertToDate(versusChl.getUntilDate()));
+        if (versusChl.getActive())
+            versusChl.setDateOfUntil(DateUtil.covertToDate(versusChl.getUntilDate()));
         for (VersusAttendance versusAtt:versusChl.getVersusAttendanceList()) {
             if (!memberService.checkMemberAvailable(versusAtt.getMemberId()))
                 Exception.throwMemberNotAvailable();
         }
-        versusChl.setChlDate(new Date());
         chlRepo.save(versusChl);
         for (VersusAttendance versusAtt:versusChl.getVersusAttendanceList()) {
             if (versusAtt.getMemberId().equals(versusChl.getChallengerId()))
@@ -253,7 +257,7 @@ public class ChallengeService implements IChallengeService {
             versusRepo.save(versusAtt);
             if (!versusAtt.getMemberId().equals(versusChl.getChallengerId()))
                 activityService.createActivity(Mappers.prepareActivity(versusAtt.getId(), versusChl.getId(), versusChl.getChallengerId(), versusAtt.getMemberId(), Constant.ACTIVITY.ACCEPT));
-            sendNotification(versusChl.getChallengerId(), versusAtt.getMemberId(), Constant.PUSH_NOTIFICATION.DONE, DateUtil.covertToDate(versusChl.getUntilDate()));
+            // sendNotification(versusChl.getChallengerId(), versusAtt.getMemberId(), Constant.PUSH_NOTIFICATION.DONE, DateUtil.covertToDate(versusChl.getUntilDate()));
         }
         return versusChl;
     }
@@ -264,9 +268,13 @@ public class ChallengeService implements IChallengeService {
         if (!memberService.checkMemberAvailable(joinChl.getChallengerId()))
             Exception.throwMemberNotAvailable();
         joinChl.setChlDate(new Date());
-        joinChl.setDateOfUntil(DateUtil.covertToDate(joinChl.getUntilDate()));
-        if (joinChl.getJoinAttendanceList() == null)
+        if (joinChl.getJoinAttendanceList() == null) {
+            joinChl.setActive(true);
             joinChl.setJoinAttendanceList(new ArrayList<JoinAttendance>());
+        } else
+            joinChl.setActive(false);
+        if (joinChl.getActive())
+            joinChl.setDateOfUntil(DateUtil.covertToDate(joinChl.getUntilDate()));
         JoinAttendance attendance = new JoinAttendance();
         attendance.setChallenger(true);
         attendance.setProof(true);
@@ -301,6 +309,7 @@ public class ChallengeService implements IChallengeService {
         selfChl.setType(Constant.TYPE.SELF);
         if (!memberService.checkMemberAvailable(selfChl.getChallengerId()))
             Exception.throwMemberNotAvailable();
+        selfChl.setActive(true);
         selfChl.setChlDate(new Date());
         selfChl.setDateOfUntil(DateUtil.covertToDate(selfChl.getUntilDate()));
         chlRepo.save(selfChl);
@@ -416,6 +425,7 @@ public class ChallengeService implements IChallengeService {
             if (joinToChallenge.getJoin()) {
                 join.setJoin(true);
                 join.setReject(false);
+                activateChallenge(challenge);
             } else {
                 join.setJoin(false);
                 join.setReject(true);
@@ -436,6 +446,22 @@ public class ChallengeService implements IChallengeService {
         activityService.createActivity(Mappers.prepareActivity(activityTableId, joinToChallenge.getChallengeId(), joinToChallenge.getMemberId(), challenge.getChallengerId(), Constant.ACTIVITY.JOIN));
     }
 
+    private void activateChallenge(Challenge challenge) {
+        if (!challenge.getActive()) {
+            challenge.setUntilDate(setUntilDateFromChallengeTime(challenge.getChallengeTime()));
+            challenge.setActive(true);
+            chlRepo.save(challenge);
+        }
+    }
+
+    private String setUntilDateFromChallengeTime(String challengeTime) {
+        Date current = new Date();
+        LocalDateTime localDateTime = current.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        localDateTime = localDateTime.plusDays(Integer.valueOf(challengeTime));
+        Date untilDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        return DateUtil.toString(untilDate);
+    }
+
     @Override
     public void acceptOrRejectChl(VersusAttendance versusAtt) {
         VersusAttendance result = versusRepo.findByMemberIdAndChallengeId(versusAtt.getMemberId(), versusAtt.getChallengeId());
@@ -443,12 +469,27 @@ public class ChallengeService implements IChallengeService {
             result.setAccept(versusAtt.getAccept());
             result.setReject(false);
             versusRepo.save(result);
+            activateChallengeForVersus(versusAtt);
         } else if (result != null && !versusAtt.getAccept()) {
             result.setAccept(false);
             result.setReject(true);
             versusRepo.save(result);
         } else
             Exception.throwNotFoundRecord();
+    }
+
+    private void activateChallengeForVersus(VersusAttendance versusAtt) {
+        Challenge challenge = chlRepo.findById(versusAtt.getChallengeId()).get();
+        if (!challenge.getActive()) {
+            Boolean isAllParticipantAccept = true;
+            List<VersusAttendance> versusAttendances = versusRepo.findByChallengeId(versusAtt.getChallengeId());
+            for (VersusAttendance versus: versusAttendances) {
+                if (!versus.getAccept())
+                    isAllParticipantAccept = false;
+            }
+            if (isAllParticipantAccept)
+                activateChallenge(challenge);
+        }
     }
 
     @Override

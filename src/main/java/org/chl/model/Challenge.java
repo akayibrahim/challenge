@@ -37,8 +37,10 @@ public class Challenge {
     private String subject;
 
     private Date chlDate; // use bg
-    @NotNull(message="You need to pass the untilDate parameter")
+
     private String untilDate; // use bg
+
+    private String challengeTime; // use bg
 
     private Date dateOfUntil;
 
@@ -74,6 +76,24 @@ public class Challenge {
     private Constant.TYPE type;
 
     private Boolean deleted;
+
+    private Boolean active;
+
+    public String getChallengeTime() {
+        return challengeTime;
+    }
+
+    public void setChallengeTime(String challengeTime) {
+        this.challengeTime = challengeTime;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 
     public Boolean getDeleted() {
         return deleted;

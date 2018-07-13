@@ -24,4 +24,9 @@ public class DateUtil {
         Date date = formatter.parse(strDate);
         return date;
     }
+
+    public static String toString(Date date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+        return formatter.format(date);
+    }
 }

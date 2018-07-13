@@ -27,6 +27,26 @@ public class Error {
 
     private String inputs;
 
+    private Boolean fe;
+
+    private Date insertTime;
+
+    public Date getInsertTime() {
+        return insertTime;
+    }
+
+    public void setInsertTime(Date insertTime) {
+        this.insertTime = insertTime;
+    }
+
+    public Boolean getFe() {
+        return fe;
+    }
+
+    public void setFe(Boolean fe) {
+        this.fe = fe;
+    }
+
     public String getId() {
         return id;
     }

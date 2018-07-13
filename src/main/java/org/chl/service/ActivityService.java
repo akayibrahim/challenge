@@ -7,6 +7,7 @@ import org.chl.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -35,6 +36,8 @@ public class ActivityService implements IActivityService {
     private MemberRepository memberRepository;
     @Autowired
     NotificationRepository notificationRepository;
+    @Autowired
+    ActivityCountRepository activityCountRepository;
 
     @Override
     public void createActivity(Activity activity) {
@@ -43,13 +46,31 @@ public class ActivityService implements IActivityService {
             Activity exist = activityRepo.findExistActivity(activity.getChallengeId(), activity.getToMemberId(), activity.getFromMemberId(), activity.getType());
             if (exist != null) {
                 exist.setType(Constant.ACTIVITY.PROOF);
+                increaseActivityCount(activity.getToMemberId());
                 activityRepo.save(exist);
-                createNotification(exist.getType(), exist.getActivityTableId(), exist.getFromMemberId(), exist.getToMemberId(),exist.getChallengeId());
+                createNotification(exist.getType(), exist.getActivityTableId(), exist.getFromMemberId(), exist.getToMemberId(), exist.getChallengeId());
                 return;
             }
         }
+        increaseActivityCount(activity.getToMemberId());
         activityRepo.save(activity);
-        createNotification(activity.getType(), activity.getActivityTableId(), activity.getFromMemberId(), activity.getToMemberId(),activity.getChallengeId());
+        createNotification(activity.getType(), activity.getActivityTableId(), activity.getFromMemberId(), activity.getToMemberId(), activity.getChallengeId());
+    }
+
+    private void increaseActivityCount(String memberId) {
+        ActivityCount exist = activityCountRepository.findByMemberId(memberId);
+        if (exist != null) {
+            String countStr = exist.getCount();
+            Integer countInt = Integer.valueOf(countStr);
+            Integer count = countInt++;
+            exist.setCount(count.toString());
+            activityCountRepository.save(exist);
+        } else {
+            ActivityCount activityCount = new ActivityCount();
+            activityCount.setMemberId(memberId);
+            activityCount.setCount(Constant.ONE);
+            activityCountRepository.save(activityCount);
+        }
     }
 
     private void createNotification(Constant.ACTIVITY type, String activityTableId, String fromMemberId, String toMemberId, String challengeId) {

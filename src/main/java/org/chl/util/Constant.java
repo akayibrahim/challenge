@@ -22,6 +22,8 @@ public class Constant {
     public static final String PROOFED_CHALLENGE = "proved %s challenge.";
     public static final String START_TO_FOLLOWING = "start to following %s.";
     public static final String START_TO_FOLLOW_YOU = "start to follow you.";
+    public static final String ZERO = "0";
+    public static final String ONE = "1";
 
     public enum ANSWER {
         ACCEPT("1"),

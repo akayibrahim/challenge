@@ -62,7 +62,7 @@ public class ChallengeControllerTest {
     private ChallengeController challengeController;
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
         List<Challenge> chls = new ArrayList<>();
         VersusChallenge versusChl = prepareVersusChlModel();
         chls.add(versusChl);
