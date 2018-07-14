@@ -17,6 +17,7 @@ import org.chl.repository.ProofRepository;
 import org.chl.service.ActivityService;
 import org.chl.service.ChallengeService;
 import org.chl.service.MemberService;
+import org.chl.service.ProofService;
 import org.chl.util.Constant;
 import org.chl.util.Exception;
 import org.chl.util.Mappers;
@@ -27,6 +28,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,50 +59,24 @@ public class ProofController {
     private ChallengeService challengeService;
     @Autowired
     private ErrorRepository errorRepository;
+    @Autowired
+    ProofService proofService;
 
     // this variable is used to store ImageId for other actions like: findOne or delete
     private String imageFileId = "";
 
+    @Transactional
     @RequestMapping(value = "/uploadImage")
     public String uploadImage(MultipartFile file, String challengeId, String memberId) throws IOException {
         try {
-            JoinAttendance joinAttendance = joinAndProofRepo.findByChallengeIdAndMemberId(challengeId, memberId);
-            if (joinAttendance.getProof())
-                Exception.throwCannotAddProofAgain();
-            DBObject metaData = new BasicDBObject();
-            metaData.put("challengeId", challengeId);
-            metaData.put("memberId", memberId);
-            InputStream inputStream = file.getInputStream();
-            metaData.put("type", "image");
-            imageFileId = gridFsTemplate.store(inputStream, file.getOriginalFilename(), file.getContentType(), metaData).toString();
-            addProof(challengeId, memberId, imageFileId);
-            return "Done " + imageFileId;
+            proofService.uploadImage(file, challengeId, memberId);
         } catch (java.lang.Exception e) {
             logError(challengeId, memberId, "uploadImage", e, "memberId=" + memberId + "&challengeId=" + challengeId);
         }
         return null;
     }
 
-    private void addProof(String challengeId, String memberId, String objectId) {
-        try {
-            JoinAttendance joinAttendance = joinAndProofRepo.findByChallengeIdAndMemberId(challengeId, memberId);
-            joinAttendance.setJoin(false);
-            joinAttendance.setProof(true);
-            joinAndProofRepo.save(joinAttendance);
-            Proof proof = new Proof();
-            proof.setProofObjectId(objectId);
-            proof.setChallengeId(challengeId);
-            proof.setMemberId(memberId);
-            proof.setInsertDate(new Date());
-            proofRepository.save(proof);
-            Challenge challenge = challengeService.getChallengeById(challengeId);
-            if (!memberId.equals(challenge.getChallengerId()))
-                activityService.createActivity(Mappers.prepareActivity(joinAttendance.getId(), challengeId, memberId, challenge.getChallengerId(), Constant.ACTIVITY.PROOF));
-        } catch (java.lang.Exception e) {
-            logError(challengeId, memberId, "addProof", e, "memberId=" + memberId + "&challengeId=" + challengeId + "&objectId=" + objectId);
-        }
-    }
-
+    @Transactional
     @RequestMapping(value = "/downloadImage", produces = MediaType.IMAGE_PNG_VALUE)
     public @ResponseBody
     byte[] downloadImage(String challengeId, String memberId) throws IOException {
@@ -124,6 +100,7 @@ public class ProofController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/downloadProofImageByObjectId", produces = MediaType.IMAGE_PNG_VALUE)
     public @ResponseBody
     byte[] downloadProofImageByObjectId(String objectId) throws IOException {
@@ -147,6 +124,7 @@ public class ProofController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/getProofInfoListByChallenge")
     public @ResponseBody List<Proof> getProofInfoListByChallenge(String challengeId) throws IOException {
         try {
@@ -178,6 +156,7 @@ public class ProofController {
         return os.toByteArray();
     }
 
+    @Transactional
     @RequestMapping("/api/save")
     public String saveFiles() throws FileNotFoundException {
         // Define metaData
@@ -203,6 +182,7 @@ public class ProofController {
         return "Done";
     }
 
+    @Transactional
     @RequestMapping("/api/retrieve/imagefile")
     public String retrieveImageFile() throws IOException {
         // read file from MongoDB
@@ -215,6 +195,7 @@ public class ProofController {
         return "Done";
     }
 
+    @Transactional
     @RequestMapping("/api/retrieve/textfiles")
     public String retrieveTextFiles(){
         /**
@@ -237,6 +218,7 @@ public class ProofController {
         return "Done";
     }
 
+    @Transactional
     @RequestMapping("/api/delete/image")
     public String deleteFile(){
         // delete image via id

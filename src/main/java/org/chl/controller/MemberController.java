@@ -9,6 +9,7 @@ import org.chl.repository.ErrorRepository;
 import org.chl.service.MemberService;
 import org.chl.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +28,7 @@ public class MemberController {
     @Autowired
     ActivityCountRepository activityCountRepository;
 
+    @Transactional
     @RequestMapping(value = "/getMemberInfo")
     public Member getMemberInfo(String memberId) {
         try {
@@ -40,6 +42,7 @@ public class MemberController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/getMemberInfoByEmail")
     public Member getMemberInfoByEmail(String email) {
         try {
@@ -51,6 +54,7 @@ public class MemberController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/addMember")
     public String addMember(@Valid @RequestBody Member member) {
         try {
@@ -62,6 +66,7 @@ public class MemberController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/getMembers")
     public Iterable<Member> getMemberInfoByEmail() {
         try {
@@ -73,6 +78,7 @@ public class MemberController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/getFollowingList")
     public List<Member> getFollowingList(String memberId) {
         try {
@@ -88,6 +94,7 @@ public class MemberController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/getFollowerList")
     public List<Member> getFollowerList(String memberId) {
         try {
@@ -103,6 +110,7 @@ public class MemberController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/followingFriend")
     public void followingFriend(String friendMemberId, String memberId, Boolean follow) {
         try {
@@ -112,6 +120,7 @@ public class MemberController {
         }
     }
 
+    @Transactional
     @RequestMapping(value = "/deleteSuggestion")
     public void deleteSuggestion(String friendMemberId, String memberId) {
         try {
@@ -121,6 +130,7 @@ public class MemberController {
         }
     }
 
+    @Transactional
     @RequestMapping(value = "/isMyFriend")
     public Boolean isMyFriend(String memberId, String friendMemberId) {
         try {
@@ -131,6 +141,7 @@ public class MemberController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/getSuggestionsForFollowing")
     public List<Member> getSuggestionsForFollowing(String memberId) {
         try {
@@ -158,6 +169,7 @@ public class MemberController {
         errorRepository.save(error);
     }
 
+    @Transactional
     @RequestMapping(value = "/errorLog")
     public void errorLog(@Valid @RequestBody Error error) {
         error.setFe(true);
@@ -165,6 +177,7 @@ public class MemberController {
         errorRepository.save(error);
     }
 
+    @Transactional
     @RequestMapping(value = "/getActivityCount")
     public String getActivityCount(@Valid String memberId) {
         try {
@@ -181,6 +194,7 @@ public class MemberController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/searchFriends")
     public List<Member> searchFriends(@Valid String searchKey) {
         try {

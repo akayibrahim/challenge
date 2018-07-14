@@ -220,7 +220,7 @@ public class ChallengeService implements IChallengeService {
             chl.setSecondTeamSupportCount(supportSecondTeam != null ? supportSecondTeam.size() : 0);
             List<JoinAttendance> proofs = joinAndProofRepo.findByChallengeIdAndProof(chl.getId(), true);
             chl.setCountOfProofs(proofs != null ? proofs.size() : 0);
-            JoinAttendance proofOfMember = joinAndProofRepo.findByChallengeIdAndMemberId(chl.getId(), memberId);
+            JoinAttendance proofOfMember = joinAndProofRepo.findByChallengeIdAndMemberId(chl.getId(), chl.getChallengerId());
             chl.setProofed(proofOfMember != null ? proofOfMember.getProof() : false);
             if (chl.getActive())
                 chl.setUntilDateStr(Calculations.calculateUntilDate(DateUtil.covertToDate(chl.getUntilDate())));
@@ -277,7 +277,7 @@ public class ChallengeService implements IChallengeService {
         if (!memberService.checkMemberAvailable(joinChl.getChallengerId()))
             Exception.throwMemberNotAvailable();
         joinChl.setChlDate(new Date());
-        if (joinChl.getJoinAttendanceList() == null) {
+        if (joinChl.getJoinAttendanceList() == null || joinChl.getJoinAttendanceList().size() == 0) {
             joinChl.setActive(true);
             joinChl.setJoinAttendanceList(new ArrayList<JoinAttendance>());
         } else

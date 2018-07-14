@@ -5,12 +5,18 @@ import org.chl.model.Error;
 import org.chl.repository.ErrorRepository;
 import org.chl.service.ActivityService;
 import org.chl.service.ChallengeService;
+import org.chl.service.ProofService;
+import org.chl.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.annotation.MultipartConfig;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +28,10 @@ public class ChallengeController {
     private ActivityService activityService;
     @Autowired
     private ErrorRepository errorRepository;
+    @Autowired
+    ProofService proofService;
 
+    @Transactional
     @RequestMapping(value = "/getChallenges")
     public Iterable<Challenge> getChallenges(String memberId) throws Exception {
         try {
@@ -34,6 +43,7 @@ public class ChallengeController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/getChallengesOfMember")
     public Iterable<Challenge> getChallengesOfMember(String memberId) throws Exception {
         try {
@@ -45,6 +55,7 @@ public class ChallengeController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/getChallengesOfFriend")
     public Iterable<Challenge> getChallengesOfFriend(String memberId, String friendMemberId) throws Exception {
         try {
@@ -56,6 +67,7 @@ public class ChallengeController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/getExplorerChallenges")
     public Iterable<Challenge> getExplorerChallenges(String memberId, String challengeId, Boolean addSimilarChallanges) throws Exception {
         try {
@@ -67,6 +79,7 @@ public class ChallengeController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/getTrendChallenges")
     public Iterable<Trends> getTrendsChallenges(String memberId, String subjectSearchKey) throws Exception {
         try {
@@ -78,8 +91,9 @@ public class ChallengeController {
         return null;
     }
 
-    @RequestMapping(value = "/addJoinChallenge")
-    public String addJoinChallenge(@Valid @RequestBody JoinAndProofChallenge joinChl) throws Exception {
+    @Transactional
+    @RequestMapping(value = "/addJoinChallengeOld")
+    public String addJoinChallengeOld(@Valid @RequestBody JoinAndProofChallenge joinChl) throws Exception {
         try {
             Challenge challenge = chlService.addJoinChallenge(joinChl);
             return challenge.getId();
@@ -90,6 +104,39 @@ public class ChallengeController {
         return null;
     }
 
+    @Transactional
+    @RequestMapping(value = "/addJoinChallenge")
+    public String addJoinChallenge(@Valid @RequestBody MultipartFile file, String challengerId, ArrayList<JoinAttendance> joinAttendanceList
+    , String challengerFBId, String name, String thinksAboutChallenge, String subject, Boolean done, String firstTeamCount
+    , String secondTeamCount, Constant.TYPE type, int visibility, String challengeTime, String untilDate, Boolean proofed) throws Exception {
+        try {
+            JoinAndProofChallenge joinChl = new JoinAndProofChallenge();
+            joinChl.setChallengerId(challengerId);
+            joinChl.setName(name);
+            joinChl.setChallengerFBId(challengerFBId);
+            if (StringUtils.hasText(thinksAboutChallenge))
+                joinChl.setThinksAboutChallenge(thinksAboutChallenge);
+            joinChl.setSubject(subject);
+            joinChl.setDone(done);
+            joinChl.setFirstTeamCount(firstTeamCount);
+            joinChl.setSecondTeamCount(secondTeamCount);
+            joinChl.setType(type);
+            joinChl.setVisibility(visibility);
+            joinChl.setChallengeTime(challengeTime);
+            joinChl.setUntilDate(untilDate);
+            joinChl.setProofed(proofed);
+            joinChl.setJoinAttendanceList(joinAttendanceList);
+            Challenge challenge = chlService.addJoinChallenge(joinChl);
+            proofService.uploadImage(file, challenge.getId(), challengerId);
+            return challenge.getId();
+        } catch (Exception e) {
+            logError(null, challengerId, "addJoinChallenge", e, "memberId=" + challengerId);
+            // TODO inputs
+        }
+        return null;
+    }
+
+    @Transactional
     @RequestMapping(value = "/addVersusChallenge")
     public String addVersusChallenge(@Valid @RequestBody VersusChallenge versusChl) throws Exception {
         try {
@@ -102,6 +149,7 @@ public class ChallengeController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/addSelfChallenge")
     public String addSelfChallenge(@Valid @RequestBody SelfChallenge selfChl) throws Exception {
         try {
@@ -114,6 +162,7 @@ public class ChallengeController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/getSubjects")
     public Iterable<Subjects> getSubjects() throws Exception {
         try {
@@ -124,6 +173,7 @@ public class ChallengeController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/getSelfSubjects")
     public Iterable<Subjects> getSelfSubjects() throws Exception {
         try {
@@ -134,6 +184,7 @@ public class ChallengeController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/commentToChallange")
     public void commentToChallange(@Valid @RequestBody TextComment textComment) throws Exception {
         try {
@@ -144,6 +195,7 @@ public class ChallengeController {
         }
     }
 
+    @Transactional
     @RequestMapping(value = "/getComments")
     public Iterable<TextComment> getComments(String challengeId) throws Exception {
         try {
@@ -154,6 +206,7 @@ public class ChallengeController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/supportChallenge")
     public void likeChallenge(@Valid @RequestBody Support support) throws Exception {
         try {
@@ -165,6 +218,7 @@ public class ChallengeController {
         }
     }
 
+    @Transactional
     @RequestMapping(value = "/joinToChallenge")
     public void joinToChallenge(@Valid @RequestBody JoinToChallenge joinToChallenge) throws Exception {
         try {
@@ -175,6 +229,7 @@ public class ChallengeController {
         }
     }
 
+    @Transactional
     @RequestMapping(value = "/updateProgressOrDoneForSelf")
     public void updateProgressOrDoneForSelf(String challengeId, String result, Boolean done) throws Exception {
         try {
@@ -185,6 +240,7 @@ public class ChallengeController {
         }
     }
 
+    @Transactional
     @RequestMapping(value = "/updateResultsOfVersus")
     public void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore) throws Exception {
         try {
@@ -195,6 +251,7 @@ public class ChallengeController {
         }
     }
 
+    @Transactional
     @RequestMapping(value = "/deleteChallenge")
     public void deleteChallenge(String challengeId) throws Exception {
         try {
@@ -204,6 +261,7 @@ public class ChallengeController {
         }
     }
 
+    @Transactional
     @RequestMapping(value = "/acceptOrRejectChl")
     public void acceptOrRejectChl(@Valid @RequestBody VersusAttendance chlAtt) throws Exception {
         try {
@@ -215,6 +273,7 @@ public class ChallengeController {
 
     }
 
+    @Transactional
     @RequestMapping(value = "/getActivities")
     public List<Activity> getActivities(String toMemberId) throws Exception {
         try {
@@ -225,6 +284,7 @@ public class ChallengeController {
         return null;
     }
 
+    @Transactional
     @RequestMapping(value = "/getChallengeRequest")
     public List<ChallengeRequest> getChallengeRequest(String memberId) throws Exception {
         try {
