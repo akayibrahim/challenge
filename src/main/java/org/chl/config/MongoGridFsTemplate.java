@@ -5,10 +5,13 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.gridfs.GridFS;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
+
+import javax.servlet.MultipartConfigElement;
 
 @Configuration
 public class MongoGridFsTemplate  extends AbstractMongoConfiguration{
@@ -35,5 +38,13 @@ public class MongoGridFsTemplate  extends AbstractMongoConfiguration{
     @Override
     protected String getDatabaseName() {
         return mongoClient().getDatabase("test").getName();
+    }
+
+    @Bean
+    public MultipartConfigElement multipartConfigElement() {
+        MultipartConfigFactory factory = new MultipartConfigFactory();
+        factory.setMaxFileSize("30MB");
+        factory.setMaxRequestSize("30MB");
+        return factory.createMultipartConfig();
     }
 }
