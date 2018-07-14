@@ -128,4 +128,11 @@ public class MemberService implements IMemberService {
         List<FriendList> friends = Lists.newArrayList(friendLists);
         return friends;
     }
+
+    @Override
+    public List<Member> searchFriends(String searchKey) {
+        Iterable<Member> memberList = memberRepo.findByKey(searchKey.toUpperCase());
+        List<Member> members = Lists.newArrayList(memberList);
+        return members;
+    }
 }

@@ -34,4 +34,7 @@ public interface IMemberService {
     List<FriendList> getSuggestionsForFollowing(String memberId);
 
     Boolean isMyFriend(String memberId, String friendMemberId);
+
+    List<Member> searchFriends(String searchKey);
 }
+

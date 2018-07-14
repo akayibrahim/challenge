@@ -180,4 +180,15 @@ public class MemberController {
         }
         return null;
     }
+
+    @RequestMapping(value = "/searchFriends")
+    public List<Member> searchFriends(@Valid String searchKey) {
+        try {
+            List<Member> members = memberService.searchFriends(searchKey);
+            return members;
+        } catch (Exception e) {
+            logError(null, null, "searchFriends", e, "searchKey=" + searchKey);
+        }
+        return null;
+    }
 }
