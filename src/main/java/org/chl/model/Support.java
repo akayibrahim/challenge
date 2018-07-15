@@ -22,11 +22,20 @@ public class Support {
     @NotEmpty(message="You need to pass the memberId parameter")
     private String memberId;
 
+    private String supportedMemberId;
     private Date date;
     @JsonProperty
     private Boolean supportFirstTeam;
     @JsonProperty
     private Boolean supportSecondTeam;
+
+    public String getSupportedMemberId() {
+        return supportedMemberId;
+    }
+
+    public void setSupportedMemberId(String supportedMemberId) {
+        this.supportedMemberId = supportedMemberId;
+    }
 
     public Boolean getSupportFirstTeam() {
         return supportFirstTeam;

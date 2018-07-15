@@ -1,7 +1,6 @@
 package org.chl.service;
 
 import com.google.common.collect.Lists;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.chl.intf.IChallengeService;
 import org.chl.model.*;
 import org.chl.repository.*;
@@ -12,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -58,7 +56,25 @@ public class ChallengeService implements IChallengeService {
     @Override
     public Iterable<Challenge> getChallenges(String memberId) {
         List<String> friendLists = memberService.getFollowingIdList(memberId);
-        Iterable<Challenge> challenges = chlRepo.findChallenges(friendLists, Constant.TYPE.PUBLIC, new Date(), new Sort(Sort.Direction.DESC,"updateDate"));
+        List<Challenge> challenges = chlRepo.findChallenges(friendLists, Constant.TYPE.PUBLIC, new Date(), new Sort(Sort.Direction.DESC, "updateDate"));
+        List<JoinAttendance> joinAttendanceList = joinAndProofRepo.findByFriendListInAttendace(friendLists);
+        joinAttendanceList.stream().filter(join -> chlRepo.findById(join.getChallengeId()).get().getActive())
+                .forEach(join -> {
+            Challenge challenge = chlRepo.findById(join.getChallengeId()).get();
+            challenge.setChallengerId(join.getMemberId());
+            challenge.setChallengerFBId(join.getFacebookID());
+            challenges.add(challenge);
+        });
+        List<VersusAttendance> versusAttendanceList = versusRepo.findByFriendListInAttendace(friendLists);
+        versusAttendanceList.stream().filter(versus -> chlRepo.findById(versus.getChallengeId()).get().getActive())
+                .forEach( versus -> {
+                    Challenge challenge = chlRepo.findById(versus.getChallengeId()).get();
+                    challenge.setChallengerId(versus.getMemberId());
+                    challenge.setChallengerFBId(versus.getFacebookID());
+                    if (challenges.stream().noneMatch(chl -> chl.getId().equals(challenge.getId())))
+                        challenges.add(challenge);
+
+                });
         prepareChallengesData(memberId, challenges, false);
         return challenges;
     }
@@ -93,24 +109,23 @@ public class ChallengeService implements IChallengeService {
         Boolean activesForMyProfile[] = {true, false};
         Boolean activesForOthers[] = {true};
         List<Boolean> actives = myProfile ? Arrays.asList(activesForMyProfile) : Arrays.asList(activesForOthers);
-        Iterable<Challenge> challengesByMemberId = chlRepo.findChallengesByMemberId(memberId, visibilities, actives, new Sort(Sort.Direction.DESC,"updateDate"));
-        List<Challenge> challenges = Lists.newArrayList(challengesByMemberId);
+        List<Challenge> challenges = chlRepo.findChallengesByMemberId(memberId, visibilities, actives, new Sort(Sort.Direction.DESC, "updateDate"));
         List<JoinAttendance> joinAttendanceList = joinAndProofRepo.findByMemberIdInAttendace(memberId);
         List<String> challangeIdList = new ArrayList<>();
         if (myProfile) {
             List<VersusAttendance> versusAttendanceList = versusRepo.findByMemberIdInAttendace(memberId);
-            for (VersusAttendance versus:  versusAttendanceList) {
+            for (VersusAttendance versus : versusAttendanceList) {
                 challangeIdList.add(versus.getChallengeId());
             }
         }
-        for (JoinAttendance join:  joinAttendanceList) {
+        for (JoinAttendance join : joinAttendanceList) {
             challangeIdList.add(join.getChallengeId());
         }
         for (Challenge chl : challenges) {
-             if (challangeIdList.contains(chl.getId()))
-                 challangeIdList.remove(chl.getId());
+            if (challangeIdList.contains(chl.getId()))
+                challangeIdList.remove(chl.getId());
         }
-        Iterable<Challenge> restChallenges = chlRepo.findChallengesByChallengeIdList(challangeIdList, actives, new Sort(Sort.Direction.DESC,"updateDate"));
+        List<Challenge> restChallenges = chlRepo.findChallengesByChallengeIdList(challangeIdList, actives, new Sort(Sort.Direction.DESC, "updateDate"));
         List<Challenge> restChallengeList = Lists.newArrayList(restChallenges);
         challenges.addAll(restChallengeList);
         prepareChallengesData(memberId, challenges, true);
@@ -120,7 +135,7 @@ public class ChallengeService implements IChallengeService {
     private void setToDoneForPastChallenge(String memberId) {
         List<String> visibilities = fullVisibility();
         Boolean actives[] = {true, false};
-        Iterable<Challenge> challengesByMemberId = chlRepo.findChallengesByMemberId(memberId, visibilities, Arrays.asList(actives), new Sort(Sort.Direction.DESC,"updateDate"));
+        List<Challenge> challengesByMemberId = chlRepo.findChallengesByMemberId(memberId, visibilities, Arrays.asList(actives), new Sort(Sort.Direction.DESC, "updateDate"));
         challengesByMemberId.forEach(challenge -> {
             if (DateUtil.covertToDate(challenge.getUntilDate()).compareTo(new Date()) <= 0) {
                 Challenge exist = chlRepo.findById(challenge.getId()).get();
@@ -137,8 +152,8 @@ public class ChallengeService implements IChallengeService {
         Challenge explorerChallenge = chlRepo.findById(challengeId).get();
         boolean isExist = false;
         if (addSimilarChallanges) {
-            Iterable<Challenge> subjectChallenges = chlRepo.findChallengesBySubjectAndType(explorerChallenge.getSubject().toString(), Constant.TYPE.PUBLIC
-                    , new Date(), new Sort(Sort.Direction.DESC,"id"));
+            List<Challenge> subjectChallenges = chlRepo.findChallengesBySubjectAndType(explorerChallenge.getSubject().toString(), Constant.TYPE.PUBLIC
+                    , new Date(), new Sort(Sort.Direction.DESC, "id"));
             List<Challenge> subjectChallengeList = Lists.newArrayList(subjectChallenges);
             challenges.addAll(subjectChallengeList);
             for (Challenge chl : subjectChallengeList) {
@@ -159,13 +174,13 @@ public class ChallengeService implements IChallengeService {
     public Iterable<Trends> getTrendChallenges(String memberId, String subjectSearchKey) {
         List<Trends> trendList = new ArrayList<>();
         if (StringUtils.hasText(subjectSearchKey)) {
-            Iterable<TrendChallenge> trendChallenges = trendChallengeRepository.findTrendChallengesBySearch(subjectSearchKey, Constant.TYPE.PUBLIC, new Sort(Sort.Direction.DESC,"popularity"));
+            Iterable<TrendChallenge> trendChallenges = trendChallengeRepository.findTrendChallengesBySearch(subjectSearchKey, Constant.TYPE.PUBLIC, new Sort(Sort.Direction.DESC, "popularity"));
             for (TrendChallenge trendChallenge : trendChallenges) {
                 Challenge challenge = chlRepo.findById(trendChallenge.getChallengeId()).get();
                 trendList.add(prepareTrend(challenge));
             }
         } else {
-            Iterable<TrendChallenge> trendChallenges = trendChallengeRepository.findTrendChallengesByType(Constant.TYPE.PUBLIC, new Sort(Sort.Direction.DESC,"popularity"));
+            Iterable<TrendChallenge> trendChallenges = trendChallengeRepository.findTrendChallengesByType(Constant.TYPE.PUBLIC, new Sort(Sort.Direction.DESC, "popularity"));
             for (TrendChallenge trendChallenge : trendChallenges) {
                 Challenge challenge = chlRepo.findById(trendChallenge.getChallengeId()).get();
                 trendList.add(prepareTrend(challenge));
@@ -185,9 +200,10 @@ public class ChallengeService implements IChallengeService {
         return trend;
     }
 
-    private void prepareChallengesData(String memberId, Iterable<Challenge> challenges, Boolean comeFromSelf) {
-        for (Challenge chl: challenges) {
-            if(chl instanceof VersusChallenge) {
+    private void prepareChallengesData(String memberId, List<Challenge> challenges, Boolean comeFromSelf) {
+        for (Challenge chl : challenges) {
+            Boolean toWorld = false;
+            if (chl instanceof VersusChallenge) {
                 VersusChallenge versusChl = (VersusChallenge) chl;
                 versusChl.setVersusAttendanceList(versusRepo.findByChallengeId(chl.getId()));
                 Integer teamSize = versusChl.getVersusAttendanceList().size() / 2;
@@ -195,12 +211,16 @@ public class ChallengeService implements IChallengeService {
                 versusChl.setSecondTeamCount(teamSize.toString());
                 versusChl.setFirstTeamScore(versusChl.getFirstTeamScore() != null ? versusChl.getFirstTeamScore() : "-");
                 versusChl.setSecondTeamScore(versusChl.getSecondTeamScore() != null ? versusChl.getSecondTeamScore() : "-");
-            } else if(chl instanceof JoinAndProofChallenge) {
+            } else if (chl instanceof JoinAndProofChallenge) {
                 JoinAndProofChallenge joinChl = (JoinAndProofChallenge) chl;
                 joinChl.setJoinAttendanceList(joinAndProofRepo.findByChallengeId(chl.getId()));
                 Integer teamSize = joinChl.getJoinAttendanceList().size() - 1;
                 joinChl.setFirstTeamCount(BigDecimal.ONE.toString());
-                joinChl.setSecondTeamCount(teamSize.toString());
+                if (!joinChl.getToWorld())
+                    joinChl.setSecondTeamCount(teamSize.toString());
+                else
+                    joinChl.setSecondTeamCount(BigDecimal.ZERO.toString());
+                toWorld = joinChl.getToWorld();
             } else {
                 chl.setFirstTeamCount(BigDecimal.ONE.toString());
                 chl.setSecondTeamCount(BigDecimal.ZERO.toString());
@@ -211,25 +231,31 @@ public class ChallengeService implements IChallengeService {
             chl.setName(memberInfo.getName() + " " + memberInfo.getSurname());
             chl.setChallengerFBId(memberInfo.getFacebookID());
             chl.setComeFromSelf(comeFromSelf);
-            Support memberSupport = supportRepository.findByMemberIdAndChallengeId(memberId, chl.getId());
+            Support memberSupport = null;
+            if (toWorld)
+                memberSupport = supportRepository.findByMemberIdAndChallengeIdAndSupportedMemberId(memberId, chl.getId(), chl.getChallengerId());
+            else
+                memberSupport = supportRepository.findByMemberIdAndChallengeId(memberId, chl.getId());
             chl.setSupportFirstTeam(memberSupport != null ? memberSupport.getSupportFirstTeam() : false);
             chl.setSupportSecondTeam(memberSupport != null ? memberSupport.getSupportSecondTeam() : false);
-            List<Support> supports =  supportRepository.findByChallengeIdAndSupportFirstTeam(chl.getId(), true);
+            List<Support> supports = supportRepository.findByChallengeIdAndSupportFirstTeam(chl.getId(), true);
             chl.setFirstTeamSupportCount(supports != null ? supports.size() : 0);
-            List<Support> supportSecondTeam =  supportRepository.findByChallengeIdAndSupportSecondTeam(chl.getId(), true);
+            List<Support> supportSecondTeam = supportRepository.findByChallengeIdAndSupportSecondTeam(chl.getId(), true);
             chl.setSecondTeamSupportCount(supportSecondTeam != null ? supportSecondTeam.size() : 0);
             List<JoinAttendance> proofs = joinAndProofRepo.findByChallengeIdAndProof(chl.getId(), true);
             chl.setCountOfProofs(proofs != null ? proofs.size() : 0);
-            JoinAttendance proofOfMember = joinAndProofRepo.findByChallengeIdAndMemberId(chl.getId(), chl.getChallengerId());
+            JoinAttendance proofOfMember = joinAndProofRepo.findByChallengeIdAndMemberId(chl.getId(), memberId);
             chl.setProofed(proofOfMember != null ? proofOfMember.getProof() : false);
             if (chl.getActive())
                 chl.setUntilDateStr(Calculations.calculateUntilDate(DateUtil.covertToDate(chl.getUntilDate())));
             chl.setInsertTime(Calculations.calculateInsertTime(chl.getChlDate()));
-            if (proofOfMember != null && proofOfMember.getProof() && proofOfMember.getChallenger()) {
+            JoinAttendance proofOfChallenger = joinAndProofRepo.findByChallengeIdAndMemberId(chl.getId(), chl.getChallengerId());
+            chl.setProofedByChallenger(proofOfChallenger != null ? proofOfChallenger.getProof() : false);
+            if (proofOfChallenger != null && proofOfChallenger.getProof() && proofOfChallenger.getChallenger()) {
                 chl.setStatus(Constant.STATUS.NEW_PROOF.getStatus());
-            } else if (proofOfMember != null && proofOfMember.getProof()) {
+            } else if (proofOfChallenger != null && proofOfChallenger.getProof()) {
                 chl.setStatus(Constant.STATUS.PROOF.getStatus());
-            } else if (proofOfMember != null && proofOfMember.getJoin()) {
+            } else if (proofOfChallenger != null && proofOfChallenger.getJoin()) {
                 chl.setStatus(Constant.STATUS.JOIN.getStatus());
             } else if (!chl.getDone()) {
                 chl.setStatus(Constant.STATUS.NEW.getStatus());
@@ -250,14 +276,14 @@ public class ChallengeService implements IChallengeService {
         versusChl.setChlDate(new Date());
         if (versusChl.getActive())
             versusChl.setDateOfUntil(DateUtil.covertToDate(versusChl.getUntilDate()));
-        for (VersusAttendance versusAtt:versusChl.getVersusAttendanceList()) {
+        for (VersusAttendance versusAtt : versusChl.getVersusAttendanceList()) {
             if (!memberService.checkMemberAvailable(versusAtt.getMemberId()))
                 Exception.throwMemberNotAvailable();
         }
         chlRepo.save(versusChl);
-        for (VersusAttendance versusAtt:versusChl.getVersusAttendanceList()) {
+        for (VersusAttendance versusAtt : versusChl.getVersusAttendanceList()) {
             if (versusAtt.getMemberId().equals(versusChl.getChallengerId()))
-                    versusAtt.setAccept(true);
+                versusAtt.setAccept(true);
             else
                 versusAtt.setAccept(null);
             versusAtt.setChallengeId(versusChl.getId());
@@ -279,9 +305,12 @@ public class ChallengeService implements IChallengeService {
         joinChl.setChlDate(new Date());
         if (joinChl.getJoinAttendanceList() == null || joinChl.getJoinAttendanceList().size() == 0) {
             joinChl.setActive(true);
+            joinChl.setToWorld(true);
             joinChl.setJoinAttendanceList(new ArrayList<JoinAttendance>());
-        } else
+        } else {
+            joinChl.setToWorld(false);
             joinChl.setActive(false);
+        }
         if (joinChl.getActive())
             joinChl.setDateOfUntil(DateUtil.covertToDate(joinChl.getUntilDate()));
         JoinAttendance attendance = new JoinAttendance();
@@ -297,7 +326,7 @@ public class ChallengeService implements IChallengeService {
                 Exception.throwMemberNotAvailable();
         }
         chlRepo.insert(joinChl);
-        for (JoinAttendance joinAtt:joinChl.getJoinAttendanceList()) {
+        for (JoinAttendance joinAtt : joinChl.getJoinAttendanceList()) {
             if (joinAtt.getMemberId().equals("TO_WORLD"))
                 continue;
             if (!joinAtt.getChallenger())
@@ -348,7 +377,11 @@ public class ChallengeService implements IChallengeService {
             trendChallengeRepository.save(newTrendChallenge);
         }
         String activityTableId;
-        Support exist = supportRepository.findByMemberIdAndChallengeId(support.getMemberId(), support.getChallengeId());
+        Support exist = null;
+        if (StringUtils.hasText(support.getSupportedMemberId()))
+            exist = supportRepository.findByMemberIdAndChallengeIdAndSupportedMemberId(support.getMemberId(), support.getChallengeId(), support.getSupportedMemberId());
+        else
+            exist = supportRepository.findByMemberIdAndChallengeId(support.getMemberId(), support.getChallengeId());
         if (exist != null) {
             exist.setSupportFirstTeam(support.getSupportFirstTeam());
             exist.setSupportSecondTeam(support.getSupportSecondTeam());
@@ -358,7 +391,7 @@ public class ChallengeService implements IChallengeService {
             supportRepository.save(support);
             activityTableId = support.getId();
         }
-        if(challenge instanceof VersusChallenge) {
+        if (challenge instanceof VersusChallenge) {
             VersusChallenge versusChl = (VersusChallenge) challenge;
             versusChl.setVersusAttendanceList(versusRepo.findByChallengeId(challenge.getId()));
             versusChl.getVersusAttendanceList().forEach(versusAttendance -> {
@@ -371,7 +404,7 @@ public class ChallengeService implements IChallengeService {
                 }
 
             });
-        } else if(challenge instanceof JoinAndProofChallenge) {
+        } else if (challenge instanceof JoinAndProofChallenge) {
             JoinAndProofChallenge joinChl = (JoinAndProofChallenge) challenge;
             joinChl.setJoinAttendanceList(joinAndProofRepo.findByChallengeId(challenge.getId()));
             joinChl.getJoinAttendanceList().forEach(joinAttendance -> {
@@ -387,7 +420,7 @@ public class ChallengeService implements IChallengeService {
     public void updateProgressOrDoneForSelf(String challengeId, String result, Boolean done) {
         Challenge chl = chlRepo.findById(challengeId).get();
         SelfChallenge selfChl = (SelfChallenge) chl;
-        if(selfChl != null && !selfChl.getDone()) {
+        if (selfChl != null && !selfChl.getDone()) {
             selfChl.setDone(done);
             selfChl.setResult(result);
             selfChl.setUpdateDate(new Date());
@@ -401,7 +434,7 @@ public class ChallengeService implements IChallengeService {
         Validation.doneValidationForVersus(true, firstTeamScore, secondTeamScore);
         Challenge chl = chlRepo.findById(challengeId).get();
         VersusChallenge versusChl = (VersusChallenge) chl;
-        if(versusChl != null && !versusChl.getDone()) {
+        if (versusChl != null && !versusChl.getDone()) {
             versusChl.setFirstTeamScore(firstTeamScore);
             versusChl.setSecondTeamScore(secondTeamScore);
             versusChl.setDone(true);
@@ -414,7 +447,7 @@ public class ChallengeService implements IChallengeService {
     @Override
     public void deleteChallenge(String challengeId) {
         Challenge findChl = chlRepo.findById(challengeId).get();
-        if(findChl != null) {
+        if (findChl != null) {
             findChl.setDeleted(true);
             chlRepo.save(findChl);
         }
@@ -479,7 +512,7 @@ public class ChallengeService implements IChallengeService {
     @Override
     public void acceptOrRejectChl(VersusAttendance versusAtt) {
         VersusAttendance result = versusRepo.findByMemberIdAndChallengeId(versusAtt.getMemberId(), versusAtt.getChallengeId());
-        if(result != null && versusAtt.getAccept()) {
+        if (result != null && versusAtt.getAccept()) {
             result.setAccept(versusAtt.getAccept());
             result.setReject(false);
             versusRepo.save(result);
@@ -497,7 +530,7 @@ public class ChallengeService implements IChallengeService {
         if (!challenge.getActive()) {
             Boolean isAllParticipantAccept = true;
             List<VersusAttendance> versusAttendances = versusRepo.findByChallengeId(versusAtt.getChallengeId());
-            for (VersusAttendance versus: versusAttendances) {
+            for (VersusAttendance versus : versusAttendances) {
                 if (!versus.getAccept())
                     isAllParticipantAccept = false;
             }

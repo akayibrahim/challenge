@@ -20,4 +20,6 @@ public interface SupportRepository extends MongoRepository<Support, String> {
     Support findByMemberId(String memberId);
 
     Support findByMemberIdAndChallengeId(String memberId, String challengeId);
+
+    Support findByMemberIdAndChallengeIdAndSupportedMemberId(String memberId, String challengeId, String supportedMemberId);
 }

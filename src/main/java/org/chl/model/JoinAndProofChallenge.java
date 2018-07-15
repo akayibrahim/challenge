@@ -14,6 +14,15 @@ import java.util.List;
 @Document
 public class JoinAndProofChallenge extends Challenge {
     private List<JoinAttendance> joinAttendanceList;
+    private Boolean toWorld;
+
+    public Boolean getToWorld() {
+        return toWorld;
+    }
+
+    public void setToWorld(Boolean toWorld) {
+        this.toWorld = toWorld;
+    }
 
     public List<JoinAttendance> getJoinAttendanceList() {
         return joinAttendanceList;

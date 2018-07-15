@@ -71,6 +71,8 @@ public class Challenge {
     @JsonProperty
     private Boolean proofed;
 
+    private Boolean proofedByChallenger;
+
     private int countOfComments;
 
     private Constant.TYPE type;
@@ -80,6 +82,14 @@ public class Challenge {
     private Boolean active;
 
     private int visibility;
+
+    public Boolean getProofedByChallenger() {
+        return proofedByChallenger;
+    }
+
+    public void setProofedByChallenger(Boolean proofedByChallenger) {
+        this.proofedByChallenger = proofedByChallenger;
+    }
 
     public int getVisibility() {
         return visibility;

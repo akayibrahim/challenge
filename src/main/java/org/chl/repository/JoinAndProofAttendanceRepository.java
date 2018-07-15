@@ -23,4 +23,7 @@ public interface JoinAndProofAttendanceRepository extends MongoRepository<JoinAt
 
     @Query(" {'memberId' : ?0 }")
     List<JoinAttendance> findByMemberIdInAttendace(String memberId);
+
+    @Query(" {'memberId' :  {$in : ?0}}")
+    List<JoinAttendance> findByFriendListInAttendace(List<String> friendList);
 }
