@@ -6,21 +6,11 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
-import org.chl.model.Challenge;
-import org.chl.model.Error;
-import org.chl.model.JoinAttendance;
 import org.chl.model.Member;
 import org.chl.model.Proof;
-import org.chl.repository.ErrorRepository;
 import org.chl.repository.JoinAndProofAttendanceRepository;
 import org.chl.repository.ProofRepository;
-import org.chl.service.ActivityService;
-import org.chl.service.ChallengeService;
-import org.chl.service.MemberService;
-import org.chl.service.ProofService;
-import org.chl.util.Constant;
-import org.chl.util.Exception;
-import org.chl.util.Mappers;
+import org.chl.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -36,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -58,7 +47,7 @@ public class ProofController {
     @Autowired
     private ChallengeService challengeService;
     @Autowired
-    private ErrorRepository errorRepository;
+    private ErrorService errorService;
     @Autowired
     ProofService proofService;
 
@@ -67,7 +56,7 @@ public class ProofController {
 
     @Transactional
     @RequestMapping(value = "/uploadImage")
-    public String uploadImage(MultipartFile file, String challengeId, String memberId) throws IOException {
+    public String uploadImage(MultipartFile file, String challengeId, String memberId) throws IOException, java.lang.Exception {
         try {
             proofService.uploadImage(file, challengeId, memberId);
         } catch (java.lang.Exception e) {
@@ -79,7 +68,7 @@ public class ProofController {
     @Transactional
     @RequestMapping(value = "/downloadImage", produces = MediaType.IMAGE_PNG_VALUE)
     public @ResponseBody
-    byte[] downloadImage(String challengeId, String memberId) throws IOException {
+    byte[] downloadImage(String challengeId, String memberId) throws IOException, java.lang.Exception {
         try {
             GridFSFile file =  gridOperations.findOne(new Query(Criteria.where("metadata.challengeId").is(challengeId).andOperator(Criteria.where("metadata.memberId").is(memberId))));
             byte[] bytesToWriteTo = null;
@@ -103,7 +92,7 @@ public class ProofController {
     @Transactional
     @RequestMapping(value = "/downloadProofImageByObjectId", produces = MediaType.IMAGE_PNG_VALUE)
     public @ResponseBody
-    byte[] downloadProofImageByObjectId(String objectId) throws IOException {
+    byte[] downloadProofImageByObjectId(String objectId) throws IOException, java.lang.Exception {
         try {
             GridFSFile file =  gridOperations.findOne(new Query(Criteria.where("_id").is(objectId)));
             byte[] bytesToWriteTo = null;
@@ -126,7 +115,7 @@ public class ProofController {
 
     @Transactional
     @RequestMapping(value = "/getProofInfoListByChallenge")
-    public @ResponseBody List<Proof> getProofInfoListByChallenge(String challengeId) throws IOException {
+    public @ResponseBody List<Proof> getProofInfoListByChallenge(String challengeId) throws IOException, java.lang.Exception {
         try {
             Iterable<Proof>  proofIterable = proofRepository.findByChallengeId(challengeId, new Sort(Sort.Direction.DESC,"insertDate"));
             List<Proof> proofs = new ArrayList<>();
@@ -226,15 +215,7 @@ public class ProofController {
         return "Done";
     }
 
-    private void logError(String challengeId, String memberId, String serviceURL, java.lang.Exception e, String inputs) {
-        Error error = new Error();
-        error.setFe(false);
-        error.setChallengeId(challengeId);
-        error.setMemberId(memberId);
-        error.setServiceURL(serviceURL);
-        error.setErrorMessage(e.getStackTrace().toString());
-        error.setInputs(inputs);
-        error.setInsertTime(new Date());
-        errorRepository.save(error);
+    private void logError(String challengeId, String memberId, String serviceURL, java.lang.Exception e, String inputs) throws java.lang.Exception {
+        errorService.logError(challengeId,memberId,serviceURL,e,inputs);
     }
 }

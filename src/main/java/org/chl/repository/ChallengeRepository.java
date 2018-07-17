@@ -15,10 +15,10 @@ import java.util.List;
 public interface ChallengeRepository extends MongoRepository<Challenge, String> {
     // cal with new Sort(Direction.ASC/DESC,"order")
     @Query(" { 'challengerId' : ?0, 'deleted': {$in: [null, false]}, 'visibility': {$in: ?1}, 'active': {$in: ?2} }")
-    List<Challenge> findChallengesByMemberId(String memberId, List<String> visibilities, List<Boolean> active, Sort sort);
+    List<Challenge> findChallengesByMemberId(String memberId, List<Integer> visibilities, List<Boolean> active, Sort sort);
 
-    @Query("{ '$or' : [ { '$or' : [{'challengerId' : {$in : ?0}, 'type' : '3' }, {'challengerId' : {$nin : ?0}, 'type' : ?1} ], 'deleted': {$in: [null, false]}, 'dateOfUntil': {'$gte': ?2}, 'done': false , 'active': true}, " +
-                       "{ '$or' : [{'challengerId' : {$in : ?0}, 'type' : '3' }, {'challengerId' : {$nin : ?0}, 'type' : ?1} ], 'deleted': {$in: [null, false]}, 'done': true , 'active': true} ] }")
+    @Query("{ '$or' : [ { '$or' : [{'challengerId' : {$in : ?0}, 'type' : 'SELF' }, {'challengerId' : {$nin : ?0}, 'type' : ?1} ], 'deleted': {$in: [null, false]}, 'dateOfUntil': {'$gte': ?2}, 'done': false , 'active': true}, " +
+                       "{ '$or' : [{'challengerId' : {$in : ?0}, 'type' : 'SELF' }, {'challengerId' : {$nin : ?0}, 'type' : ?1} ], 'deleted': {$in: [null, false]}, 'done': true , 'active': true} ] }")
     List<Challenge> findChallenges(List<String> memberIdList, Constant.TYPE type, Date sysdate, Sort sort);
 
     @Query(" { 'id' : {$in : ?0} , 'deleted': {$in: [null, false]}, 'visibility': {$in: [1, 2]}, 'active': {$in: ?1} }")

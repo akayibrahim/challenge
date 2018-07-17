@@ -13,6 +13,10 @@ import java.util.List;
 public interface SupportRepository extends MongoRepository<Support, String> {
 
     //    @Query("SELECT s FROM SeqTb s where s.analysisId = :analysisId")
+    List<Support> findByChallengeIdAndSupportedMemberIdAndSupportFirstTeam(String challengeId, String supportedMemberId, Boolean supportFirstTeam);
+
+    List<Support> findByChallengeIdAndSupportedMemberIdAndSupportSecondTeam(String challengeId, String supportedMemberId, Boolean supportSecondTeam);
+
     List<Support> findByChallengeIdAndSupportFirstTeam(String challengeId, Boolean supportFirstTeam);
 
     List<Support> findByChallengeIdAndSupportSecondTeam(String challengeId, Boolean supportSecondTeam);

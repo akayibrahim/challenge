@@ -13,8 +13,6 @@ public class SelfChallenge extends Challenge {
     @NotEmpty(message="You need to pass the goal parameter")
     private String goal;
 
-    private int visibility;
-
     private String result;
 
     public String getResult() {
@@ -23,14 +21,6 @@ public class SelfChallenge extends Challenge {
 
     public void setResult(String result) {
         this.result = result;
-    }
-
-    public int getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(int visibility) {
-        this.visibility = visibility;
     }
 
     public String getGoal() {

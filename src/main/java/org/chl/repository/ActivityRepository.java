@@ -12,6 +12,7 @@ import java.util.List;
  * Created by ibrahim on 06/28/2018.
  */
 public interface ActivityRepository extends MongoRepository<Activity, String> {
+    @Query(" { 'toMemberId' : ?0, 'type' : {$nin: ['FOLLOWING']} }")
     List<Activity> findActivityByToMemberId(String toMemberId, Sort sort);
 
     @Query(" { 'challengeId' : ?0, 'toMemberId' : ?1, 'fromMemberId' : ?2, 'type' : ?3 }")

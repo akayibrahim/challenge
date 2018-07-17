@@ -155,7 +155,7 @@ public class ActivityService implements IActivityService {
                     break;
                 case FOLLOWING:
                     activity.setFacebookID(toMember.getFacebookID());
-                    activity.setName("You");
+                    activity.setName(Constant.YOU);
                     activity.setContent(getFollowingMessageContent(member.getName(), member.getSurname()));
                     break;
                 default:
@@ -193,7 +193,8 @@ public class ActivityService implements IActivityService {
 
     private String getSupportMessageContent(String activityTableId) {
         Optional<Support> support = supportRepository.findById(activityTableId);
-        return support.get().getSupportFirstTeam() ? Constant.YOUR_TEAM : Constant.YOUR_OPPONENT_TEAM;
+        Challenge challenge = challengeRepository.findById(support.get().getChallengeId()).get();
+        return support.get().getSupportFirstTeam() ? (challenge.getType().compareTo(Constant.TYPE.PRIVATE) == 0 ? Constant.YOUR_TEAM : Constant.SUPPORT_YOU) : Constant.YOUR_OPPONENT_TEAM;
     }
 
     private String getProofMessageContent(String activityTableId) {

@@ -2,20 +2,22 @@ package org.chl.controller;
 
 import org.chl.model.*;
 import org.chl.model.Error;
-import org.chl.repository.ErrorRepository;
 import org.chl.service.ActivityService;
 import org.chl.service.ChallengeService;
+import org.chl.service.ErrorService;
 import org.chl.service.ProofService;
 import org.chl.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.annotation.MultipartConfig;
 import javax.validation.Valid;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,7 +29,7 @@ public class ChallengeController {
     @Autowired
     private ActivityService activityService;
     @Autowired
-    private ErrorRepository errorRepository;
+    private ErrorService errorService;
     @Autowired
     ProofService proofService;
 
@@ -92,8 +94,8 @@ public class ChallengeController {
     }
 
     @Transactional
-    @RequestMapping(value = "/addJoinChallengeOld")
-    public String addJoinChallengeOld(@Valid @RequestBody JoinAndProofChallenge joinChl) throws Exception {
+    @RequestMapping(value = "/addJoinChallenge")
+    public String addJoinChallenge(@Valid @RequestBody JoinAndProofChallenge joinChl) throws Exception {
         try {
             Challenge challenge = chlService.addJoinChallenge(joinChl);
             return challenge.getId();
@@ -105,10 +107,10 @@ public class ChallengeController {
     }
 
     @Transactional
-    @RequestMapping(value = "/addJoinChallenge")
-    public String addJoinChallenge(@Valid @RequestBody MultipartFile file, String challengerId, ArrayList<JoinAttendance> joinAttendanceList
+    @RequestMapping(value = "/addJoinChallengeOld")
+    public String addJoinChallengeOld(@Valid @RequestBody MultipartFile file, String challengerId, ArrayList<JoinAttendance> joinAttendanceList
     , String challengerFBId, String name, String thinksAboutChallenge, String subject, Boolean done, String firstTeamCount
-    , String secondTeamCount, Constant.TYPE type, int visibility, String challengeTime, String untilDate, Boolean proofed) throws Exception {
+    , String secondTeamCount, Constant.TYPE type, Integer visibility, String challengeTime, String untilDate, Boolean proofed) throws Exception {
         try {
             JoinAndProofChallenge joinChl = new JoinAndProofChallenge();
             joinChl.setChallengerId(challengerId);
@@ -296,15 +298,6 @@ public class ChallengeController {
     }
 
     private void logError(String challengeId, String memberId, String serviceURL, java.lang.Exception e, String inputs) throws Exception {
-        Error error = new Error();
-        error.setFe(false);
-        error.setChallengeId(challengeId);
-        error.setMemberId(memberId);
-        error.setServiceURL(serviceURL);
-        error.setErrorMessage(e.toString());
-        error.setInputs(inputs);
-        error.setInsertTime(new Date());
-        errorRepository.save(error);
-        throw new Exception(e.toString());
+        errorService.logError(challengeId,memberId,serviceURL,e,inputs);
     }
 }

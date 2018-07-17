@@ -49,7 +49,7 @@ public class MemberControllerTests {
     private static final String friendMemberId = "12345678902";
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
         Member member = new Member();
         member.setId(id);
         member.setName(name);

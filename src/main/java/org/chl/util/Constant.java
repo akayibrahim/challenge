@@ -24,6 +24,8 @@ public class Constant {
     public static final String START_TO_FOLLOW_YOU = "start to follow you.";
     public static final String ZERO = "0";
     public static final String ONE = "1";
+    public static final String YOU = "You";
+    public static final String SUPPORT_YOU = "support you.";
 
     public enum ANSWER {
         ACCEPT("1"),
@@ -59,17 +61,17 @@ public class Constant {
     }
 
     public enum VISIBILITY {
-        JUST("3"),
-        FRIENDS("2"),
-        EVERYONE("1");
+        JUST(3),
+        FRIENDS(2),
+        EVERYONE(1);
 
-        private String code;
+        private Integer code;
 
-        VISIBILITY(String code) {
+        VISIBILITY(Integer code) {
             this.code = code;
         }
 
-        public String getCode() {
+        public Integer getCode() {
             return code;
         }
     }

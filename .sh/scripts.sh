@@ -42,7 +42,7 @@ commands
     db.member.remove( { "_id": ObjectId("5b3152701cb199f1fadc0faa") })
 
     db.joinAttendance.find()
-    db.joinAttendance.remove({})
+    db.joinAttendance.remove({ "challengeId": "5b4bbe098d396692e248e5f2"})
     db.joinAttendance.update( { "_id": ObjectId("5b1fb4a21cb19924cc638840") }, { $set: {"join": true, "proof": false} } )
     db.joinAttendance.remove( { "_id": ObjectId("5b39b3c11cb1997e50a35cda") })
 
@@ -53,11 +53,17 @@ commands
 
     db.challenge.find()
     db.challenge.find({ "challengerId": { $nin: ["5b3152d31cb199f1fadc0fb02"] } })
-    db.challenge.remove({})
+    db.challenge.remove({ "_id": ObjectId("5b4bbe098d396692e248e5f2") })
     db.challenge.update( { "done": true }, { $set: {"visibility": "1"} } )
-    db.challenge.find( { "_id": ObjectId("5b4a80478d396678b97fa7c5") })
+    db.challenge.find( { "_id": ObjectId("5b4cd32f8d3966b51be4e871") })
     db.challenge.find({"untilDate": {"$lt": new Date()} })
     db.challenge.find({ '$or' : [ { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'dateOfUntil': {'$gte': new Date()}, 'done': false }, { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'done': true } ] })
+
+    db.support.find()
+    db.support.find( { "challengeId": "5b4cd32f8d3966b51be4e871" } )
+    db.support.remove({})
+    db.support.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
+    db.support.remove( { "_id": ObjectId("5b4cd7df8d3966b628d4ad32") })
 
     db.activity.find()
     db.activity.remove({})

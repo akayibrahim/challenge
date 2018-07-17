@@ -23,6 +23,8 @@ public class Error {
 
     private String errorMessage;
 
+    private String stack;
+
     private String serviceURL;
 
     private String inputs;
@@ -30,6 +32,14 @@ public class Error {
     private Boolean fe;
 
     private Date insertTime;
+
+    public String getStack() {
+        return stack;
+    }
+
+    public void setStack(String stack) {
+        this.stack = stack;
+    }
 
     public Date getInsertTime() {
         return insertTime;

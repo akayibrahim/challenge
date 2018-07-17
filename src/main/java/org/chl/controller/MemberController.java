@@ -5,7 +5,7 @@ import org.chl.model.Error;
 import org.chl.model.FriendList;
 import org.chl.model.Member;
 import org.chl.repository.ActivityCountRepository;
-import org.chl.repository.ErrorRepository;
+import org.chl.service.ErrorService;
 import org.chl.service.MemberService;
 import org.chl.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +24,13 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
     @Autowired
-    private ErrorRepository errorRepository;
+    private ErrorService errorService;
     @Autowired
     ActivityCountRepository activityCountRepository;
 
     @Transactional
     @RequestMapping(value = "/getMemberInfo")
-    public Member getMemberInfo(String memberId) {
+    public Member getMemberInfo(String memberId) throws Exception {
         try {
             Member memberInfo = memberService.getMemberInfo(memberId);
             memberInfo.setFollowerCount(getFollowerList(memberId).size());
@@ -44,7 +44,7 @@ public class MemberController {
 
     @Transactional
     @RequestMapping(value = "/getMemberInfoByEmail")
-    public Member getMemberInfoByEmail(String email) {
+    public Member getMemberInfoByEmail(String email) throws Exception {
         try {
             Member memberInfo = memberService.getMemberInfoByEmail(email);
             return memberInfo;
@@ -56,7 +56,7 @@ public class MemberController {
 
     @Transactional
     @RequestMapping(value = "/addMember")
-    public String addMember(@Valid @RequestBody Member member) {
+    public String addMember(@Valid @RequestBody Member member) throws Exception {
         try {
             return memberService.addMember(member);
         } catch (Exception e) {
@@ -68,7 +68,7 @@ public class MemberController {
 
     @Transactional
     @RequestMapping(value = "/getMembers")
-    public Iterable<Member> getMemberInfoByEmail() {
+    public Iterable<Member> getMemberInfoByEmail() throws Exception {
         try {
             Iterable<Member> memberInfo = memberService.getMembers();
             return memberInfo;
@@ -80,7 +80,7 @@ public class MemberController {
 
     @Transactional
     @RequestMapping(value = "/getFollowingList")
-    public List<Member> getFollowingList(String memberId) {
+    public List<Member> getFollowingList(String memberId) throws Exception {
         try {
             List<Member> memberList = new ArrayList<>();
             Iterable<FriendList> friendList = memberService.getFollowingList(memberId);
@@ -96,7 +96,7 @@ public class MemberController {
 
     @Transactional
     @RequestMapping(value = "/getFollowerList")
-    public List<Member> getFollowerList(String memberId) {
+    public List<Member> getFollowerList(String memberId) throws Exception {
         try {
             List<Member> memberList = new ArrayList<>();
             Iterable<FriendList> friendList = memberService.getFollowerList(memberId);
@@ -112,7 +112,7 @@ public class MemberController {
 
     @Transactional
     @RequestMapping(value = "/followingFriend")
-    public void followingFriend(String friendMemberId, String memberId, Boolean follow) {
+    public void followingFriend(String friendMemberId, String memberId, Boolean follow) throws Exception {
         try {
             memberService.followingFriend(friendMemberId, memberId, follow);
         } catch (Exception e) {
@@ -122,7 +122,7 @@ public class MemberController {
 
     @Transactional
     @RequestMapping(value = "/deleteSuggestion")
-    public void deleteSuggestion(String friendMemberId, String memberId) {
+    public void deleteSuggestion(String friendMemberId, String memberId) throws Exception {
         try {
             memberService.deleteSuggestion(friendMemberId, memberId);
         } catch (Exception e) {
@@ -132,7 +132,7 @@ public class MemberController {
 
     @Transactional
     @RequestMapping(value = "/isMyFriend")
-    public Boolean isMyFriend(String memberId, String friendMemberId) {
+    public Boolean isMyFriend(String memberId, String friendMemberId) throws Exception {
         try {
             return memberService.isMyFriend(memberId, friendMemberId);
         } catch (Exception e) {
@@ -143,7 +143,7 @@ public class MemberController {
 
     @Transactional
     @RequestMapping(value = "/getSuggestionsForFollowing")
-    public List<Member> getSuggestionsForFollowing(String memberId) {
+    public List<Member> getSuggestionsForFollowing(String memberId) throws Exception {
         try {
             List<Member> memberList = new ArrayList<>();
             Iterable<FriendList> friendList = memberService.getSuggestionsForFollowing(memberId);
@@ -157,16 +157,8 @@ public class MemberController {
         return null;
     }
 
-    private void logError(String challengeId, String memberId, String serviceURL, Exception e, String inputs) {
-        Error error = new Error();
-        error.setFe(false);
-        error.setChallengeId(challengeId);
-        error.setMemberId(memberId);
-        error.setServiceURL(serviceURL);
-        error.setErrorMessage(e.getStackTrace().toString());
-        error.setInputs(inputs);
-        error.setInsertTime(new Date());
-        errorRepository.save(error);
+    private void logError(String challengeId, String memberId, String serviceURL, Exception e, String inputs) throws Exception {
+        errorService.logError(challengeId,memberId,serviceURL,e,inputs);
     }
 
     @Transactional
@@ -174,12 +166,12 @@ public class MemberController {
     public void errorLog(@Valid @RequestBody Error error) {
         error.setFe(true);
         error.setInsertTime(new Date());
-        errorRepository.save(error);
+        errorService.save(error);
     }
 
     @Transactional
     @RequestMapping(value = "/getActivityCount")
-    public String getActivityCount(@Valid String memberId) {
+    public String getActivityCount(@Valid String memberId) throws Exception {
         try {
             ActivityCount activityCount = activityCountRepository.findByMemberId(memberId);
             String count = activityCount != null ? activityCount.getCount() : Constant.ZERO;
@@ -196,7 +188,7 @@ public class MemberController {
 
     @Transactional
     @RequestMapping(value = "/searchFriends")
-    public List<Member> searchFriends(@Valid String searchKey) {
+    public List<Member> searchFriends(@Valid String searchKey) throws Exception {
         try {
             List<Member> members = memberService.searchFriends(searchKey);
             return members;
