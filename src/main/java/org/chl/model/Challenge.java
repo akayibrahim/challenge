@@ -116,7 +116,7 @@ public class Challenge {
     }
 
     public Boolean getDeleted() {
-        return deleted;
+        return (deleted == null || (deleted != null && !deleted)) ? false : true;
     }
 
     public void setDeleted(Boolean deleted) {

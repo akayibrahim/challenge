@@ -35,9 +35,9 @@ public class ChallengeController {
 
     @Transactional
     @RequestMapping(value = "/getChallenges")
-    public Iterable<Challenge> getChallenges(String memberId) throws Exception {
+    public Iterable<Challenge> getChallenges(String memberId, int page) throws Exception {
         try {
-            Iterable<Challenge> challenges = chlService.getChallenges(memberId);
+            Iterable<Challenge> challenges = chlService.getChallenges(memberId, page);
             return challenges;
         } catch (Exception e) {
             logError(null, memberId, "getChallenges", e, "memberId=" + memberId);

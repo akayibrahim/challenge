@@ -14,7 +14,7 @@ import java.util.List;
 public interface IChallengeService {
     Challenge getChallengeById(String challangeId);
 
-    Iterable<Challenge> getChallenges(@Valid @NotEmpty String memberId);
+    Iterable<Challenge> getChallenges(@Valid @NotEmpty String memberId, int page);
 
     Iterable<Challenge> getChallengesOfMember(@Valid @NotEmpty String memberId);
 

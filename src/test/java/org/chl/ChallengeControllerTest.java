@@ -66,7 +66,7 @@ public class ChallengeControllerTest {
         List<Challenge> chls = new ArrayList<>();
         VersusChallenge versusChl = prepareVersusChlModel();
         chls.add(versusChl);
-        Mockito.when(challengeController.getChallenges(memberId)).thenReturn(chls);
+        Mockito.when(challengeController.getChallenges(memberId, 0)).thenReturn(chls);
     }
 
     @Test
@@ -95,7 +95,7 @@ public class ChallengeControllerTest {
 
     @Test
     public void verifyGetChallenges() throws  Exception{
-        Iterable<Challenge> found =  challengeController.getChallenges(memberId);
+        Iterable<Challenge> found =  challengeController.getChallenges(memberId, 0);
         for (Challenge chl : found) {
             assertThat(chl.getChallengerId()).isEqualTo(VERSUS_CHALLENGER_ID);
             assertThat(chl.getChallengerFBId()).isEqualTo(CHALLENGER_FB_ID);

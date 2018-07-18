@@ -1,6 +1,8 @@
 package org.chl.repository;
 
 import org.chl.model.JoinAttendance;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -26,4 +28,7 @@ public interface JoinAndProofAttendanceRepository extends MongoRepository<JoinAt
 
     @Query(" {'memberId' :  {$in : ?0}}")
     List<JoinAttendance> findByFriendListInAttendace(List<String> friendList);
+
+    @Query(" {'memberId' :  {$in : ?0}}")
+    Page<JoinAttendance> findByFriendListInAttendaceAsPageble(List<String> friendList, Pageable pageable);
 }
