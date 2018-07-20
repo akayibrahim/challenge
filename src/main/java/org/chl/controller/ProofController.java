@@ -8,7 +8,6 @@ import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.chl.model.Member;
 import org.chl.model.Proof;
-import org.chl.repository.JoinAndProofAttendanceRepository;
 import org.chl.repository.ProofRepository;
 import org.chl.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +37,6 @@ public class ProofController {
     private GridFsTemplate gridFsTemplate;
     @Autowired
     private ProofRepository proofRepository;
-    @Autowired
-    private JoinAndProofAttendanceRepository joinAndProofRepo;;
     @Autowired
     private MemberService memberService;
     @Autowired

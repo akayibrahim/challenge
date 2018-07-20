@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by ibrahim on 06/28/2018.
@@ -19,25 +20,21 @@ import java.util.Optional;
 @Service
 public class ActivityService implements IActivityService {
     @Autowired
+    NotificationRepository notificationRepository;
+    @Autowired
+    ActivityCountRepository activityCountRepository;
+    @Autowired
     private ActivityRepository activityRepo;
     @Autowired
     private CommentRepository commentRepository;
-    @Autowired
-    private JoinAndProofAttendanceRepository joinAndProofAttendanceRepository;
     @Autowired
     private ProofRepository proofRepository;
     @Autowired
     private ChallengeRepository challengeRepository;
     @Autowired
-    private VersusAttendanceRepository versusAttendanceRepository;
-    @Autowired
     private SupportRepository supportRepository;
     @Autowired
     private MemberRepository memberRepository;
-    @Autowired
-    NotificationRepository notificationRepository;
-    @Autowired
-    ActivityCountRepository activityCountRepository;
 
     @Override
     public void createActivity(Activity activity) {
@@ -51,6 +48,10 @@ public class ActivityService implements IActivityService {
                 createNotification(exist.getType(), exist.getActivityTableId(), exist.getFromMemberId(), exist.getToMemberId(), exist.getChallengeId());
                 return;
             }
+        } else if (activity.getType().equals(Constant.ACTIVITY.SUPPORT)) {
+            Activity exist = activityRepo.findExistActivity(activity.getChallengeId(), activity.getToMemberId(), activity.getFromMemberId(), activity.getType());
+            if (exist != null)
+                activityRepo.delete(exist);
         }
         increaseActivityCount(activity.getToMemberId());
         activityRepo.save(activity);
@@ -85,7 +86,7 @@ public class ActivityService implements IActivityService {
                 break;
             case PROOF:
                 title = Constant.PUSH_NOTIFICATION.PROOF.getMessageTitle();
-                content = nameSurname + getProofMessageContent(activityTableId);
+                content = nameSurname + getProofMessageContent(challengeId, toMemberId);
                 break;
             case SUPPORT:
                 title = Constant.PUSH_NOTIFICATION.SUPPORT.getMessageTitle();
@@ -93,11 +94,11 @@ public class ActivityService implements IActivityService {
                 break;
             case ACCEPT:
                 title = Constant.PUSH_NOTIFICATION.ACCEPT.getMessageTitle();
-                content = nameSurname + getAcceptMessageContent(activityTableId);
+                content = nameSurname + getAcceptMessageContent(challengeId, toMemberId);
                 break;
             case JOIN:
                 title = Constant.PUSH_NOTIFICATION.JOIN.getMessageTitle();
-                content = nameSurname + getJoinMessageContent(activityTableId);
+                content = nameSurname + getJoinMessageContent(challengeId, toMemberId);
                 break;
             case FOLLOWER:
                 title = Constant.PUSH_NOTIFICATION.FOLLOWER.getMessageTitle();
@@ -128,7 +129,7 @@ public class ActivityService implements IActivityService {
         List<Activity> activities = activityRepo.findActivityByToMemberId(toMemberId, new Sort(Sort.Direction.DESC, "insertDate"));
         activities.forEach(activity -> {
             Member member = memberRepository.findById(activity.getFromMemberId()).get();
-            Member toMember = memberRepository.findById(toMemberId).get();
+            Member toMember = memberRepository.findById(activity.getToMemberId()).get();
             activity.setFacebookID(member.getFacebookID());
             activity.setName(member.getName() + Constant.SPACE + member.getSurname());
             switch (activity.getType()) {
@@ -136,19 +137,18 @@ public class ActivityService implements IActivityService {
                     activity.setContent(getCommentMessageContent(activity.getActivityTableId()));
                     break;
                 case PROOF:
-                    JoinAttendance proofAttendance = joinAndProofAttendanceRepository.findById(activity.getActivityTableId()).get();
-                    Proof proof = proofRepository.findByChallengeIdAndMemberId(proofAttendance.getChallengeId(), proofAttendance.getMemberId());
+                    Proof proof = proofRepository.findByChallengeIdAndMemberId(activity.getChallengeId(), activity.getToMemberId());
                     activity.setMediaObjectId(proof.getProofObjectId());
-                    activity.setContent(getProofMessageContent(activity.getActivityTableId()));
+                    activity.setContent(getProofMessageContent(activity.getChallengeId(), activity.getToMemberId()));
                     break;
                 case SUPPORT:
                     activity.setContent(getSupportMessageContent(activity.getActivityTableId()));
                     break;
                 case ACCEPT:
-                    activity.setContent(getAcceptMessageContent(activity.getActivityTableId()));
+                    activity.setContent(getAcceptMessageContent(activity.getChallengeId(), activity.getToMemberId()));
                     break;
                 case JOIN:
-                    activity.setContent(getJoinMessageContent(activity.getActivityTableId()));
+                    activity.setContent(getJoinMessageContent(activity.getChallengeId(), activity.getToMemberId()));
                     break;
                 case FOLLOWER:
                     activity.setContent(getFollowerMessageContent(activity.getActivityTableId()));
@@ -162,7 +162,7 @@ public class ActivityService implements IActivityService {
 
             }
         });
-        return activities;
+        return activities.stream().filter(act -> StringUtils.hasText(act.getContent())).collect(Collectors.toList());
     }
 
     private String getFollowingMessageContent(String name, String surname) {
@@ -173,34 +173,47 @@ public class ActivityService implements IActivityService {
         return Constant.START_TO_FOLLOW_YOU;
     }
 
-    private String getJoinMessageContent(String activityTableId) {
-        Optional<JoinAttendance> joinAttendance = joinAndProofAttendanceRepository.findById(activityTableId);
-        Challenge challengeOfJoin = challengeRepository.findById(joinAttendance.get().getChallengeId()).get();
-        if (joinAttendance.get().getJoin())
-            return String.format(Constant.JOINED_TO_CHALLENGE, challengeOfJoin.getSubject().toString());
-        else
+    private String getJoinMessageContent(String challengeId, String toMemberId) {
+        Challenge challengeOfJoin = challengeRepository.findById(challengeId).get();
+        if (challengeOfJoin.getJoinAttendanceList().stream().anyMatch(join -> !join.getChallenger() && join.getMemberId().equals(toMemberId) && !join.getJoin() && !join.getProof()))
             return String.format(Constant.JOIN_REQUEST_CONTENT, challengeOfJoin.getSubject().toString());
+        else if (challengeOfJoin.getJoinAttendanceList().stream().anyMatch(join -> !join.getChallenger() && !join.getMemberId().equals(toMemberId) && join.getJoin() && !join.getProof()))
+            return String.format(Constant.JOINED_TO_CHALLENGE, challengeOfJoin.getSubject().toString());
+        return null;
     }
 
-    private String getAcceptMessageContent(String activityTableId) {
-        Optional<VersusAttendance> versusAttendance = versusAttendanceRepository.findById(activityTableId);
-        Optional<Challenge> challengeOfVersus = challengeRepository.findById(versusAttendance.get().getChallengeId());
-        if (versusAttendance.get().getAccept() != null)
-            return (versusAttendance.get().getAccept() ? Constant.ACCEPT : Constant.REJECT) + Constant.SPACE + challengeOfVersus.get().getSubject().toString();
-        else
-            return String.format(Constant.ACCEPT_REQUEST, challengeOfVersus.get().getSubject().toString());
+    private String getAcceptMessageContent(String challengeId, String toMemberId) {
+        Challenge challengeOfJoin = challengeRepository.findById(challengeId).get();
+        if (challengeOfJoin.getVersusAttendanceList().stream()
+                .anyMatch(versus -> versus.getMemberId().equals(toMemberId) && versus.getAccept() == null)) {
+            return String.format(Constant.ACCEPT_REQUEST, challengeOfJoin.getSubject().toString());
+        } else if (challengeOfJoin.getVersusAttendanceList().stream()
+                .anyMatch(versus -> versus.getMemberId().equals(challengeOfJoin.getChallengerId()) &&
+                        versus.getMemberId().equals(toMemberId) && versus.getAccept() != null && versus.getAccept())) {
+            return Constant.ACCEPT + Constant.SPACE + challengeOfJoin.getSubject().toString();
+        } else if (challengeOfJoin.getVersusAttendanceList().stream()
+                .anyMatch(versus -> versus.getMemberId().equals(challengeOfJoin.getChallengerId()) &&
+                        versus.getMemberId().equals(toMemberId) && versus.getAccept() != null && !versus.getAccept())) {
+            return Constant.REJECT + Constant.SPACE + challengeOfJoin.getSubject().toString();
+        }
+        return null;
     }
 
     private String getSupportMessageContent(String activityTableId) {
         Optional<Support> support = supportRepository.findById(activityTableId);
         Challenge challenge = challengeRepository.findById(support.get().getChallengeId()).get();
-        return support.get().getSupportFirstTeam() ? (challenge.getType().compareTo(Constant.TYPE.PRIVATE) == 0 ? Constant.YOUR_TEAM : Constant.SUPPORT_YOU) : Constant.YOUR_OPPONENT_TEAM;
+        return support.get().getSupportFirstTeam() ? (challenge.getType().compareTo(Constant.TYPE.PRIVATE) == 0 ? Constant.YOUR_TEAM : Constant.SUPPORT_YOU)
+                : support.get().getSupportSecondTeam() ? Constant.YOUR_OPPONENT_TEAM : null;
     }
 
-    private String getProofMessageContent(String activityTableId) {
-        JoinAttendance proofAttendance = joinAndProofAttendanceRepository.findById(activityTableId).get();
-        Optional<Challenge> challengeOfProof = challengeRepository.findById(proofAttendance.getChallengeId());
-        return String.format(Constant.PROOFED_CHALLENGE, challengeOfProof.get().getSubject().toString());
+    private String getProofMessageContent(String challengeId, String toMemberId) {
+        Challenge challengeOfProof = challengeRepository.findById(challengeId).get();
+        if (challengeOfProof.getJoinAttendanceList().stream()
+                .anyMatch(join -> join.getMemberId().equals(challengeOfProof.getChallengerId()) &&
+                        join.getMemberId().equals(toMemberId) && join.getProof())) {
+            return String.format(Constant.PROOFED_CHALLENGE, challengeOfProof.getSubject().toString());
+        }
+        return null;
     }
 
     private String getCommentMessageContent(String activityTableId) {

@@ -1,10 +1,12 @@
 package org.chl.model;
 
+import javax.annotation.Generated;
 import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -13,7 +15,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @Document
 public class Attendance {
-    @Id
+    @Field("id")
     private String id;
     @NotEmpty(message="You need to pass the challengeId parameter")
     private String challengeId;

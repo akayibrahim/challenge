@@ -83,6 +83,76 @@ public class Challenge {
 
     private int visibility;
 
+    private List<VersusAttendance> versusAttendanceList;
+
+    private String firstTeamScore;
+
+    private String secondTeamScore;
+
+    private List<JoinAttendance> joinAttendanceList;
+
+    private Boolean toWorld;
+
+    private String goal;
+
+    private String result;
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public String getGoal() {
+        return goal;
+    }
+
+    public void setGoal(String goal) {
+        this.goal = goal;
+    }
+
+    public Boolean getToWorld() {
+        return toWorld;
+    }
+
+    public void setToWorld(Boolean toWorld) {
+        this.toWorld = toWorld;
+    }
+
+    public List<JoinAttendance> getJoinAttendanceList() {
+        return joinAttendanceList;
+    }
+
+    public void setJoinAttendanceList(List<JoinAttendance> joinAttendanceList) {
+        this.joinAttendanceList = joinAttendanceList;
+    }
+
+    public String getFirstTeamScore() {
+        return firstTeamScore;
+    }
+
+    public void setFirstTeamScore(String firstTeamScore) {
+        this.firstTeamScore = firstTeamScore;
+    }
+
+    public String getSecondTeamScore() {
+        return secondTeamScore;
+    }
+
+    public void setSecondTeamScore(String secondTeamScore) {
+        this.secondTeamScore = secondTeamScore;
+    }
+
+    public List<VersusAttendance> getVersusAttendanceList() {
+        return versusAttendanceList;
+    }
+
+    public void setVersusAttendanceList(List<VersusAttendance> versusAttendanceList) {
+        this.versusAttendanceList = versusAttendanceList;
+    }
+
     public Boolean getProofedByChallenger() {
         return proofedByChallenger;
     }
@@ -321,5 +391,17 @@ public class Challenge {
 
     public void setDateOfUntil(Date dateOfUntil) {
         this.dateOfUntil = dateOfUntil;
+    }
+
+    public Boolean isJoin() {
+        return getType().compareTo(Constant.TYPE.PUBLIC) == 0;
+    }
+
+    public Boolean isVersus() {
+        return getType().compareTo(Constant.TYPE.PRIVATE) == 0;
+    }
+
+    public Boolean isSelf() {
+        return getType().compareTo(Constant.TYPE.SELF) == 0;
     }
 }

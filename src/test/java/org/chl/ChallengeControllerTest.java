@@ -44,12 +44,6 @@ public class ChallengeControllerTest {
     private SupportRepository likeRepo;
 
     @MockBean
-    private VersusAttendanceRepository versusRepo;
-
-    @MockBean
-    private JoinAndProofAttendanceRepository joinAndProofRepo;
-
-    @MockBean
     private NotificationService notificationService;
 
     @MockBean

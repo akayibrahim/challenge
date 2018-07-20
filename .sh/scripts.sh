@@ -52,8 +52,10 @@ commands
     db.versusAttendance.remove( { "challengeId": "5b3e310c1cb1995e53e42a63" })
 
     db.challenge.find()
+    db.challenge.find({ "versusAttendanceList.memberId": "5b3152821cb199f1fadc0fab" })
     db.challenge.find({ "challengerId": { $nin: ["5b3152d31cb199f1fadc0fb02"] } })
     db.challenge.remove({ "_id": ObjectId("5b4bbe098d396692e248e5f2") })
+    db.challenge.remove({})
     db.challenge.update( { "done": true }, { $set: {"visibility": "1"} } )
     db.challenge.find( { "_id": ObjectId("5b4cd32f8d3966b51be4e871") })
     db.challenge.find({"untilDate": {"$lt": new Date()} })
@@ -68,7 +70,7 @@ commands
     db.activity.find()
     db.activity.remove({})
     db.activity.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
-    db.activity.remove( { "_id": ObjectId("5b37be761cb19960037e831e") })
+    db.activity.remove( { "_id": ObjectId("5b51edc38fd68643dd0fdd04") })
 
     db.notification.find()
     db.notification.remove({})

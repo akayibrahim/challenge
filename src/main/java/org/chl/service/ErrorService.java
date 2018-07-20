@@ -34,6 +34,7 @@ public class ErrorService implements IErrorService {
         error.setInputs(inputs);
         error.setInsertTime(new Date());
         errorRepository.save(error);
+        System.out.println(sw.toString());
         throw new java.lang.Exception(e.toString());
     }
 

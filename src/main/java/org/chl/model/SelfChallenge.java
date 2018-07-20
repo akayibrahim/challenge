@@ -10,24 +10,5 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @Document
 public class SelfChallenge extends Challenge {
-    @NotEmpty(message="You need to pass the goal parameter")
-    private String goal;
 
-    private String result;
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public String getGoal() {
-        return goal;
-    }
-
-    public void setGoal(String goal) {
-        this.goal = goal;
-    }
 }

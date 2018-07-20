@@ -73,8 +73,10 @@ public class MemberService implements IMemberService {
             friendRepo.save(friendList);
             activityTableId = friendList.getId();
         }
-        activityService.createActivity(Mappers.prepareActivity(activityTableId, null, friendMemberId, memberId, Constant.ACTIVITY.FOLLOWING));
-        activityService.createActivity(Mappers.prepareActivity(activityTableId, null, memberId, friendMemberId, Constant.ACTIVITY.FOLLOWER));
+        if (follow) {
+            activityService.createActivity(Mappers.prepareActivity(activityTableId, null, friendMemberId, memberId, Constant.ACTIVITY.FOLLOWING));
+            activityService.createActivity(Mappers.prepareActivity(activityTableId, null, memberId, friendMemberId, Constant.ACTIVITY.FOLLOWER));
+        }
     }
 
     @Override

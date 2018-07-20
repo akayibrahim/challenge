@@ -47,9 +47,9 @@ public class ChallengeController {
 
     @Transactional
     @RequestMapping(value = "/getChallengesOfMember")
-    public Iterable<Challenge> getChallengesOfMember(String memberId) throws Exception {
+    public Iterable<Challenge> getChallengesOfMember(String memberId, int page) throws Exception {
         try {
-            Iterable<Challenge> challenges = chlService.getChallengesOfMember(memberId);
+            Iterable<Challenge> challenges = chlService.getChallengesOfMember(memberId, page);
             return challenges;
         } catch (Exception e) {
             logError(null, memberId, "getChallengesOfMember", e, "memberId=" + memberId);
@@ -59,9 +59,9 @@ public class ChallengeController {
 
     @Transactional
     @RequestMapping(value = "/getChallengesOfFriend")
-    public Iterable<Challenge> getChallengesOfFriend(String memberId, String friendMemberId) throws Exception {
+    public Iterable<Challenge> getChallengesOfFriend(String memberId, String friendMemberId, int page) throws Exception {
         try {
-            Iterable<Challenge> challenges = chlService.getChallengesOfFriend(memberId, friendMemberId);
+            Iterable<Challenge> challenges = chlService.getChallengesOfFriend(memberId, friendMemberId, page);
             return challenges;
         } catch (Exception e) {
             logError(null, memberId, "getChallengesOfFriend", e, "memberId=" + memberId + "&friendMemberId=" + friendMemberId);
@@ -95,7 +95,7 @@ public class ChallengeController {
 
     @Transactional
     @RequestMapping(value = "/addJoinChallenge")
-    public String addJoinChallenge(@Valid @RequestBody JoinAndProofChallenge joinChl) throws Exception {
+    public String addJoinChallenge(@Valid @RequestBody Challenge joinChl) throws Exception {
         try {
             Challenge challenge = chlService.addJoinChallenge(joinChl);
             return challenge.getId();
@@ -140,12 +140,12 @@ public class ChallengeController {
 
     @Transactional
     @RequestMapping(value = "/addVersusChallenge")
-    public String addVersusChallenge(@Valid @RequestBody VersusChallenge versusChl) throws Exception {
+    public String addVersusChallenge(@Valid @RequestBody Challenge challenge) throws Exception {
         try {
-            Challenge challenge = chlService.addVersusChallenge(versusChl);
-            return challenge.getId();
+            Challenge chl = chlService.addVersusChallenge(challenge);
+            return chl.getId();
         } catch (Exception e) {
-            logError(null, versusChl.getChallengerId(), "addVersusChallenge", e, "memberId=" + versusChl.getChallengerId());
+            logError(null, challenge.getChallengerId(), "addVersusChallenge", e, "memberId=" + challenge.getChallengerId());
             // TODO inputs
         }
         return null;
@@ -153,12 +153,12 @@ public class ChallengeController {
 
     @Transactional
     @RequestMapping(value = "/addSelfChallenge")
-    public String addSelfChallenge(@Valid @RequestBody SelfChallenge selfChl) throws Exception {
+    public String addSelfChallenge(@Valid @RequestBody Challenge challenge) throws Exception {
         try {
-            Challenge challenge = chlService.addSelfChallenge(selfChl);
-            return challenge.getId();
+            Challenge chl = chlService.addSelfChallenge(challenge);
+            return chl.getId();
         } catch (Exception e) {
-            logError(null, selfChl.getChallengerId(), "addSelfChallenge", e, "memberId=" + selfChl.getChallengerId());
+            logError(null, challenge.getChallengerId(), "addSelfChallenge", e, "memberId=" + challenge.getChallengerId());
             // TODO inputs
         }
         return null;

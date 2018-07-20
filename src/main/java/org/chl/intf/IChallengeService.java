@@ -12,23 +12,25 @@ import java.util.List;
  */
 @Validated
 public interface IChallengeService {
+    void save(Challenge challenge);
+
     Challenge getChallengeById(String challangeId);
 
     Iterable<Challenge> getChallenges(@Valid @NotEmpty String memberId, int page);
 
-    Iterable<Challenge> getChallengesOfMember(@Valid @NotEmpty String memberId);
+    Iterable<Challenge> getChallengesOfMember(@Valid @NotEmpty String memberId, int page);
 
-    Iterable<Challenge> getChallengesOfFriend(@Valid @NotEmpty String memberId, String friendMemberId);
+    Iterable<Challenge> getChallengesOfFriend(@Valid @NotEmpty String memberId, String friendMemberId, int page);
 
     Iterable<Challenge> getExplorerChallenges(@Valid @NotEmpty String memberId, String challengeId, Boolean addSimilarChallanges);
 
     Iterable<Trends> getTrendChallenges(String memberId, String subjectSearchKey);
 
-    VersusChallenge addVersusChallenge(VersusChallenge versusChl);
+    Challenge addVersusChallenge(Challenge challenge);
 
-    JoinAndProofChallenge addJoinChallenge(JoinAndProofChallenge joinChl);
+    Challenge addJoinChallenge(Challenge challenge);
 
-    SelfChallenge addSelfChallenge(SelfChallenge selfChl);
+    Challenge addSelfChallenge(Challenge challenge);
 
     Iterable<Subjects> getSubjects(boolean isSelf);
 
