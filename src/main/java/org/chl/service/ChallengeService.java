@@ -253,7 +253,7 @@ public class ChallengeService implements IChallengeService {
                 member.add(memberId);
                 List<Challenge> publicChallenges = getPublicChallenges(member, 0);
                 publicChallenges.stream()
-                        .filter(challenge -> trendList.stream().noneMatch(trends -> !trends.getChallengeId().equals(challenge.getId())))
+                        .filter(challenge -> trendList.stream().noneMatch(trends -> trends.getChallengeId().equals(challenge.getId())))
                         .forEach(challenge -> {
                     trendList.add(prepareTrend(challenge));
                 });
@@ -680,8 +680,8 @@ public class ChallengeService implements IChallengeService {
             activityService.createActivity(Mappers.prepareActivity(null, challenge.getId(), versusAtt.getMemberId(), challenge.getChallengerId(), Constant.ACTIVITY.ACCEPT));
         });
         chlRepo.save(challenge);
-        if (!challenge.getActive())
-            if (challenge.getVersusAttendanceList().stream().noneMatch(ver -> !ver.getAccept()))
+        if (!challenge.getActive() && challenge.getVersusAttendanceList().stream().
+                noneMatch(ver -> ver.getAccept() != null && !ver.getAccept()))
                 activateChallenge(challenge);
     }
 

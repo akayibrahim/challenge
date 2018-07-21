@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by ibrahim on 11/24/2017.
@@ -126,8 +128,14 @@ public class MemberService implements IMemberService {
 
     @Override
     public List<FriendList> getSuggestionsForFollowing(String memberId) {
-        Iterable<FriendList> friendLists = friendRepo.findByMemberIdAndFollowed(memberId, false);
-        List<FriendList> friends = Lists.newArrayList(friendLists);
+        List<FriendList> friends = friendRepo.findByMemberIdAndFollowed(memberId, false);
+        List<String> friendList = getFollowingIdList(memberId);
+        Optional.ofNullable(friendList).orElseGet(Collections::emptyList).stream()
+                .filter(fri -> friends.size() < 10)
+            .forEach(fri -> {
+                List<FriendList> list = friendRepo.findByMemberIdAndFollowed(fri, false);
+                friends.addAll(list);
+            });
         return friends;
     }
 
