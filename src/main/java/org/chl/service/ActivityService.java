@@ -175,9 +175,14 @@ public class ActivityService implements IActivityService {
 
     private String getJoinMessageContent(String challengeId, String toMemberId) {
         Challenge challengeOfJoin = challengeRepository.findById(challengeId).get();
-        if (challengeOfJoin.getJoinAttendanceList().stream().anyMatch(join -> !join.getChallenger() && join.getMemberId().equals(toMemberId) && !join.getJoin() && !join.getProof()))
+        if (challengeOfJoin.getJoinAttendanceList().stream().anyMatch(join -> !join.getChallenger()
+                && join.getMemberId().equals(toMemberId) && !join.getReject() && !join.getJoin() && !join.getProof()))
             return String.format(Constant.JOIN_REQUEST_CONTENT, challengeOfJoin.getSubject().toString());
-        else if (challengeOfJoin.getJoinAttendanceList().stream().anyMatch(join -> !join.getChallenger() && !join.getMemberId().equals(toMemberId) && join.getJoin() && !join.getProof()))
+        else if (challengeOfJoin.getJoinAttendanceList().stream().anyMatch(join -> !join.getChallenger() &&
+                !join.getMemberId().equals(toMemberId) && join.getReject()))
+            return String.format(Constant.DONT_JOINED_TO_CHALLENGE, challengeOfJoin.getSubject().toString());
+        else if (challengeOfJoin.getJoinAttendanceList().stream().anyMatch(join -> !join.getChallenger() &&
+                !join.getMemberId().equals(toMemberId) && !join.getReject() && join.getJoin() && !join.getProof()))
             return String.format(Constant.JOINED_TO_CHALLENGE, challengeOfJoin.getSubject().toString());
         return null;
     }
@@ -188,12 +193,12 @@ public class ActivityService implements IActivityService {
                 .anyMatch(versus -> versus.getMemberId().equals(toMemberId) && versus.getAccept() == null)) {
             return String.format(Constant.ACCEPT_REQUEST, challengeOfJoin.getSubject().toString());
         } else if (challengeOfJoin.getVersusAttendanceList().stream()
-                .anyMatch(versus -> versus.getMemberId().equals(challengeOfJoin.getChallengerId()) &&
-                        versus.getMemberId().equals(toMemberId) && versus.getAccept() != null && versus.getAccept())) {
+                .anyMatch(versus -> toMemberId.equals(challengeOfJoin.getChallengerId()) &&
+                        !versus.getMemberId().equals(toMemberId) && versus.getAccept() != null && versus.getAccept() && !versus.getReject())) {
             return Constant.ACCEPT + Constant.SPACE + challengeOfJoin.getSubject().toString();
         } else if (challengeOfJoin.getVersusAttendanceList().stream()
-                .anyMatch(versus -> versus.getMemberId().equals(challengeOfJoin.getChallengerId()) &&
-                        versus.getMemberId().equals(toMemberId) && versus.getAccept() != null && !versus.getAccept())) {
+                .anyMatch(versus -> toMemberId.equals(challengeOfJoin.getChallengerId()) &&
+                        !versus.getMemberId().equals(toMemberId) && versus.getAccept() != null && !versus.getAccept() && versus.getReject())) {
             return Constant.REJECT + Constant.SPACE + challengeOfJoin.getSubject().toString();
         }
         return null;

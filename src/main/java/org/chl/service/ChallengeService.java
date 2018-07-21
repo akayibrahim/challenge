@@ -65,7 +65,8 @@ public class ChallengeService implements IChallengeService {
             challenges.add(chl);
         });
         challengesAsPageable.stream().distinct().filter(chl -> chl.isJoin()).forEach(chl -> {
-            chl.getJoinAttendanceList().stream().filter(join -> friendLists.contains(join.getMemberId())).forEach(join -> {
+            chl.getJoinAttendanceList().stream().filter(join -> friendLists.contains(join.getMemberId()) &&
+                    (join.getJoin() || join.getProof())).forEach(join -> {
                 changeChallengeWithAttendanceInfo(challenges, chl.getId(), join.getMemberId(), join.getFacebookID());
             });
         });
@@ -693,7 +694,7 @@ public class ChallengeService implements IChallengeService {
                 .forEach(challenge -> {
                     challenge.getJoinAttendanceList().stream()
                             .filter(join -> !join.getChallenger() && join.getMemberId().equals(memberId)
-                                    && !join.getJoin() && !join.getProof())
+                                    && !join.getReject() && !join.getJoin() && !join.getProof())
                             .forEach(chl -> {
                                 Member member = memberService.getMemberInfo(challenge.getChallengerId());
                                 ChallengeRequest request = new ChallengeRequest();
@@ -744,7 +745,8 @@ public class ChallengeService implements IChallengeService {
         textComment.setDate(new Date());
         commentRepository.save(textComment);
         Challenge challenge = chlRepo.findById(textComment.getChallengeId()).get();
-        activityService.createActivity(Mappers.prepareActivity(textComment.getId(), textComment.getChallengeId(), textComment.getMemberId(), challenge.getChallengerId(), Constant.ACTIVITY.COMMENT));
+        activityService.createActivity(Mappers.prepareActivity(textComment.getId(), textComment.getChallengeId(), textComment.getMemberId()
+                , StringUtils.hasText(textComment.getCommentedMemberId()) ? textComment.getCommentedMemberId() : challenge.getChallengerId(), Constant.ACTIVITY.COMMENT));
     }
 
     @Override

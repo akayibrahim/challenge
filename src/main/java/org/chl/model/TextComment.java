@@ -13,6 +13,16 @@ public class TextComment extends Comment {
     @NotEmpty(message = "You need to pass the text parameter")
     private String comment;
 
+    private String commentedMemberId;
+
+    public String getCommentedMemberId() {
+        return commentedMemberId;
+    }
+
+    public void setCommentedMemberId(String commentedMemberId) {
+        this.commentedMemberId = commentedMemberId;
+    }
+
     public String getComment() {
         return comment;
     }

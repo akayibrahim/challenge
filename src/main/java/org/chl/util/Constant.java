@@ -18,6 +18,7 @@ public class Constant {
     public static final String ACCEPT_REQUEST = "request you for accept of %s challenge.";
     public static final String JOIN_REQUEST_CONTENT = "request you for join to %s challenge.";
     public static final String JOINED_TO_CHALLENGE = "joined to %s challenge.";
+    public static final String DONT_JOINED_TO_CHALLENGE = "refuse %s challenge.";
     public static final String COMMENTED = "commented: ";
     public static final String PROOFED_CHALLENGE = "proved %s challenge.";
     public static final String START_TO_FOLLOWING = "start to following %s.";

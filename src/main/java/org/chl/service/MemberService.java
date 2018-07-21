@@ -134,7 +134,8 @@ public class MemberService implements IMemberService {
                 .filter(fri -> friends.size() < 10)
             .forEach(fri -> {
                 List<FriendList> list = friendRepo.findByMemberIdAndFollowed(fri, false);
-                friends.addAll(list);
+                if (list.stream().noneMatch(friend -> !friend.getMemberId().equals(memberId)))
+                    friends.addAll(list);
             });
         return friends;
     }
