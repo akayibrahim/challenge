@@ -20,13 +20,13 @@ public class DateUtil {
     }
 
     private static Date toDate(String strDate) throws ParseException {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         Date date = formatter.parse(strDate);
         return date;
     }
 
     public static String toString(Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         return formatter.format(date);
     }
 }

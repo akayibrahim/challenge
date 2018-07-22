@@ -664,7 +664,7 @@ public class ChallengeService implements IChallengeService {
     private Date addDayToToday(String challengeTime) {
         Date current = new Date();
         LocalDateTime localDateTime = current.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        localDateTime = localDateTime.plusDays(Integer.valueOf(challengeTime));
+        localDateTime = localDateTime.plusMinutes(Integer.valueOf(challengeTime));
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
