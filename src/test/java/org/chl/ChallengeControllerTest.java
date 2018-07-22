@@ -105,7 +105,7 @@ public class ChallengeControllerTest {
 
     @Test
     public void verifyUpdateResultsOfVersus() throws  Exception{
-        challengeController.updateResultsOfVersus(CHALLENGE_ID, "3", "2");
+        challengeController.updateResultsOfVersus(CHALLENGE_ID, "3", "2", false);
     }
 
     @Test

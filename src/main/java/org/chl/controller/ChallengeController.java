@@ -244,9 +244,9 @@ public class ChallengeController {
 
     @Transactional
     @RequestMapping(value = "/updateResultsOfVersus")
-    public void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore) throws Exception {
+    public void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore, Boolean done) throws Exception {
         try {
-            chlService.updateResultsOfVersus(challengeId, firstTeamScore, secondTeamScore);
+            chlService.updateResultsOfVersus(challengeId, firstTeamScore, secondTeamScore, done);
         } catch (Exception e) {
             logError(challengeId, null, "updateResultsOfVersus", e, "challengeId=" + challengeId + "&firstTeamScore=" + firstTeamScore
                     + "&secondTeamScore=" + secondTeamScore);

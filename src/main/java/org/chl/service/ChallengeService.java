@@ -80,7 +80,7 @@ public class ChallengeService implements IChallengeService {
         List<Challenge> publicChallenges = getPublicChallenges(friendListsWithMember, page);
         challenges.addAll(publicChallenges);
         prepareChallengesData(memberId, challenges, false, true);
-        return challenges.stream().sorted(Comparator.comparing(Challenge::getId).reversed()).collect(Collectors.toList());
+        return challenges.stream().sorted(Comparator.comparing(Challenge::getUpdateDate).reversed()).collect(Collectors.toList());
     }
 
     private boolean postShowedControl(String memberId, Challenge chl) {
@@ -569,8 +569,7 @@ public class ChallengeService implements IChallengeService {
 
     @Override
     public void updateProgressOrDoneForSelf(String challengeId, String result, Boolean done) {
-        Challenge chl = chlRepo.findById(challengeId).get();
-        SelfChallenge selfChl = (SelfChallenge) chl;
+        Challenge selfChl = chlRepo.findById(challengeId).get();
         if (selfChl != null && !selfChl.getDone()) {
             selfChl.setDone(done);
             selfChl.setResult(result);
@@ -581,14 +580,13 @@ public class ChallengeService implements IChallengeService {
     }
 
     @Override
-    public void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore) {
+    public void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore, Boolean done) {
         Validation.doneValidationForVersus(true, firstTeamScore, secondTeamScore);
-        Challenge chl = chlRepo.findById(challengeId).get();
-        VersusChallenge versusChl = (VersusChallenge) chl;
+        Challenge versusChl = chlRepo.findById(challengeId).get();
         if (versusChl != null && !versusChl.getDone()) {
             versusChl.setFirstTeamScore(firstTeamScore);
             versusChl.setSecondTeamScore(secondTeamScore);
-            versusChl.setDone(true);
+            versusChl.setDone(done);
             versusChl.setUpdateDate(new Date());
             chlRepo.save(versusChl);
         } else

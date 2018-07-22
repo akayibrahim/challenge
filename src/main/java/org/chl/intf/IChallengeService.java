@@ -38,7 +38,7 @@ public interface IChallengeService {
 
     void updateProgressOrDoneForSelf(String challengeId, String score, Boolean done);
 
-    void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore);
+    void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore, Boolean done);
 
     Iterable<Challenge> getAllChallenges();
 
