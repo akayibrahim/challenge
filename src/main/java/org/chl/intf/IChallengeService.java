@@ -22,9 +22,9 @@ public interface IChallengeService {
 
     Iterable<Challenge> getChallengesOfFriend(@Valid @NotEmpty String memberId, String friendMemberId, int page);
 
-    Iterable<Challenge> getExplorerChallenges(@Valid @NotEmpty String memberId, String challengeId, Boolean addSimilarChallanges);
+    Iterable<Challenge> getExplorerChallenges(@Valid @NotEmpty String memberId, String challengeId, Boolean addSimilarChallenges, int page);
 
-    Iterable<Trends> getTrendChallenges(String memberId, String subjectSearchKey);
+    Iterable<Trends> getTrendChallenges(String memberId, String subjectSearchKey, int page);
 
     Challenge addVersusChallenge(Challenge challenge);
 
@@ -34,7 +34,7 @@ public interface IChallengeService {
 
     Iterable<Subjects> getSubjects(boolean isSelf);
 
-    Iterable<TextComment> getComments(String challengeId);
+    Iterable<TextComment> getComments(String challengeId, int page);
 
     void updateProgressOrDoneForSelf(String challengeId, String score, Boolean done);
 
@@ -53,4 +53,6 @@ public interface IChallengeService {
     void deleteChallenge(@Valid @NotEmpty String challengeId);
 
     void commentAsTextToChallange(TextComment textComment);
+
+    String getChallengeSizeOfMember(String memberId);
 }

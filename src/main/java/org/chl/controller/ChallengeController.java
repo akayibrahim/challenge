@@ -71,21 +71,21 @@ public class ChallengeController {
 
     @Transactional
     @RequestMapping(value = "/getExplorerChallenges")
-    public Iterable<Challenge> getExplorerChallenges(String memberId, String challengeId, Boolean addSimilarChallanges) throws Exception {
+    public Iterable<Challenge> getExplorerChallenges(String memberId, String challengeId, Boolean addSimilarChallenges, int page) throws Exception {
         try {
-            Iterable<Challenge> challenges = chlService.getExplorerChallenges(memberId, challengeId, addSimilarChallanges);
+            Iterable<Challenge> challenges = chlService.getExplorerChallenges(memberId, challengeId, addSimilarChallenges, page);
             return challenges;
         } catch (Exception e) {
-            logError(challengeId, memberId, "getExplorerChallenges", e, "memberId=" + memberId + "&challengeId=" + challengeId + "&addSimilarChallanges=" + addSimilarChallanges);
+            logError(challengeId, memberId, "getExplorerChallenges", e, "memberId=" + memberId + "&challengeId=" + challengeId + "&addSimilarChallanges=" + addSimilarChallenges);
         }
         return null;
     }
 
     @Transactional
     @RequestMapping(value = "/getTrendChallenges")
-    public Iterable<Trends> getTrendsChallenges(String memberId, String subjectSearchKey) throws Exception {
+    public Iterable<Trends> getTrendsChallenges(String memberId, String subjectSearchKey, int page) throws Exception {
         try {
-            Iterable<Trends> trends = chlService.getTrendChallenges(memberId, subjectSearchKey);
+            Iterable<Trends> trends = chlService.getTrendChallenges(memberId, subjectSearchKey, page);
             return trends;
         } catch (Exception e) {
             logError(null, memberId, "getTrendChallenges", e, "memberId=" + memberId + "&subjectSearchKey=" + subjectSearchKey);
@@ -199,9 +199,9 @@ public class ChallengeController {
 
     @Transactional
     @RequestMapping(value = "/getComments")
-    public Iterable<TextComment> getComments(String challengeId) throws Exception {
+    public Iterable<TextComment> getComments(String challengeId, int page) throws Exception {
         try {
-            return chlService.getComments(challengeId);
+            return chlService.getComments(challengeId, page);
         } catch (Exception e) {
             logError(challengeId, null, "getComments", e, "challengeId=" + challengeId);
         }
@@ -277,9 +277,9 @@ public class ChallengeController {
 
     @Transactional
     @RequestMapping(value = "/getActivities")
-    public List<Activity> getActivities(String toMemberId) throws Exception {
+    public List<Activity> getActivities(String toMemberId, int page) throws Exception {
         try {
-            return activityService.getActivities(toMemberId);
+            return activityService.getActivities(toMemberId, page);
         } catch (Exception e) {
             logError(null, toMemberId, "getActivities", e, "toMemberId=" + toMemberId);
         }
@@ -299,5 +299,16 @@ public class ChallengeController {
 
     private void logError(String challengeId, String memberId, String serviceURL, java.lang.Exception e, String inputs) throws Exception {
         errorService.logError(challengeId,memberId,serviceURL,e,inputs);
+    }
+
+    @Transactional
+    @RequestMapping(value = "/getChallengeSizeOfMember")
+    public String getChallengeSizeOfMember(String memberId) throws Exception {
+        try {
+            return chlService.getChallengeSizeOfMember(memberId);
+        } catch (Exception e) {
+            logError(null, memberId, "getChallengeSizeOfMember", e, "memberId=" + memberId);
+        }
+        return null;
     }
 }

@@ -4,11 +4,14 @@ import org.chl.intf.IActivityService;
 import org.chl.model.*;
 import org.chl.repository.*;
 import org.chl.util.Constant;
+import org.chl.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -125,8 +128,8 @@ public class ActivityService implements IActivityService {
     }
 
     @Override
-    public List<Activity> getActivities(String toMemberId) {
-        List<Activity> activities = activityRepo.findActivityByToMemberId(toMemberId, new Sort(Sort.Direction.DESC, "insertDate"));
+    public List<Activity> getActivities(String toMemberId, int page) {
+        List<Activity> activities = getActivitiesAsPageable(toMemberId, page);
         activities.forEach(activity -> {
             Member member = memberRepository.findById(activity.getFromMemberId()).get();
             Member toMember = memberRepository.findById(activity.getToMemberId()).get();
@@ -163,6 +166,23 @@ public class ActivityService implements IActivityService {
             }
         });
         return activities.stream().filter(act -> StringUtils.hasText(act.getContent())).collect(Collectors.toList());
+    }
+
+    private List<Activity> getActivitiesAsPageable(String toMemberId, int page) {
+        Page<Activity> nextPage;
+        List<Activity> dbRecords;
+        boolean stop = false;
+        do {
+            Sort sort = new Sort(Sort.Direction.DESC, "insertDate");
+            nextPage = activityRepo.findActivityByToMemberId(toMemberId, Util.getPageable(page, sort, Constant.DEFAULT_PAGEABLE_SIZE));
+            dbRecords = nextPage.getContent();
+            if (dbRecords.size() > 0) {
+                return dbRecords;
+            } else {
+                stop = true;
+            }
+        } while (nextPage.getSize() > 0 && !stop);
+        return new ArrayList<Activity>();
     }
 
     private String getFollowingMessageContent(String name, String surname) {

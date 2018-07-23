@@ -7,8 +7,6 @@ import org.chl.util.*;
 import org.chl.util.Exception;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -102,7 +100,7 @@ public class ChallengeService implements IChallengeService {
         boolean stop = false;
         do {
             Sort sort = new Sort(Sort.Direction.DESC, "updateDate");
-            nextPage = chlRepo.findChallenges(friendLists, Constant.TYPE.PUBLIC, new Date(), getPageable(page, sort, 7));
+            nextPage = chlRepo.findChallenges(friendLists, Constant.TYPE.PUBLIC, new Date(), Util.getPageable(page, sort, 7));
             dbRecords = nextPage.getContent();
             if (dbRecords.size() > 0) {
                 return dbRecords;
@@ -119,7 +117,7 @@ public class ChallengeService implements IChallengeService {
         boolean stop = false;
         do {
             Sort sort = new Sort(Sort.Direction.DESC, "updateDate");
-            nextPage = chlRepo.findPublicChallenges(friendLists, Constant.TYPE.PUBLIC, new Date(), getPageable(page, sort, 3));
+            nextPage = chlRepo.findPublicChallenges(friendLists, Constant.TYPE.PUBLIC, new Date(), Util.getPageable(page, sort, 3));
             dbRecords = nextPage.getContent();
             if (dbRecords.size() > 0) {
                 return dbRecords;
@@ -128,10 +126,6 @@ public class ChallengeService implements IChallengeService {
             }
         } while (nextPage.getSize() > 0 && !stop);
         return new ArrayList<Challenge>();
-    }
-
-    private Pageable getPageable(int page, Sort sort, int size) {
-        return new PageRequest(page, size, sort);
     }
 
     @Override
@@ -159,12 +153,17 @@ public class ChallengeService implements IChallengeService {
 
     @Override
     public Iterable<Challenge> getChallengesOfFriend(String memberId, String friendMemberId, int page) {
+        List<Integer> visibilities = prepareVisibilityOfFriends(memberId, friendMemberId);
+        List<Challenge> challenges = findMemberChallenges(friendMemberId, visibilities, false, page);
+        return challenges;
+    }
+
+    private List<Integer> prepareVisibilityOfFriends(String memberId, String friendMemberId) {
         List<Integer> visibilities = new ArrayList<>();
         visibilities.add(Constant.VISIBILITY.EVERYONE.getCode());
         if (memberService.isMyFriend(memberId, friendMemberId))
             visibilities.add(Constant.VISIBILITY.FRIENDS.getCode());
-        List<Challenge> challenges = findMemberChallenges(friendMemberId, visibilities, false, page);
-        return challenges;
+        return visibilities;
     }
 
     private List<Challenge> getChallengeAsPageableForProfile(String memberId, List<Integer> visibilities, List<Boolean> actives, int page) {
@@ -173,7 +172,7 @@ public class ChallengeService implements IChallengeService {
         boolean stop = false;
         do {
             Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "done"), new Sort.Order(Sort.Direction.DESC, "chlDate"));
-            nextPage = chlRepo.findChallengesByMemberId(memberId, visibilities, actives, getPageable(page, sort, 10));
+            nextPage = chlRepo.findChallengesByMemberId(memberId, visibilities, actives, Util.getPageable(page, sort, Constant.DEFAULT_PAGEABLE_SIZE));
             dbRecords = nextPage.getContent();
             if (dbRecords.size() > 0) {
                 return dbRecords;
@@ -211,20 +210,20 @@ public class ChallengeService implements IChallengeService {
     }
 
     @Override
-    public Iterable<Challenge> getExplorerChallenges(String memberId, String challengeId, Boolean addSimilarChallanges) {
+    public Iterable<Challenge> getExplorerChallenges(String memberId, String challengeId, Boolean addSimilarChallenges, int page) {
         List<Challenge> challenges = new ArrayList<>();
         Challenge explorerChallenge = chlRepo.findById(challengeId).get();
-        challenges.add(explorerChallenge);
-        addSimilarChallenges(addSimilarChallanges, challenges, explorerChallenge);
+        if (page == 0)
+            challenges.add(explorerChallenge);
+        addSimilarChallenges(addSimilarChallenges, challenges, explorerChallenge, page);
         prepareChallengesData(memberId, challenges, false, false);
         Iterable<Challenge> challengeIterable = challenges;
         return challengeIterable;
     }
 
-    private void addSimilarChallenges(Boolean addSimilarChallanges, List<Challenge> challenges, Challenge explorerChallenge) {
+    private void addSimilarChallenges(Boolean addSimilarChallanges, List<Challenge> challenges, Challenge explorerChallenge, int page) {
         if (addSimilarChallanges) {
-            List<Challenge> subjectChallenges = chlRepo.findChallengesBySubjectAndType(explorerChallenge.getSubject().toString(),
-                    Constant.TYPE.PUBLIC, new Date(), new Sort(Sort.Direction.DESC, "id"));
+            List<Challenge> subjectChallenges = getSimilarChallenges(explorerChallenge.getSubject().toString(), page);
             subjectChallenges.stream()
                     .filter(chl -> !chl.getId().equals(explorerChallenge.getId()))
                     .forEach(chl -> {
@@ -234,33 +233,62 @@ public class ChallengeService implements IChallengeService {
 
     }
 
+    private List<Challenge> getSimilarChallenges(String subject, int page) {
+        Page<Challenge> nextPage;
+        List<Challenge> dbRecords;
+        boolean stop = false;
+        do {
+            Sort sort = new Sort(Sort.Direction.DESC, "updateDate");
+            nextPage = chlRepo.findChallengesBySubjectAndType(subject, Constant.TYPE.PUBLIC, new Date(), Util.getPageable(page, sort, Constant.DEFAULT_PAGEABLE_SIZE));
+            dbRecords = nextPage.getContent();
+            if (dbRecords.size() > 0) {
+                return dbRecords;
+            } else {
+                stop = true;
+            }
+        } while (nextPage.getSize() > 0 && !stop);
+        return new ArrayList<Challenge>();
+    }
+
     @Override
-    public Iterable<Trends> getTrendChallenges(String memberId, String subjectSearchKey) {
+    public Iterable<Trends> getTrendChallenges(String memberId, String subjectSearchKey, int page) {
         List<Trends> trendList = new ArrayList<>();
-        if (StringUtils.hasText(subjectSearchKey)) {
-            Iterable<TrendChallenge> trendChallenges = trendChallengeRepository.findTrendChallengesBySearch(subjectSearchKey, Constant.TYPE.PUBLIC, new Sort(Sort.Direction.DESC, "popularity"));
-            for (TrendChallenge trendChallenge : trendChallenges) {
-                Challenge challenge = chlRepo.findById(trendChallenge.getChallengeId()).get();
-                trendList.add(prepareTrend(challenge));
-            }
-        } else {
-            Iterable<TrendChallenge> trendChallenges = trendChallengeRepository.findTrendChallengesByType(Constant.TYPE.PUBLIC, new Sort(Sort.Direction.DESC, "popularity"));
-            for (TrendChallenge trendChallenge : trendChallenges) {
-                Challenge challenge = chlRepo.findById(trendChallenge.getChallengeId()).get();
-                trendList.add(prepareTrend(challenge));
-            }
-            if (trendList.stream().count() < 10) {
-                List<String> member = new ArrayList<>();
-                member.add(memberId);
-                List<Challenge> publicChallenges = getPublicChallenges(member, 0);
-                publicChallenges.stream()
-                        .filter(challenge -> trendList.stream().noneMatch(trends -> trends.getChallengeId().equals(challenge.getId())))
-                        .forEach(challenge -> {
-                    trendList.add(prepareTrend(challenge));
-                });
-            }
+        List<TrendChallenge> trendChallenges = getTrendChallengeAsPageable(memberId, subjectSearchKey, page);
+        for (TrendChallenge trendChallenge : trendChallenges) {
+            Challenge challenge = chlRepo.findById(trendChallenge.getChallengeId()).get();
+            trendList.add(prepareTrend(challenge));
+        }
+        if (!StringUtils.hasText(subjectSearchKey) && trendList.stream().count() < 10) {
+            List<String> member = new ArrayList<>();
+            member.add(memberId);
+            List<Challenge> publicChallenges = getPublicChallenges(member, 0);
+            publicChallenges.stream()
+                    .filter(challenge -> trendList.stream().noneMatch(trends -> trends.getChallengeId().equals(challenge.getId())))
+                    .forEach(challenge -> {
+                        trendList.add(prepareTrend(challenge));
+                    });
         }
         return trendList;
+    }
+
+    private List<TrendChallenge> getTrendChallengeAsPageable(String memberId, String subjectSearchKey, int page) {
+        Page<TrendChallenge> nextPage;
+        List<TrendChallenge> dbRecords;
+        boolean stop = false;
+        do {
+            Sort sort = new Sort(Sort.Direction.DESC, "popularity");
+            if (StringUtils.hasText(subjectSearchKey))
+                nextPage = trendChallengeRepository.findTrendChallengesBySearch(subjectSearchKey, Constant.TYPE.PUBLIC, Util.getPageable(page, sort, Constant.DEFAULT_PAGEABLE_SIZE));
+            else
+                nextPage = trendChallengeRepository.findTrendChallengesByType(Constant.TYPE.PUBLIC, Util.getPageable(page, sort, Constant.DEFAULT_PAGEABLE_SIZE));
+            dbRecords = nextPage.getContent();
+            if (dbRecords.size() > 0) {
+                return dbRecords;
+            } else {
+                stop = true;
+            }
+        } while (nextPage.getSize() > 0 && !stop);
+        return new ArrayList<TrendChallenge>();
     }
 
     private Trends prepareTrend(Challenge challenge) {
@@ -321,9 +349,11 @@ public class ChallengeService implements IChallengeService {
         } else if (proofOfChallenger != null && proofOfChallenger.getJoin()) {
             chl.setStatus(Constant.STATUS.JOIN.getStatus());
         } else if (!chl.getDone()) {
-            chl.setStatus(Constant.STATUS.NEW.getStatus());
+            chl.setStatus(String.format(Constant.STATUS.NEW.getStatus(), chl.isJoin() ? Constant.PUBLIC_CHL :
+                    (chl.isVersus() ? Constant.TEAM_CHL : Constant.SELF_CHL)));
         } else if (chl.getDone()) {
-            chl.setStatus(Constant.STATUS.FINISH.getStatus());
+            chl.setStatus(String.format(Constant.STATUS.FINISH.getStatus(), chl.isJoin() ? Constant.PUBLIC_CHL :
+                    (chl.isVersus() ? Constant.TEAM_CHL : Constant.SELF_CHL)));
         }
     }
 
@@ -748,13 +778,38 @@ public class ChallengeService implements IChallengeService {
     }
 
     @Override
-    public Iterable<TextComment> getComments(String challengeId) {
-        Iterable<TextComment> textComments = commentRepository.findByChallengeId(challengeId);
+    public Iterable<TextComment> getComments(String challengeId, int page) {
+        Iterable<TextComment> textComments = getCommentsAsPageable(challengeId, page);
         for (TextComment comment : textComments) {
             Member member = memberService.getMemberInfo(comment.getMemberId());
             comment.setName(member.getName() + Constant.SPACE + member.getSurname());
             comment.setFbID(member.getFacebookID());
         }
         return textComments;
+    }
+
+    private List<TextComment> getCommentsAsPageable(String challengeId, int page) {
+        Page<TextComment> nextPage;
+        List<TextComment> dbRecords;
+        boolean stop = false;
+        do {
+            Sort sort = new Sort(Sort.Direction.DESC, "date");
+            nextPage = commentRepository.findByChallengeId(challengeId, Util.getPageable(page, sort, Constant.DEFAULT_PAGEABLE_SIZE));
+            dbRecords = nextPage.getContent();
+            if (dbRecords.size() > 0) {
+                return dbRecords;
+            } else {
+                stop = true;
+            }
+        } while (nextPage.getSize() > 0 && !stop);
+        return new ArrayList<TextComment>();
+    }
+
+    @Override
+    public String getChallengeSizeOfMember(String memberId) {
+        List<Integer> visibilities = fullVisibility();
+        Boolean actives[] = {true, false};
+        List<Challenge> challenges = chlRepo.findChallengeSizeByMemberId(memberId, visibilities, Arrays.asList(actives));
+        return Integer.valueOf(challenges.size()).toString();
     }
 }

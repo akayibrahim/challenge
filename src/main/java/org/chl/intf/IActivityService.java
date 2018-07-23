@@ -11,5 +11,5 @@ import java.util.List;
 public interface IActivityService {
     void createActivity(Activity activity);
 
-    List<Activity> getActivities(String memberId);
+    List<Activity> getActivities(String memberId, int page);
 }

@@ -10,7 +10,10 @@ import org.chl.model.Member;
 import org.chl.model.Proof;
 import org.chl.repository.ProofRepository;
 import org.chl.service.*;
+import org.chl.util.Constant;
+import org.chl.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -112,9 +115,9 @@ public class ProofController {
 
     @Transactional
     @RequestMapping(value = "/getProofInfoListByChallenge")
-    public @ResponseBody List<Proof> getProofInfoListByChallenge(String challengeId) throws IOException, java.lang.Exception {
+    public @ResponseBody List<Proof> getProofInfoListByChallenge(String challengeId, int page) throws IOException, java.lang.Exception {
         try {
-            Iterable<Proof>  proofIterable = proofRepository.findByChallengeId(challengeId, new Sort(Sort.Direction.DESC,"insertDate"));
+            Iterable<Proof>  proofIterable = getProofs(challengeId, page);
             List<Proof> proofs = new ArrayList<>();
             proofIterable.forEach(file -> {
                 Proof proof = new Proof();
@@ -131,6 +134,23 @@ public class ProofController {
             logError(challengeId, null, "getProofInfoListByChallenge", e, "challengeId=" + challengeId);
         }
         return null;
+    }
+
+    private List<Proof> getProofs(String challengeId, int page) {
+        Page<Proof> nextPage;
+        List<Proof> dbRecords;
+        boolean stop = false;
+        do {
+            Sort sort = new Sort(Sort.Direction.DESC,"insertDate");
+            nextPage = proofRepository.findByChallengeId(challengeId, Util.getPageable(page, sort, Constant.DEFAULT_PAGEABLE_SIZE));
+            dbRecords = nextPage.getContent();
+            if (dbRecords.size() > 0) {
+                return dbRecords;
+            } else {
+                stop = true;
+            }
+        } while (nextPage.getSize() > 0 && !stop);
+        return new ArrayList<Proof>();
     }
 
     public static byte[] getBytesFromInputStream(InputStream is) throws IOException {

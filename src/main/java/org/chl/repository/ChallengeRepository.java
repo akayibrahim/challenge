@@ -19,6 +19,11 @@ public interface ChallengeRepository extends MongoRepository<Challenge, String> 
             " 'deleted': {$in: [null, false]}, 'visibility': {$in: ?1}, 'active': {$in: ?2} }")
     Page<Challenge> findChallengesByMemberId(String memberId, List<Integer> visibilities, List<Boolean> active, Pageable pageable);
 
+    @Query(" { '$or': [ { 'challengerId' : ?0 }, { 'versusAttendanceList.memberId': ?0 }, { 'joinAttendanceList.memberId': ?0 } ]," +
+            " 'deleted': {$in: [null, false]}, 'visibility': {$in: ?1}, 'active': {$in: ?2} }")
+    List<Challenge> findChallengeSizeByMemberId(String memberId, List<Integer> visibilities, List<Boolean> active);
+
+
     @Query(" { 'challengerId' : ?0, 'deleted': {$in: [null, false]}, 'visibility': {$in: ?1}, 'active': {$in: ?2} }")
     List<Challenge> findChallengesByMemberId(String memberId, List<Integer> visibilities, List<Boolean> active, Sort sort);
 
@@ -35,5 +40,5 @@ public interface ChallengeRepository extends MongoRepository<Challenge, String> 
 
     @Query("{ '$or' : [ { 'subject' : ?0, 'type': ?1, 'deleted': {$in: [null, false]}, 'visibility': {$in: [1, 2]}, 'done': false, 'active': true, 'dateOfUntil': {'$gte': ?2} }, " +
             "           { 'subject' : ?0, 'type': ?1, 'deleted': {$in: [null, false]}, 'visibility': {$in: [1, 2]}, 'done': true, 'active': true } ] }")
-    List<Challenge> findChallengesBySubjectAndType(String subject, Constant.TYPE type, Date sysdate, Sort sort);
+    Page<Challenge> findChallengesBySubjectAndType(String subject, Constant.TYPE type, Date sysdate, Pageable pageable);
 }
