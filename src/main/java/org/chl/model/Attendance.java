@@ -35,6 +35,46 @@ public class Attendance {
     @JsonProperty
     private Boolean reject;
 
+    private Boolean followed;
+
+    private String name;
+
+    private String surname;
+
+    private String facebookId;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getFacebookId() {
+        return facebookId;
+    }
+
+    public void setFacebookId(String facebookId) {
+        this.facebookId = facebookId;
+    }
+
+    public Boolean getFollowed() {
+        return followed;
+    }
+
+    public void setFollowed(Boolean followed) {
+        this.followed = followed;
+    }
+
     public String getId() {
         return id;
     }

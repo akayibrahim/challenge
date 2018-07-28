@@ -311,4 +311,26 @@ public class ChallengeController {
         }
         return null;
     }
+
+    @Transactional
+    @RequestMapping(value = "/getSupportList")
+    public List<Support> getSupportList(String challengeId, String memberId, String supportedMemberId, Boolean firstTeam) throws Exception {
+        try {
+            return chlService.getSupportList(challengeId, memberId, supportedMemberId, firstTeam);
+        } catch (Exception e) {
+            logError(challengeId, supportedMemberId, "getSupportList", e, "memberId=" + supportedMemberId);
+        }
+        return null;
+    }
+
+    @Transactional
+    @RequestMapping(value = "/getChallengerList")
+    public List<Attendance> getChallengerList(String challengeId, String memberId, Boolean firstTeam) throws Exception {
+        try {
+            return chlService.getChallengerList(challengeId, memberId, firstTeam);
+        } catch (Exception e) {
+            logError(challengeId, null, "getChallengerList", e, "challengeId=" + challengeId);
+        }
+        return null;
+    }
 }

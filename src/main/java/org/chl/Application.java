@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
@@ -16,7 +18,7 @@ import org.springframework.jms.support.converter.MessageType;
 @Configuration
 @EnableAutoConfiguration
 public class Application {
-    
+
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(Application.class, args);
         /**

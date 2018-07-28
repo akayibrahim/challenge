@@ -261,9 +261,9 @@ public class ChallengeService implements IChallengeService {
         if (!StringUtils.hasText(subjectSearchKey) && trendList.stream().count() < 10) {
             List<String> member = new ArrayList<>();
             member.add(memberId);
-            List<Challenge> publicChallenges = getPublicChallenges(member, 0);
+            List<Challenge> publicChallenges = getPublicChallenges(member, page);
             publicChallenges.stream()
-                    .filter(challenge -> trendList.stream().noneMatch(trends -> trends.getChallengeId().equals(challenge.getId())))
+                    .filter(challenge -> trendChallengeRepository.findTrendByChallengeId(challenge.getId()) == null)
                     .forEach(challenge -> {
                         trendList.add(prepareTrend(challenge));
                     });
@@ -679,8 +679,10 @@ public class ChallengeService implements IChallengeService {
 
     private void activateChallenge(Challenge challenge) {
         if (!challenge.getActive()) {
-            challenge.setUntilDate(setUntilDateFromChallengeTime(challenge.getChallengeTime()));
-            challenge.setDateOfUntil(addDayToToday(challenge.getChallengeTime()));
+            if (!challenge.getDone()) {
+                challenge.setUntilDate(setUntilDateFromChallengeTime(challenge.getChallengeTime()));
+                challenge.setDateOfUntil(addDayToToday(challenge.getChallengeTime()));
+            }
             challenge.setActive(true);
             chlRepo.save(challenge);
         }
@@ -811,5 +813,57 @@ public class ChallengeService implements IChallengeService {
         Boolean actives[] = {true, false};
         List<Challenge> challenges = chlRepo.findChallengeSizeByMemberId(memberId, visibilities, Arrays.asList(actives));
         return Integer.valueOf(challenges.size()).toString();
+    }
+
+    @Override
+    public List<Support> getSupportList(String challengeId, String memberId, String supportedMemberId, Boolean firstTeam) {
+        List<Support> supports = null;
+        if (StringUtils.hasText(supportedMemberId)) {
+            if (firstTeam)
+                supports = supportRepository.findByChallengeIdAndSupportedMemberIdAndSupportFirstTeam(challengeId, supportedMemberId, true);
+            else
+                supports = supportRepository.findByChallengeIdAndSupportedMemberIdAndSupportSecondTeam(challengeId, supportedMemberId, true);
+        } else {
+            if (firstTeam)
+                supports = supportRepository.findByChallengeIdAndSupportFirstTeam(challengeId, true);
+            else
+                supports = supportRepository.findByChallengeIdAndSupportSecondTeam(challengeId, true);
+        }
+        supports.stream().forEach(support -> {
+            Member member = memberService.getMemberInfo(support.getMemberId());
+            support.setName(member.getName());
+            support.setSurname(member.getSurname());
+            support.setFacebookId(member.getFacebookID());
+            support.setFollowed(memberService.isMyFriend(memberId, support.getMemberId()));
+        });
+        return supports;
+    }
+
+    @Override
+    public List<Attendance> getChallengerList(String challengeId, String memberId, Boolean firstTeam) {
+        List<Attendance> attendances = new ArrayList<>();
+        Challenge challenge = chlRepo.findById(challengeId).get();
+        if (challenge.isVersus()) {
+            challenge.getVersusAttendanceList().stream().filter(ver -> firstTeam && ver.getFirstTeamMember())
+                    .forEach( ver -> {
+                        ver.setFollowed(memberService.isMyFriend(memberId, ver.getMemberId()));
+                        attendances.add(ver);
+                    });
+            challenge.getVersusAttendanceList().stream().filter(ver -> !firstTeam && ver.getSecondTeamMember())
+                    .forEach( ver -> {
+                        ver.setFollowed(memberService.isMyFriend(memberId, ver.getMemberId()));
+                        attendances.add(ver);
+                    });
+        } else if (challenge.isJoin()) {
+            challenge.getJoinAttendanceList().stream().filter(join -> !join.getMemberId().equals(memberId)).forEach(join -> {
+                Member member = memberService.getMemberInfo(join.getMemberId());
+                join.setName(member.getName());
+                join.setSurname(member.getSurname());
+                join.setFacebookId(member.getFacebookID());
+                join.setFollowed(memberService.isMyFriend(memberId, join.getMemberId()));
+                attendances.add(join);
+            });
+        }
+        return attendances;
     }
 }

@@ -29,6 +29,46 @@ public class Support {
     @JsonProperty
     private Boolean supportSecondTeam;
 
+    private String name;
+
+    private String surname;
+
+    private String facebookId;
+
+    private Boolean followed;
+
+    public Boolean getFollowed() {
+        return followed;
+    }
+
+    public void setFollowed(Boolean followed) {
+        this.followed = followed;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getFacebookId() {
+        return facebookId;
+    }
+
+    public void setFacebookId(String facebookId) {
+        this.facebookId = facebookId;
+    }
+
     public String getSupportedMemberId() {
         return supportedMemberId;
     }

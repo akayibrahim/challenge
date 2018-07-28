@@ -27,7 +27,7 @@ public interface ChallengeRepository extends MongoRepository<Challenge, String> 
     @Query(" { 'challengerId' : ?0, 'deleted': {$in: [null, false]}, 'visibility': {$in: ?1}, 'active': {$in: ?2} }")
     List<Challenge> findChallengesByMemberId(String memberId, List<Integer> visibilities, List<Boolean> active, Sort sort);
 
-    @Query("{ 'challengerId' : {$nin : ?0}, 'versusAttendanceList.memberId': {$nin : ?0}, 'joinAttendanceList.memberId': {$nin : ?0} , 'type' : 'PUBLIC', 'deleted': {$in: [null, false]}, 'active': true" +
+    @Query("{ 'challengerId' : {$nin : ?0}, 'versusAttendanceList.memberId': {$nin : ?0}, 'joinAttendanceList.memberId': {$nin : ?0}, 'deleted': {$in: [null, false]}, 'active': true" +
             ", 'visibility': 1, '$or' : [ { 'dateOfUntil': {'$gte': ?2}, 'done': false  }, { 'done': true } ] }")
     Page<Challenge> findPublicChallenges(List<String> memberIdList, Constant.TYPE type, Date sysdate, Pageable pageable);
 

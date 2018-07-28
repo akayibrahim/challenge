@@ -55,4 +55,8 @@ public interface IChallengeService {
     void commentAsTextToChallange(TextComment textComment);
 
     String getChallengeSizeOfMember(String memberId);
+
+    List<Support> getSupportList(String challengeId, String memberId, String supportedMemberId, Boolean firstTeam);
+
+    List<Attendance> getChallengerList(String challengeId, String memberId, Boolean firstTeam);
 }

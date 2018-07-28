@@ -8,6 +8,12 @@ killall mongod
 
 http://localhost:8080/downloadImage?challengeId=5b2cdaf41cb199833bc830ca&memberId=5b1a97bbcb353e79ca335a38
 
+ssh -i "akay.pem" ubuntu@ec2-107-22-156-149.compute-1.amazonaws.com
+
+nohup java -jar gs-spring-boot-0.1.0.jar &
+
+ps aux | grep java
+
 > help
         db.help()                    help on db methods
         db.mycoll.help()             help on collection methods
