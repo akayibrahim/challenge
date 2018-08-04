@@ -329,7 +329,8 @@ public class ChallengeService implements IChallengeService {
         trend.setChallengerId(challenge.getChallengerId());
         JoinAttendance proofOfChallenger = Optional.ofNullable(challenge.getJoinAttendanceList())
                 .orElseGet(Collections::emptyList).stream().filter(join -> join.getMemberId().equals(challenge.getChallengerId())).findFirst().orElse(null);
-        trend.setProvedWithImage(proofOfChallenger != null ? proofOfChallenger.getProvedWithImage() : true);
+        trend.setProvedWithImage(proofOfChallenger != null && proofOfChallenger.getProvedWithImage() != null
+                ? proofOfChallenger.getProvedWithImage() : true);
         return trend;
     }
 
@@ -367,11 +368,16 @@ public class ChallengeService implements IChallengeService {
             JoinAttendance proofOfChallenger = Optional.ofNullable(chl.getJoinAttendanceList())
                     .orElseGet(Collections::emptyList).stream().filter(join -> join.getMemberId().equals(chl.getChallengerId())).findFirst().orElse(null);
             chl.setProofedByChallenger(proofOfChallenger != null ? proofOfChallenger.getProof() : false);
-            chl.setProvedWithImage(proofOfChallenger != null ? proofOfChallenger.getProvedWithImage() : true);
+            chl.setProvedWithImage(proofOfChallenger != null ? nvl(proofOfChallenger.getProvedWithImage(), true) : true);
             setStatusOfChallenge(chl, proofOfChallenger);
+            chl.setRejectedByAllAttendance(nvl(chl.getRejectedByAllAttendance(), false));
             if (comeFromFeeds)
                 savePostShowed(memberId, chl);
         });
+    }
+
+    private static <T> T nvl(T value, T defaultValue) {
+        return value != null ? value : defaultValue;
     }
 
     private void setStatusOfChallenge(Challenge chl, JoinAttendance proofOfChallenger) {
@@ -539,6 +545,7 @@ public class ChallengeService implements IChallengeService {
         }
         if (challenge.getActive())
             challenge.setDateOfUntil(DateUtil.covertToDate(challenge.getUntilDate()));
+        challenge.setRejectedByAllAttendance(false);
     }
 
     private void initializeVersusChallenge(Challenge challenge) {
@@ -548,6 +555,7 @@ public class ChallengeService implements IChallengeService {
         challenge.setActive(false);
         if (challenge.getActive())
             challenge.setDateOfUntil(DateUtil.covertToDate(challenge.getUntilDate()));
+        challenge.setRejectedByAllAttendance(false);
     }
 
     private void initializeSelfChallenge(Challenge challenge) {
@@ -557,6 +565,7 @@ public class ChallengeService implements IChallengeService {
         challenge.setActive(true);
         if (!challenge.getDone())
             challenge.setDateOfUntil(DateUtil.covertToDate(challenge.getUntilDate()));
+        challenge.setRejectedByAllAttendance(false);
     }
 
     @Override
@@ -706,6 +715,9 @@ public class ChallengeService implements IChallengeService {
                 .findFirst().ifPresent(join -> {
             activityService.createActivity(Mappers.prepareActivity(null, joinToChallenge.getChallengeId(), joinToChallenge.getMemberId(), challenge.getChallengerId(), Constant.ACTIVITY.JOIN));
         });
+        if (challenge.getJoinAttendanceList().stream().noneMatch(joi ->
+                !joi.getChallenger() && joi.getReject() != null && !joi.getReject()))
+            challenge.setRejectedByAllAttendance(true);
         chlRepo.save(challenge);
     }
 
@@ -753,6 +765,8 @@ public class ChallengeService implements IChallengeService {
             versus.setReject(!versusAtt.getAccept());
             activityService.createActivity(Mappers.prepareActivity(null, challenge.getId(), versusAtt.getMemberId(), challenge.getChallengerId(), Constant.ACTIVITY.ACCEPT));
         });
+        if (challenge.getVersusAttendanceList().stream().noneMatch(ver -> !ver.getMemberId().equals(challenge.getChallengerId()) && ver.getReject() != null && !ver.getReject()))
+            challenge.setRejectedByAllAttendance(true);
         chlRepo.save(challenge);
         if (!challenge.getActive() && challenge.getVersusAttendanceList().stream().
                 noneMatch(ver -> ver.getAccept() != null && !ver.getAccept()))

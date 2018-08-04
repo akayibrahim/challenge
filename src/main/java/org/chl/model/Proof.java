@@ -20,6 +20,15 @@ public class Proof {
     private String fbID;
     private String memberId;
     private Date insertDate;
+    private Boolean provedWithImage;
+
+    public Boolean getProvedWithImage() {
+        return provedWithImage;
+    }
+
+    public void setProvedWithImage(Boolean provedWithImage) {
+        this.provedWithImage = provedWithImage;
+    }
 
     public String getId() {
         return id;

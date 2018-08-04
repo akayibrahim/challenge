@@ -185,6 +185,8 @@ public class ProofController {
                 Member member = memberService.getMemberInfo(file.getMemberId());
                 proof.setName(member.getName() + " " + member.getSurname());
                 proof.setFbID(member.getFacebookID());
+                GridFSFile fsFile =  gridOperations.findOne(new Query(Criteria.where("_id").is(file.getProofObjectId())));
+                proof.setProvedWithImage(fsFile != null ? "image".equals(fsFile.getMetadata().get("type")) : true);
                 proofs.add(proof);
             });
             return proofs;

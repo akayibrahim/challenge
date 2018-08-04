@@ -107,6 +107,16 @@ public class Challenge {
 
     private Boolean provedWithImage;
 
+    private Boolean rejectedByAllAttendance;
+
+    public Boolean getRejectedByAllAttendance() {
+        return rejectedByAllAttendance;
+    }
+
+    public void setRejectedByAllAttendance(Boolean rejectedByAllAttendance) {
+        this.rejectedByAllAttendance = rejectedByAllAttendance;
+    }
+
     public Boolean getProvedWithImage() {
         return provedWithImage;
     }
