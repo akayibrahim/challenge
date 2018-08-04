@@ -233,9 +233,9 @@ public class ChallengeController {
 
     @Transactional
     @RequestMapping(value = "/updateProgressOrDoneForSelf")
-    public void updateProgressOrDoneForSelf(String challengeId, String result, Boolean done) throws Exception {
+    public void updateProgressOrDoneForSelf(String challengeId, Boolean homeWin, String result, String goal, Boolean done) throws Exception {
         try {
-            chlService.updateProgressOrDoneForSelf(challengeId, result, done);
+            chlService.updateProgressOrDoneForSelf(challengeId, homeWin, result, goal, done);
         } catch (Exception e) {
             logError(challengeId, null, "updateProgressOrDoneForSelf", e, "challengeId=" + challengeId + "&result=" + result
                     + "&done=" + done);
@@ -244,9 +244,9 @@ public class ChallengeController {
 
     @Transactional
     @RequestMapping(value = "/updateResultsOfVersus")
-    public void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore, Boolean done) throws Exception {
+    public void updateResultsOfVersus(String challengeId, Boolean homeWin, Boolean awayWin, String firstTeamScore, String secondTeamScore, Boolean done) throws Exception {
         try {
-            chlService.updateResultsOfVersus(challengeId, firstTeamScore, secondTeamScore, done);
+            chlService.updateResultsOfVersus(challengeId, homeWin, awayWin, firstTeamScore, secondTeamScore, done);
         } catch (Exception e) {
             logError(challengeId, null, "updateResultsOfVersus", e, "challengeId=" + challengeId + "&firstTeamScore=" + firstTeamScore
                     + "&secondTeamScore=" + secondTeamScore);

@@ -97,6 +97,56 @@ public class Challenge {
 
     private String result;
 
+    private Boolean canJoin;
+
+    private Boolean joined;
+
+    private Boolean homeWin;
+
+    private Boolean awayWin;
+
+    private Boolean provedWithImage;
+
+    public Boolean getProvedWithImage() {
+        return provedWithImage;
+    }
+
+    public void setProvedWithImage(Boolean provedWithImage) {
+        this.provedWithImage = provedWithImage;
+    }
+
+    public Boolean getAwayWin() {
+        return awayWin;
+    }
+
+    public void setAwayWin(Boolean awayWin) {
+        this.awayWin = awayWin;
+    }
+
+    public Boolean getHomeWin() {
+        return homeWin;
+    }
+
+    public void setHomeWin(Boolean homeWin) {
+        this.homeWin = homeWin;
+    }
+
+    public Boolean getJoined() {
+        return joined;
+    }
+
+    public void setJoined(Boolean joined) {
+        this.joined = joined;
+    }
+
+    public Boolean getCanJoin() {
+        return canJoin;
+    }
+
+    public void setCanJoin(Boolean canJoin) {
+        this.canJoin = canJoin;
+    }
+
     public String getResult() {
         return result;
     }

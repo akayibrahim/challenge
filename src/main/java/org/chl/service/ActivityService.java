@@ -41,6 +41,8 @@ public class ActivityService implements IActivityService {
 
     @Override
     public void createActivity(Activity activity) {
+        if (activity.getToMemberId().equals(activity.getFromMemberId()))
+            return;
         activity.setInsertDate(new Date());
         if (activity.getType().equals(Constant.ACTIVITY.PROOF)) {
             Activity exist = activityRepo.findExistActivity(activity.getChallengeId(), activity.getToMemberId(), activity.getFromMemberId(), activity.getType());

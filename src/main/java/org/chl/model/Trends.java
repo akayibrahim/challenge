@@ -23,6 +23,16 @@ public class Trends {
 
     private String challengerId;
 
+    private Boolean provedWithImage;
+
+    public Boolean getProvedWithImage() {
+        return provedWithImage;
+    }
+
+    public void setProvedWithImage(Boolean provedWithImage) {
+        this.provedWithImage = provedWithImage;
+    }
+
     public String getChallengerId() {
         return challengerId;
     }

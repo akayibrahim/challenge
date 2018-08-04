@@ -60,10 +60,9 @@
         </plugins>
         <resources>
             <resource>
-                <directory>resources</directory>
-                <targetPath>${project.build.outputDirectory}</targetPath>
+                <directory>src/main/resources</directory>
                 <includes>
-                    <include>application.properties</include>
+                    <include>**/*.properties</include>
                 </includes>
             </resource>
         </resources>

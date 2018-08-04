@@ -6,6 +6,9 @@ killall mongod
 
 "/Users/iakay/software tools/mongodb/bin/mongo"
 
+"/Users/iakay/software tools/mongodb/bin/mongodump"
+"/Users/iakay/software tools/mongodb/bin/mongorestore"
+
 http://localhost:8080/downloadImage?challengeId=5b2cdaf41cb199833bc830ca&memberId=5b1a97bbcb353e79ca335a38
 
 ssh -i "akay.pem" ubuntu@ec2-107-22-156-149.compute-1.amazonaws.com

@@ -48,10 +48,12 @@ public class ProofService implements IProofService {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    metaData.put("type", "image");
+                    String type[] = file.getContentType().split("/");
+                    metaData.put("type", type[0]);
                     String imageFileId = gridFsTemplate.store(inputStream, file.getOriginalFilename(), file.getContentType(), metaData).toString();
                     joinAttendance.setJoin(false);
                     joinAttendance.setProof(true);
+                    joinAttendance.setProvedWithImage("image".equals(type[0]) ? true : false);
                     addProof(challengeId, memberId, imageFileId);
                 });
         challengeService.save(challenge);

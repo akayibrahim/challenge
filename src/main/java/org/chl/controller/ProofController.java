@@ -6,6 +6,7 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import org.chl.model.Challenge;
 import org.chl.model.Member;
 import org.chl.model.Proof;
 import org.chl.repository.ProofRepository;
@@ -20,6 +21,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -60,9 +62,17 @@ public class ProofController {
         try {
             proofService.uploadImage(file, challengeId, memberId);
         } catch (java.lang.Exception e) {
+            deleteChallenge(challengeId);
             logError(challengeId, memberId, "uploadImage", e, "memberId=" + memberId + "&challengeId=" + challengeId);
         }
         return null;
+    }
+
+    @Async
+    private void deleteChallenge(String challengeId) {
+        Challenge challenge = challengeService.getChallengeById(challengeId);
+        if (challenge.getJoinAttendanceList().stream().noneMatch(join -> !join.getChallenger()))
+            challengeService.deleteChallenge(challengeId);
     }
 
     @Transactional
@@ -90,9 +100,57 @@ public class ProofController {
     }
 
     @Transactional
+    @RequestMapping(value = "/downloadVideo", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    public @ResponseBody
+    byte[] downloadVideo(String challengeId, String memberId) throws IOException, java.lang.Exception {
+        try {
+            GridFSFile file =  gridOperations.findOne(new Query(Criteria.where("metadata.challengeId").is(challengeId).andOperator(Criteria.where("metadata.memberId").is(memberId))));
+            byte[] bytesToWriteTo = null;
+            if (file != null) {
+                GridFSDownloadStream downloadStream = gridFSBucket.openDownloadStream(file.getObjectId());
+                int fileLength = (int) downloadStream.getGridFSFile().getLength();
+                bytesToWriteTo = new byte[fileLength];
+                int streamDownloadPosition = 0;
+                while(streamDownloadPosition != -1) {
+                    streamDownloadPosition += downloadStream.read(bytesToWriteTo, streamDownloadPosition, fileLength);
+                }
+                downloadStream.close();
+            }
+            return bytesToWriteTo;
+        } catch (java.lang.Exception e) {
+            logError(challengeId, memberId, "downloadImage", e, "memberId=" + memberId + "&challengeId=" + challengeId);
+        }
+        return null;
+    }
+
+    @Transactional
     @RequestMapping(value = "/downloadProofImageByObjectId", produces = MediaType.IMAGE_PNG_VALUE)
     public @ResponseBody
     byte[] downloadProofImageByObjectId(String objectId) throws IOException, java.lang.Exception {
+        try {
+            GridFSFile file =  gridOperations.findOne(new Query(Criteria.where("_id").is(objectId)));
+            byte[] bytesToWriteTo = null;
+            if (file != null) {
+                GridFSDownloadStream downloadStream = gridFSBucket.openDownloadStream(file.getObjectId());
+                int fileLength = (int) downloadStream.getGridFSFile().getLength();
+                bytesToWriteTo = new byte[fileLength];
+                int streamDownloadPosition = 0;
+                while(streamDownloadPosition != -1) {
+                    streamDownloadPosition += downloadStream.read(bytesToWriteTo, streamDownloadPosition, fileLength);
+                }
+                downloadStream.close();
+            }
+            return bytesToWriteTo;
+        } catch (java.lang.Exception e) {
+            logError(null, null, "downloadProofImageByObjectId", e, "objectId=" + objectId);
+        }
+        return null;
+    }
+
+    @Transactional
+    @RequestMapping(value = "/downloadProofVideoByObjectId", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    public @ResponseBody
+    byte[] downloadProofVideoByObjectId(String objectId) throws IOException, java.lang.Exception {
         try {
             GridFSFile file =  gridOperations.findOne(new Query(Criteria.where("_id").is(objectId)));
             byte[] bytesToWriteTo = null;

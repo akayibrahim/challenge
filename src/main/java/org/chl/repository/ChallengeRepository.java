@@ -24,12 +24,12 @@ public interface ChallengeRepository extends MongoRepository<Challenge, String> 
     List<Challenge> findChallengeSizeByMemberId(String memberId, List<Integer> visibilities, List<Boolean> active);
 
 
-    @Query(" { 'challengerId' : ?0, 'deleted': {$in: [null, false]}, 'visibility': {$in: ?1}, 'active': {$in: ?2} }")
-    List<Challenge> findChallengesByMemberId(String memberId, List<Integer> visibilities, List<Boolean> active, Sort sort);
+    @Query(" { 'challengerId' : ?0, 'deleted': {$in: [null, false]}, 'visibility': {$in: ?1}, 'active': {$in: ?2}, 'dateOfUntil': {'$lte': ?3}, 'done': false }")
+    List<Challenge> findChallengesByMemberId(String memberId, List<Integer> visibilities, List<Boolean> active, Date sysdate, Sort sort);
 
     @Query("{ 'challengerId' : {$nin : ?0}, 'versusAttendanceList.memberId': {$nin : ?0}, 'joinAttendanceList.memberId': {$nin : ?0}, 'deleted': {$in: [null, false]}, 'active': true" +
-            ", 'visibility': 1, '$or' : [ { 'dateOfUntil': {'$gte': ?2}, 'done': false  }, { 'done': true } ] }")
-    Page<Challenge> findPublicChallenges(List<String> memberIdList, Constant.TYPE type, Date sysdate, Pageable pageable);
+            ", 'type': {$in : ?1} , 'visibility': 1, '$or' : [ { 'dateOfUntil': {'$gte': ?2}, 'done': false  }, { 'done': true } ] }")
+    Page<Challenge> findPublicChallenges(List<String> memberIdList, List<String> type, Date sysdate, Pageable pageable);
 
     @Query("{ '$or' : [ { '$or' : [ {'challengerId' : {$in : ?0}}, { 'versusAttendanceList.memberId': {$in : ?0} }, { 'joinAttendanceList.memberId': {$in : ?0} } ], 'deleted': {$in: [null, false]}, 'dateOfUntil': {'$gte': ?2}, 'done': false , 'active': true}, " +
                        "{ '$or' : [ {'challengerId' : {$in : ?0}}, { 'versusAttendanceList.memberId': {$in : ?0} }, { 'joinAttendanceList.memberId': {$in : ?0} } ], 'deleted': {$in: [null, false]}, 'done': true , 'active': true} ] }")

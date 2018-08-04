@@ -36,9 +36,9 @@ public interface IChallengeService {
 
     Iterable<TextComment> getComments(String challengeId, int page);
 
-    void updateProgressOrDoneForSelf(String challengeId, String score, Boolean done);
+    void updateProgressOrDoneForSelf(String challengeId, Boolean homeWin, String score, String goal, Boolean done);
 
-    void updateResultsOfVersus(String challengeId, String firstTeamScore, String secondTeamScore, Boolean done);
+    void updateResultsOfVersus(String challengeId, Boolean homeWin, Boolean awayWin, String firstTeamScore, String secondTeamScore, Boolean done);
 
     Iterable<Challenge> getAllChallenges();
 

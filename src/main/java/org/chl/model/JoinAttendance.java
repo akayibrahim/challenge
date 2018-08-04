@@ -22,6 +22,16 @@ public class JoinAttendance extends Attendance {
     @JsonProperty
     private Boolean challenger;
 
+    private Boolean provedWithImage;
+
+    public Boolean getProvedWithImage() {
+        return provedWithImage;
+    }
+
+    public void setProvedWithImage(Boolean provedWithImage) {
+        this.provedWithImage = provedWithImage;
+    }
+
     public Boolean getJoin() {
         return join;
     }
