@@ -171,11 +171,11 @@ public class MemberController {
 
     @Transactional
     @RequestMapping(value = "/getActivityCount")
-    public String getActivityCount(@Valid String memberId) throws Exception {
+    public String getActivityCount(@Valid String memberId, Boolean delete) throws Exception {
         try {
             ActivityCount activityCount = activityCountRepository.findByMemberId(memberId);
             String count = activityCount != null ? activityCount.getCount() : Constant.ZERO;
-            if (activityCount != null) {
+            if (delete && activityCount != null) {
                 activityCount.setCount(Constant.ZERO);
                 activityCountRepository.save(activityCount);
             }

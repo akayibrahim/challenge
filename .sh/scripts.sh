@@ -63,7 +63,7 @@ commands
     db.challenge.find()
     db.challenge.find({ "versusAttendanceList.memberId": "5b3152821cb199f1fadc0fab" })
     db.challenge.find({ "challengerId": { $nin: ["5b3152d31cb199f1fadc0fb02"] } })
-    db.challenge.remove({ "_id": ObjectId("5b4bbe098d396692e248e5f2") })
+    db.challenge.remove({ "_id": ObjectId("5b6bdf4cd35c653e6a09aae0") })
     db.challenge.remove({})
     db.challenge.update( { "done": true }, { $set: {"visibility": "1"} } )
     db.challenge.find( { "_id": ObjectId("5b4cd32f8d3966b51be4e871") })

@@ -776,7 +776,7 @@ public class ChallengeService implements IChallengeService {
     @Override
     public List<ChallengeRequest> getChallengeRequests(String memberId) {
         List<ChallengeRequest> challengeRequests = new ArrayList<>();
-        List<Challenge> challenges = chlRepo.findChallengeRequests(memberId);
+        List<Challenge> challenges = chlRepo.findChallengeRequests(memberId, new Sort(Sort.Direction.DESC, "chlDate"));
         challenges.stream().filter(join -> join.isJoin())
                 .forEach(challenge -> {
                     challenge.getJoinAttendanceList().stream()

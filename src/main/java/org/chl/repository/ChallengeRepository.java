@@ -36,7 +36,7 @@ public interface ChallengeRepository extends MongoRepository<Challenge, String> 
     Page<Challenge> findChallenges(List<String> memberIdList, Constant.TYPE type, Date sysdate, Pageable pageable);
 
     @Query(" { '$or': [ { 'versusAttendanceList.memberId': ?0 }, { 'joinAttendanceList.memberId': ?0 } ], 'join': {$in: [null, false]}, 'proof': {$in: [null, false]}, 'reject': {$in: [null, false]} }" )
-    List<Challenge> findChallengeRequests(String memberId);
+    List<Challenge> findChallengeRequests(String memberId, Sort sort);
 
     @Query("{ '$or' : [ { 'subject' : ?0, 'type': ?1, 'deleted': {$in: [null, false]}, 'visibility': {$in: [1, 2]}, 'done': false, 'active': true, 'dateOfUntil': {'$gte': ?2} }, " +
             "           { 'subject' : ?0, 'type': ?1, 'deleted': {$in: [null, false]}, 'visibility': {$in: [1, 2]}, 'done': true, 'active': true } ] }")
