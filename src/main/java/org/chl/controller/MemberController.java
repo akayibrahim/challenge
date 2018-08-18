@@ -1,14 +1,13 @@
 package org.chl.controller;
 
-import org.chl.model.ActivityCount;
+import org.chl.model.*;
 import org.chl.model.Error;
-import org.chl.model.FriendList;
-import org.chl.model.Member;
 import org.chl.repository.ActivityCountRepository;
 import org.chl.service.ErrorService;
 import org.chl.service.MemberService;
 import org.chl.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -117,6 +116,23 @@ public class MemberController {
             memberService.followingFriend(friendMemberId, memberId, follow);
         } catch (Exception e) {
             logError(null, memberId, "followingFriend", e, "memberId=" + memberId + "&friendMemberId=" + friendMemberId + "&follow=" + follow);
+        }
+    }
+
+    @Transactional
+    @RequestMapping(value = "/followingFriendList")
+    public void followingFriendList(FriendsBulkList friendsBulkList) throws Exception {
+        addFriends(friendsBulkList.getFriendMemberIdList(), friendsBulkList.getMemberId());
+    }
+
+    @Async
+    public void addFriends(List<String> friendMemberIdList, String memberId) throws Exception {
+        try {
+            friendMemberIdList.stream().forEach(friendId -> {
+                memberService.followingFriend(friendId, memberId, false);
+            });
+        } catch (Exception e) {
+            logError(null, memberId, "followingFriend", e, "memberId=" + memberId + "&friendMemberIdList=" + friendMemberIdList.toString() + "&follow=false");
         }
     }
 

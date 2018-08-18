@@ -66,8 +66,8 @@ public class ChallengeService implements IChallengeService {
             challenges.add(chl);
         });
         challengesAsPageable.stream().distinct().filter(chl -> chl.isJoin()).forEach(chl -> {
-            chl.getJoinAttendanceList().stream().filter(join -> friendLists.contains(join.getMemberId()) &&
-                    (join.getJoin() || join.getProof())).forEach(join -> {
+            chl.getJoinAttendanceList().stream().filter(join -> friendLists.contains(join.getMemberId())
+                    && (join.getJoin() || join.getProof())).forEach(join -> {
                 changeChallengeWithAttendanceInfo(challenges, chl.getId(), join.getMemberId(), join.getFacebookID());
             });
         });
@@ -88,6 +88,20 @@ public class ChallengeService implements IChallengeService {
         return challenges.stream().sorted(Comparator.comparing(Challenge::getUpdateDate).reversed()).collect(Collectors.toList());
     }
 
+    private boolean isTimesUp(Constant.TYPE type, Boolean done, Boolean homeWin, Boolean awayWin, Boolean join, Boolean proof) {
+        if (type.equals(Constant.TYPE.SELF)) {
+            return !(!done || (done && isNotNullAndTrue(homeWin)));
+        } else if (type.equals(Constant.TYPE.PRIVATE)) {
+            return !(!done || (done && (isNotNullAndTrue(homeWin) || isNotNullAndTrue(awayWin))));
+        } else if (type.equals(Constant.TYPE.PUBLIC)) {
+            return !((!done && (join || isNotNullAndTrue(proof))) || (done && isNotNullAndTrue(proof)));
+        }
+        return false;
+    }
+
+    private boolean isNotNullAndTrue(Boolean bool) {
+        return !Objects.isNull(bool) && bool ? true : false;
+    }
     private boolean postShowedControl(String memberId, Challenge chl) {
         List<PostShowed> postShowed = postShowedRepository.findByMemberIdAndChallengeIdAndChallengerId(memberId, chl.getId(), chl.getChallengerId());
         return postShowed.isEmpty();
@@ -371,6 +385,7 @@ public class ChallengeService implements IChallengeService {
             chl.setProvedWithImage(proofOfChallenger != null ? nvl(proofOfChallenger.getProvedWithImage(), true) : true);
             setStatusOfChallenge(chl, proofOfChallenger);
             chl.setRejectedByAllAttendance(nvl(chl.getRejectedByAllAttendance(), false));
+            chl.setTimesUp(isTimesUp(chl.getType(), chl.getDone(), chl.getHomeWin(), chl.getAwayWin(), chl.getJoined(), comeFromSelf ? chl.getProofed() : chl.getProofedByChallenger()));
             if (comeFromFeeds)
                 savePostShowed(memberId, chl);
         });
@@ -403,21 +418,26 @@ public class ChallengeService implements IChallengeService {
         challenge.setCanJoin(proofOfMember != null && !proofOfMember.getJoin() && !proofOfMember.getProof() ? true :
                 challenge.getToWorld() && proofOfMember == null? true : false);
         challenge.setJoined(proofOfMember != null && proofOfMember.getJoin() != null ? proofOfMember.getJoin() : false);
-        List<JoinAttendance> joinAttendances = challenge.getJoinAttendanceList();
         if (challenge.getActive()) {
+            List<JoinAttendance> joinAttendances = challenge.getJoinAttendanceList();
             challenge.setJoinAttendanceList(new ArrayList<>());
             joinAttendances.stream()
                     .filter(join -> (join.getJoin() != null && join.getJoin()) || (join.getProof() != null && join.getProof()))
+                    .limit(5)
                     .forEach(join -> {
+                        if (Objects.isNull(join.getFacebookID())) {
+                            Member member = memberService.getMemberInfo(join.getMemberId());
+                            join.setFacebookID(member.getFacebookID());
+                        }
                         challenge.getJoinAttendanceList().add(join);
                     });
         }
-        Integer teamSize = challenge.getJoinAttendanceList().size() - 1;
+        Integer teamSize = challenge.getJoinAttendanceList().size() > 0 ? challenge.getJoinAttendanceList().size() - 1 : 0;
         challenge.setFirstTeamCount(BigDecimal.ONE.toString());
-        if (!challenge.getToWorld())
-            challenge.setSecondTeamCount(teamSize.toString());
-        else
-            challenge.setSecondTeamCount(BigDecimal.ZERO.toString());
+        // if (!challenge.getToWorld())
+        challenge.setSecondTeamCount(teamSize.toString());
+        // else
+            // challenge.setSecondTeamCount(BigDecimal.ZERO.toString());
         long proofSize = Optional.ofNullable(challenge.getJoinAttendanceList())
                 .orElseGet(Collections::emptyList).stream()
                 .filter(Objects::nonNull)
@@ -903,24 +923,28 @@ public class ChallengeService implements IChallengeService {
         if (challenge.isVersus()) {
             challenge.getVersusAttendanceList().stream().filter(ver -> firstTeam && ver.getFirstTeamMember())
                     .forEach( ver -> {
-                        ver.setFollowed(memberService.isMyFriend(memberId, ver.getMemberId()));
+                        fillAttendaceInfo(ver, memberId);
                         attendances.add(ver);
                     });
             challenge.getVersusAttendanceList().stream().filter(ver -> !firstTeam && ver.getSecondTeamMember())
                     .forEach( ver -> {
-                        ver.setFollowed(memberService.isMyFriend(memberId, ver.getMemberId()));
+                        fillAttendaceInfo(ver, memberId);
                         attendances.add(ver);
                     });
         } else if (challenge.isJoin()) {
             challenge.getJoinAttendanceList().stream().filter(join -> !join.getMemberId().equals(memberId)).forEach(join -> {
-                Member member = memberService.getMemberInfo(join.getMemberId());
-                join.setName(member.getName());
-                join.setSurname(member.getSurname());
-                join.setFacebookId(member.getFacebookID());
-                join.setFollowed(memberService.isMyFriend(memberId, join.getMemberId()));
+                fillAttendaceInfo(join, memberId);
                 attendances.add(join);
             });
         }
         return attendances;
+    }
+
+    private void fillAttendaceInfo(Attendance attendance, String memberId) {
+        Member member = memberService.getMemberInfo(attendance.getMemberId());
+        attendance.setName(member.getName());
+        attendance.setSurname(member.getSurname());
+        attendance.setFacebookId(member.getFacebookID());
+        attendance.setFollowed(memberService.isMyFriend(memberId, attendance.getMemberId()));
     }
 }

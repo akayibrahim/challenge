@@ -48,7 +48,7 @@ commands
     db.member.find()
     db.member.remove({})
     db.member.update( { "_id": ObjectId("5b3152821cb199f1fadc0fab") }, { $set: {"privateMember": false} } )
-    db.member.remove( { "_id": ObjectId("5b3152701cb199f1fadc0faa") })
+    db.member.remove( { "_id": ObjectId("5b5a3c61d35c65260545d832") })
 
     db.joinAttendance.find()
     db.joinAttendance.remove({ "challengeId": "5b4bbe098d396692e248e5f2"})

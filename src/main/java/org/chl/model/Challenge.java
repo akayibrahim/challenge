@@ -109,6 +109,16 @@ public class Challenge {
 
     private Boolean rejectedByAllAttendance;
 
+    private Boolean timesUp = false;
+
+    public Boolean getTimesUp() {
+        return timesUp;
+    }
+
+    public void setTimesUp(Boolean timesUp) {
+        this.timesUp = timesUp;
+    }
+
     public Boolean getRejectedByAllAttendance() {
         return rejectedByAllAttendance;
     }
