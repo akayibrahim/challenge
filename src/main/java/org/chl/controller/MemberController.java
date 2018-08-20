@@ -3,6 +3,7 @@ package org.chl.controller;
 import org.chl.model.*;
 import org.chl.model.Error;
 import org.chl.repository.ActivityCountRepository;
+import org.chl.service.ActivityService;
 import org.chl.service.ErrorService;
 import org.chl.service.MemberService;
 import org.chl.util.Constant;
@@ -121,7 +122,7 @@ public class MemberController {
 
     @Transactional
     @RequestMapping(value = "/followingFriendList")
-    public void followingFriendList(FriendsBulkList friendsBulkList) throws Exception {
+    public void followingFriendList(@Valid @RequestBody FriendsBulkList friendsBulkList) throws Exception {
         addFriends(friendsBulkList.getFriendMemberIdList(), friendsBulkList.getMemberId());
     }
 
@@ -129,7 +130,9 @@ public class MemberController {
     public void addFriends(List<String> friendMemberIdList, String memberId) throws Exception {
         try {
             friendMemberIdList.stream().forEach(friendId -> {
-                memberService.followingFriend(friendId, memberId, false);
+                Member member = memberService.getMemberInfoByFaceBookId(friendId);
+                if (member != null)
+                    memberService.followingFriend(member.getId(), memberId, false);
             });
         } catch (Exception e) {
             logError(null, memberId, "followingFriend", e, "memberId=" + memberId + "&friendMemberIdList=" + friendMemberIdList.toString() + "&follow=false");

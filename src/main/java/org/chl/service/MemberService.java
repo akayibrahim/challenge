@@ -49,6 +49,11 @@ public class MemberService implements IMemberService {
     }
 
     @Override
+    public Member getMemberInfoByFaceBookId(String facebookID) {
+        return memberRepo.findByfacebookID(facebookID);
+    }
+
+    @Override
     public Member getMemberInfoByEmail(String email) {
         return memberRepo.findByEmail(email);
     }
@@ -78,7 +83,8 @@ public class MemberService implements IMemberService {
         if (follow) {
             activityService.createActivity(Mappers.prepareActivity(activityTableId, null, friendMemberId, memberId, Constant.ACTIVITY.FOLLOWING));
             activityService.createActivity(Mappers.prepareActivity(activityTableId, null, memberId, friendMemberId, Constant.ACTIVITY.FOLLOWER));
-        }
+        } else
+            activityService.increaseActivityCount(memberId);
     }
 
     @Override

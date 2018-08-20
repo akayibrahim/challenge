@@ -12,4 +12,6 @@ public interface IActivityService {
     void createActivity(Activity activity);
 
     List<Activity> getActivities(String memberId, int page);
+
+    void increaseActivityCount(String memberId);
 }

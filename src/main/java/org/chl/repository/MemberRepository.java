@@ -14,4 +14,6 @@ public interface MemberRepository extends MongoRepository<Member, String> {
 
     @Query(" { '$or' : [ { 'name' : {$regex: '(?i)?0' } }, { 'surname' : {$regex: '(?i)?0' } } ]  }")
     List<Member> findByKey(String searchKey);
+
+    Member findByfacebookID(String facebookID);
 }

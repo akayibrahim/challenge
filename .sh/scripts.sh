@@ -89,7 +89,7 @@ commands
     db.friendList.find({ "memberId": "5b3152821cb199f1fadc0fab" })
     db.friendList.remove({ "friendMemberId": "5b36283d1cb199413144407e" })
     db.friendList.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
-    db.friendList.remove( { "friendMemberId": "5b3152701cb199f1fadc0faa" })
+    db.friendList.remove( { "_id": ObjectId("5b7b0e87954799a691739c12") })
 
     db.trendChallenge.find()
     db.trendChallenge.remove({})

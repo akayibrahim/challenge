@@ -58,12 +58,17 @@ public class ActivityService implements IActivityService {
             if (exist != null)
                 activityRepo.delete(exist);
         }
-        increaseActivityCount(activity.getToMemberId());
+        increaseCountOfActivity(activity.getToMemberId());
         activityRepo.save(activity);
         createNotification(activity.getType(), activity.getActivityTableId(), activity.getFromMemberId(), activity.getToMemberId(), activity.getChallengeId());
     }
 
-    private void increaseActivityCount(String memberId) {
+    @Override
+    public void increaseActivityCount(String memberId) {
+        increaseCountOfActivity(memberId);
+    }
+
+    private void increaseCountOfActivity(String memberId) {
         ActivityCount exist = activityCountRepository.findByMemberId(memberId);
         if (exist != null) {
             String countStr = exist.getCount();

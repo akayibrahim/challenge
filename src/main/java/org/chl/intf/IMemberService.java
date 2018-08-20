@@ -17,6 +17,8 @@ public interface IMemberService {
 
     Member getMemberInfo(@Valid @NotEmpty String memberId);
 
+    Member getMemberInfoByFaceBookId(@Valid @NotEmpty String facebookId);
+
     Member getMemberInfoByEmail(@Valid @NotEmpty String email);
 
     Iterable<Member> getMembers();
