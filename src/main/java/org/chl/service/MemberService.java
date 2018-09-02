@@ -68,6 +68,8 @@ public class MemberService implements IMemberService {
         FriendList exist = friendRepo.findByFriendMemberIdAndMemberId(friendMemberId, memberId);
         String activityTableId;
         if (exist != null) {
+            if (exist.getFollowed())
+                return;
             exist.setFollowed(follow);
             friendRepo.save(exist);
             activityTableId = exist.getId();
@@ -79,12 +81,13 @@ public class MemberService implements IMemberService {
             friendList.setMemberId(memberId);
             friendRepo.save(friendList);
             activityTableId = friendList.getId();
+            if (!follow)
+                activityService.increaseActivityCount(memberId);
         }
         if (follow) {
             activityService.createActivity(Mappers.prepareActivity(activityTableId, null, friendMemberId, memberId, Constant.ACTIVITY.FOLLOWING));
             activityService.createActivity(Mappers.prepareActivity(activityTableId, null, memberId, friendMemberId, Constant.ACTIVITY.FOLLOWER));
-        } else
-            activityService.increaseActivityCount(memberId);
+        }
     }
 
     @Override
