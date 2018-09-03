@@ -109,6 +109,8 @@ public class ChallengeService implements IChallengeService {
 
     private void changeChallengeWithAttendanceInfo(List<Challenge> challenges, String challengeId, String memberId, String facebookID) {
         Challenge challenge = chlRepo.findById(challengeId).get();
+        if (!challenge.getChallengerId().equals(memberId))
+            challenge.setThinksAboutChallenge(null);
         challenge.setChallengerId(memberId);
         challenge.setChallengerFBId(facebookID);
         if (challenges.stream().noneMatch(chl -> chl.getId().equals(challenge.getId())))
