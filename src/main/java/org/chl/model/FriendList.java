@@ -32,6 +32,15 @@ public class FriendList {
 
     private Boolean deleted;
 
+    private Boolean requested;
+
+    public Boolean getRequested() {
+        return requested == null ? false : requested;
+    }
+
+    public void setRequested(Boolean requested) {
+        this.requested = requested;
+    }
 
     public Boolean getFollowed() {
         return followed;

@@ -16,7 +16,7 @@ public interface FriendListRepository extends MongoRepository<FriendList, String
     List<FriendList> findByMemberIdAndFollowed(String  memberId, Boolean followed);
 
     @Query(" { 'deleted' : false, 'friendMemberId' : ?0, 'followed' : ?1 }")
-    Iterable<FriendList> findByFriendMemberIdAndFollowed(String  friendMemberId, Boolean followed);
+    List<FriendList> findByFriendMemberIdAndFollowed(String  friendMemberId, Boolean followed);
 
     @Query(" { 'deleted' : false, 'friendMemberId' : ?0, 'memberId' : ?1 }")
     FriendList findByFriendMemberIdAndMemberId(String friendMemberId, String memberId);

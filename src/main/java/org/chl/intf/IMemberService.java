@@ -27,9 +27,9 @@ public interface IMemberService {
 
     void deleteSuggestion(@Valid @NotEmpty String friendMemberId, String memberId);
 
-    Iterable<FriendList> getFollowingList(@Valid @NotEmpty String memberId);
+    List<FriendList> getFollowingList(@Valid @NotEmpty String memberId);
 
-    Iterable<FriendList> getFollowerList(String memberId);
+    List<FriendList> getFollowerList(String memberId, Boolean followed);
 
     Boolean checkMemberAvailable(String memberId);
 
@@ -37,6 +37,10 @@ public interface IMemberService {
 
     Boolean isMyFriend(String memberId, String friendMemberId);
 
-    List<Member> searchFriends(String searchKey);
+    List<Member> searchFriends(String searchKey, String memberId);
+
+    void changeAccountPrivacy(String memberId, Boolean toPrivate);
+
+    public Boolean isRequestedFriend(String memberId, String friendMemberId);
 }
 

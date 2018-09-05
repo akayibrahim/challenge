@@ -12,10 +12,8 @@ import org.chl.util.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by ibrahim on 11/24/2017.
@@ -65,18 +63,38 @@ public class MemberService implements IMemberService {
 
     @Override
     public void followingFriend(String friendMemberId, String memberId, Boolean follow) {
+        Member member = memberRepo.findById(friendMemberId).get();
         FriendList exist = friendRepo.findByFriendMemberIdAndMemberId(friendMemberId, memberId);
+        Boolean existFollow = !Objects.isNull(exist) ? exist.getFollowed() : false;
         String activityTableId;
         if (exist != null) {
-            if (exist.getFollowed())
-                return;
-            exist.setFollowed(follow);
+            if (exist.getRequested()) {
+                exist.setRequested(false);
+                exist.setFollowed(follow);
+                activityService.createActivity(Mappers.prepareActivity(null, null, friendMemberId, memberId, Constant.ACTIVITY.ACCEPT_FRIEND_REQUEST));
+            } else {
+                if (member.getPrivateMember() && follow) {
+                    exist.setRequested(true);
+                    exist.setFollowed(false);
+                    follow = false;
+                    activityService.createActivity(Mappers.prepareActivity(null, null, memberId, friendMemberId, Constant.ACTIVITY.FRIEND_REQUEST));
+                } else {
+                    exist.setFollowed(follow);
+                }
+            }
             friendRepo.save(exist);
             activityTableId = exist.getId();
         } else {
             FriendList friendList = new FriendList();
             friendList.setDeleted(false);
-            friendList.setFollowed(follow);
+            if (member.getPrivateMember() && follow) {
+                friendList.setRequested(true);
+                friendList.setFollowed(false);
+                follow = false;
+                activityService.createActivity(Mappers.prepareActivity(null, null, memberId, friendMemberId, Constant.ACTIVITY.FRIEND_REQUEST));
+            } else {
+                friendList.setFollowed(follow);
+            }
             friendList.setFriendMemberId(friendMemberId);
             friendList.setMemberId(memberId);
             friendRepo.save(friendList);
@@ -84,8 +102,8 @@ public class MemberService implements IMemberService {
             if (!follow)
                 activityService.increaseActivityCount(memberId);
         }
-        if (follow) {
-            activityService.createActivity(Mappers.prepareActivity(activityTableId, null, friendMemberId, memberId, Constant.ACTIVITY.FOLLOWING));
+        if (follow && !existFollow) {
+            // activityService.createActivity(Mappers.prepareActivity(activityTableId, null, friendMemberId, memberId, Constant.ACTIVITY.FOLLOWING));
             activityService.createActivity(Mappers.prepareActivity(activityTableId, null, memberId, friendMemberId, Constant.ACTIVITY.FOLLOWER));
         }
     }
@@ -102,23 +120,23 @@ public class MemberService implements IMemberService {
     }
 
     @Override
-    public Iterable<FriendList> getFollowingList(String memberId) {
-        Iterable<FriendList> friendLists = friendRepo.findByMemberIdAndFollowed(memberId, true);
+    public List<FriendList> getFollowingList(String memberId) {
+        List<FriendList> friendLists = friendRepo.findByMemberIdAndFollowed(memberId, true);
         return friendLists;
     }
 
     @Override
-    public Iterable<FriendList> getFollowerList(String memberId) {
-        Iterable<FriendList> friendLists = friendRepo.findByFriendMemberIdAndFollowed(memberId, true);
+    public List<FriendList> getFollowerList(String memberId, Boolean followed) {
+        List<FriendList> friendLists = friendRepo.findByFriendMemberIdAndFollowed(memberId, followed);
         return friendLists;
     }
 
     public List<String> getFollowingIdList(String memberId) {
-        Iterable<FriendList> friendLists = friendRepo.findByMemberIdAndFollowed(memberId, true);
+        List<FriendList> friendLists = friendRepo.findByMemberIdAndFollowed(memberId, true);
         List<String> listOfFriend = new ArrayList<>();
-        for (FriendList friend:friendLists) {
+        friendLists.stream().filter(fri -> !fri.getRequested()).forEach(friend -> {
             listOfFriend.add(friend.getFriendMemberId());
-        }
+        });
         return listOfFriend;
     }
 
@@ -150,9 +168,22 @@ public class MemberService implements IMemberService {
     }
 
     @Override
-    public List<Member> searchFriends(String searchKey) {
+    public List<Member> searchFriends(String searchKey, String memberId) {
         Iterable<Member> memberList = memberRepo.findByKey(searchKey.toUpperCase());
         List<Member> members = Lists.newArrayList(memberList);
-        return members;
+        return members.stream().filter(member -> !isMyFriend(memberId, member.getId()) && !isRequestedFriend(memberId, member.getId())).collect(Collectors.toList());
+    }
+
+    @Override
+    public Boolean isRequestedFriend(String memberId, String friendMemberId) {
+        FriendList friendList = friendRepo.findByFriendMemberIdAndMemberId(friendMemberId, memberId);
+        return friendList != null && friendList.getRequested() ? true : false;
+    }
+
+    @Override
+    public void changeAccountPrivacy(String memberId, Boolean toPrivate) {
+        Member member = memberRepo.findById(memberId).get();
+        member.setPrivateMember(toPrivate);
+        memberRepo.save(member);
     }
 }

@@ -83,10 +83,10 @@ public class MemberController {
     public List<Member> getFollowingList(String memberId) throws Exception {
         try {
             List<Member> memberList = new ArrayList<>();
-            Iterable<FriendList> friendList = memberService.getFollowingList(memberId);
-            for (FriendList friend: friendList) {
-                memberList.add(memberService.getMemberInfo(friend.getFriendMemberId()));
-            }
+            List<FriendList> friendList = memberService.getFollowingList(memberId);
+            friendList.stream().filter(fri -> !fri.getRequested()).forEach(fri -> {
+                memberList.add(memberService.getMemberInfo(fri.getFriendMemberId()));
+            });
             return memberList;
         } catch (Exception e) {
             logError(null, memberId, "getFollowingList", e, "memberId=" + memberId);
@@ -99,10 +99,10 @@ public class MemberController {
     public List<Member> getFollowerList(String memberId) throws Exception {
         try {
             List<Member> memberList = new ArrayList<>();
-            Iterable<FriendList> friendList = memberService.getFollowerList(memberId);
-            for (FriendList friend: friendList) {
-                memberList.add(memberService.getMemberInfo(friend.getMemberId()));
-            }
+            List<FriendList> friendList = memberService.getFollowerList(memberId, true);
+            friendList.stream().filter(fri -> !fri.getRequested()).forEach(fri -> {
+                memberList.add(memberService.getMemberInfo(fri.getMemberId()));
+            });
             return memberList;
         } catch (Exception e) {
             logError(null, memberId, "getFollowerList", e, "memberId=" + memberId);
@@ -165,10 +165,10 @@ public class MemberController {
     public List<Member> getSuggestionsForFollowing(String memberId) throws Exception {
         try {
             List<Member> memberList = new ArrayList<>();
-            Iterable<FriendList> friendList = memberService.getSuggestionsForFollowing(memberId);
-            for (FriendList friend: friendList) {
-                memberList.add(memberService.getMemberInfo(friend.getFriendMemberId()));
-            }
+            List<FriendList> friendList = memberService.getSuggestionsForFollowing(memberId);
+            friendList.stream().filter(fri -> !fri.getRequested()).forEach(fri -> {
+                memberList.add(memberService.getMemberInfo(fri.getFriendMemberId()));
+            });
             return memberList;
         } catch (Exception e) {
             logError(null, memberId, "getSuggestionsForFollowing", e, "memberId=" + memberId);
@@ -207,12 +207,49 @@ public class MemberController {
 
     @Transactional
     @RequestMapping(value = "/searchFriends")
-    public List<Member> searchFriends(@Valid String searchKey) throws Exception {
+    public List<Member> searchFriends(@Valid String searchKey, String memberId) throws Exception {
         try {
-            List<Member> members = memberService.searchFriends(searchKey);
+            List<Member> members = memberService.searchFriends(searchKey, memberId);
             return members;
         } catch (Exception e) {
             logError(null, null, "searchFriends", e, "searchKey=" + searchKey);
+        }
+        return null;
+    }
+
+    @Transactional
+    @RequestMapping(value = "/changeAccountPrivacy")
+    public void changeAccountPrivacy(@Valid String memberId, Boolean toPrivate) throws Exception {
+        try {
+            memberService.changeAccountPrivacy(memberId, toPrivate);
+        } catch (Exception e) {
+            logError(null, memberId, "changeAccountPrivacy", e, "toPrivate=" + toPrivate);
+        }
+    }
+
+    @Transactional
+    @RequestMapping(value = "/getFollowerRequests")
+    public List<Member> getFollowerRequests(String memberId) throws Exception {
+        try {
+            List<Member> memberList = new ArrayList<>();
+            List<FriendList> friendList = memberService.getFollowerList(memberId, false);
+            friendList.stream().filter(fri -> fri.getRequested()).forEach(fri -> {
+                memberList.add(memberService.getMemberInfo(fri.getMemberId()));
+            });
+            return memberList;
+        } catch (Exception e) {
+            logError(null, memberId, "getFollowerRequests", e, "memberId=" + memberId);
+        }
+        return null;
+    }
+
+    @Transactional
+    @RequestMapping(value = "/isRequestedFriend")
+    public Boolean isRequestedFriend(String memberId, String friendMemberId) throws Exception {
+        try {
+            return memberService.isRequestedFriend(memberId, friendMemberId);
+        } catch (Exception e) {
+            logError(null, memberId, "isRequestedFriend", e, "memberId=" + memberId + "&friendMemberId=" + friendMemberId);
         }
         return null;
     }

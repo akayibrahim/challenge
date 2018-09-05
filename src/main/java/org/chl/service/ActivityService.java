@@ -119,6 +119,9 @@ public class ActivityService implements IActivityService {
                 nameSurname = toMember.getName() + Constant.SPACE + toMember.getSurname() + Constant.SPACE;
                 content = nameSurname + getFollowingMessageContent(member.getName(), member.getSurname());
                 break;
+            case FRIEND_REQUEST:
+                // TODO
+                break;
             default:
         }
         sendNotification(challengeId, fromMemberId, title, content);
@@ -168,6 +171,9 @@ public class ActivityService implements IActivityService {
                     activity.setName(Constant.YOU);
                     activity.setContent(getFollowingMessageContent(member.getName(), member.getSurname()));
                     break;
+                case ACCEPT_FRIEND_REQUEST:
+                    activity.setContent(getAcceptFollowerRequestMessageContent(activity.getActivityTableId()));
+                    break;
                 default:
 
             }
@@ -198,6 +204,10 @@ public class ActivityService implements IActivityService {
 
     private String getFollowerMessageContent(String activityTableId) {
         return Constant.START_TO_FOLLOW_YOU;
+    }
+
+    private String getAcceptFollowerRequestMessageContent(String activityTableId) {
+        return Constant.ACCEPT_FOLLOWER_REQUEST;
     }
 
     private String getJoinMessageContent(String challengeId, String toMemberId) {

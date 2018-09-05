@@ -23,6 +23,7 @@ public class Constant {
     public static final String PROOFED_CHALLENGE = "proved %s challenge.";
     public static final String START_TO_FOLLOWING = "start to following %s.";
     public static final String START_TO_FOLLOW_YOU = "start to follow you.";
+    public static final String ACCEPT_FOLLOWER_REQUEST = "accept your following request.";
     public static final String ZERO = "0";
     public static final String ONE = "1";
     public static final String YOU = "You";
@@ -100,7 +101,8 @@ public class Constant {
         ACCEPT("Accept it!", ""),
         JOIN("Join it!", ""),
         FOLLOWER("A new follower!", ""),
-        FOLLOWING("A new following!", "");
+        FOLLOWING("A new following!", ""),
+        FRIEND_REQUEST("A new follower!", "");
 
         private String messageTitle;
         private String message;
@@ -138,7 +140,9 @@ public class Constant {
         FOLLOWING,
         FOLLOWER,
         JOIN,
-        ACCEPT;
+        ACCEPT,
+        FRIEND_REQUEST,
+        ACCEPT_FRIEND_REQUEST;
     }
 
     public enum REQUEST_TYPE {
