@@ -38,7 +38,7 @@ public interface IChallengeService {
 
     void updateProgressOrDoneForSelf(String challengeId, Boolean homeWin, String score, String goal, Boolean done);
 
-    void updateResultsOfVersus(String challengeId, Boolean homeWin, Boolean awayWin, String firstTeamScore, String secondTeamScore, Boolean done);
+    void updateResultsOfVersus(String challengeId, Boolean homeWin, Boolean awayWin, String firstTeamScore, String secondTeamScore, Boolean done, String memberId);
 
     Iterable<Challenge> getAllChallenges();
 
@@ -59,4 +59,8 @@ public interface IChallengeService {
     List<Support> getSupportList(String challengeId, String memberId, String supportedMemberId, Boolean firstTeam);
 
     List<Attendance> getChallengerList(String challengeId, String memberId, Boolean firstTeam);
+
+    List<Challenge> getChallengeApproves(String memberId);
+
+    void approveVersus(String challengeId, String memberId, Boolean accept);
 }

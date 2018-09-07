@@ -8,7 +8,7 @@ import org.springframework.util.StringUtils;
  */
 public class Validation {
     public static void doneValidationForVersus(Boolean done, Boolean homeWin, Boolean awayWin) {
-        if(done & (homeWin == null || awayWin == null))
+        if(done != null && done & (homeWin == null || awayWin == null))
             Exception.throwDoneExceptionForVersus();
     }
 

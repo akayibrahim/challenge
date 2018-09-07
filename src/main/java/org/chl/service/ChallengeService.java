@@ -1,5 +1,6 @@
 package org.chl.service;
 
+import org.apache.tomcat.util.bcel.Const;
 import org.chl.intf.IChallengeService;
 import org.chl.model.*;
 import org.chl.repository.*;
@@ -682,15 +683,34 @@ public class ChallengeService implements IChallengeService {
     }
 
     @Override
-    public void updateResultsOfVersus(String challengeId, Boolean homeWin, Boolean awayWin, String firstTeamScore, String secondTeamScore, Boolean done) {
-        Validation.doneValidationForVersus(true, homeWin, awayWin);
+    public void updateResultsOfVersus(String challengeId, Boolean homeWin, Boolean awayWin, String firstTeamScore, String secondTeamScore, Boolean done, String memberId) {
+        Validation.doneValidationForVersus(done, homeWin, awayWin);
         Challenge versusChl = chlRepo.findById(challengeId).get();
-        if (versusChl != null && !versusChl.getDone()) {
-            versusChl.setHomeWin(homeWin);
-            versusChl.setAwayWin(awayWin);
-            versusChl.setFirstTeamScore(firstTeamScore);
-            versusChl.setSecondTeamScore(secondTeamScore);
-            versusChl.setDone(done);
+        if (versusChl.getScoreRejected())
+            return;
+        if (versusChl != null) {
+            if (versusChl.getWaitForApprove() != null && versusChl.getWaitForApprove()) {
+                versusChl.setActive(true);
+                versusChl.setWaitForApprove(false);
+            } else if (!versusChl.getDone()) {
+                VersusAttendance versusAttendance = versusChl.getVersusAttendanceList().stream().filter(ver -> ver.getMemberId().equals(memberId)).findFirst().get();
+                versusChl.setHomeWin(homeWin);
+                versusChl.setAwayWin(awayWin);
+                versusChl.setFirstTeamScore(firstTeamScore);
+                versusChl.setSecondTeamScore(secondTeamScore);
+                versusChl.setDone(done);
+                versusChl.setActive(false);
+                versusChl.setWaitForApprove(true);
+                versusChl.setApproverTeamFirst(versusAttendance.getFirstTeamMember() ? false : true);
+                versusChl.getVersusAttendanceList().stream().filter(ver -> ver.getFirstTeamMember() == !versusAttendance.getFirstTeamMember()
+                        && ver.getSecondTeamMember() == !versusAttendance.getSecondTeamMember()).forEach(versus -> {
+                    activityService.createActivity(Mappers.prepareActivity(null, versusChl.getId(), memberId, versus.getMemberId(), Constant.ACTIVITY.CHALLENGE_APPROVE));
+                });
+                versusChl.setSendingApproveMemberId(versusAttendance.getMemberId());
+                Member member = memberService.getMemberInfo(memberId);
+                versusChl.setSendApproveName(member.getName() + Constant.SPACE + member.getSurname());
+                versusChl.setSendApproveFacebookId(versusAttendance.getFacebookID());
+            }
             versusChl.setUpdateDate(new Date());
             chlRepo.save(versusChl);
         } else
@@ -791,7 +811,7 @@ public class ChallengeService implements IChallengeService {
             challenge.setRejectedByAllAttendance(true);
         chlRepo.save(challenge);
         if (!challenge.getActive() && challenge.getVersusAttendanceList().stream().
-                noneMatch(ver -> ver.getAccept() != null && !ver.getAccept()))
+                noneMatch(ver -> ver.getAccept() == null || (ver.getAccept() != null && !ver.getAccept())))
                 activateChallenge(challenge);
     }
 
@@ -925,28 +945,61 @@ public class ChallengeService implements IChallengeService {
         if (challenge.isVersus()) {
             challenge.getVersusAttendanceList().stream().filter(ver -> firstTeam && ver.getFirstTeamMember())
                     .forEach( ver -> {
-                        fillAttendaceInfo(ver, memberId);
+                        fillAttendanceInfo(ver, memberId);
                         attendances.add(ver);
                     });
             challenge.getVersusAttendanceList().stream().filter(ver -> !firstTeam && ver.getSecondTeamMember())
                     .forEach( ver -> {
-                        fillAttendaceInfo(ver, memberId);
+                        fillAttendanceInfo(ver, memberId);
                         attendances.add(ver);
                     });
         } else if (challenge.isJoin()) {
             challenge.getJoinAttendanceList().stream().filter(join -> !join.getMemberId().equals(memberId)).forEach(join -> {
-                fillAttendaceInfo(join, memberId);
+                fillAttendanceInfo(join, memberId);
                 attendances.add(join);
             });
         }
         return attendances;
     }
 
-    private void fillAttendaceInfo(Attendance attendance, String memberId) {
+    private void fillAttendanceInfo(Attendance attendance, String memberId) {
         Member member = memberService.getMemberInfo(attendance.getMemberId());
         attendance.setName(member.getName());
         attendance.setSurname(member.getSurname());
         attendance.setFacebookId(member.getFacebookID());
         attendance.setFollowed(memberService.isMyFriend(memberId, attendance.getMemberId()));
+    }
+
+    @Override
+    public List<Challenge> getChallengeApproves(String memberId) {
+        List<Challenge> challengeForApprove = new ArrayList<>();
+        List<Challenge> challenges = chlRepo.findChallengeApproves(memberId, new Sort(Sort.Direction.DESC, "updateDate"));
+        challenges.stream().forEach(chl ->{
+            VersusAttendance att = chl.getVersusAttendanceList().stream().filter(ver -> ver.getMemberId().equals(memberId)).findFirst().get();
+            Boolean teamFirst = att.getFirstTeamMember() ? true : false;
+            if (chl.getApproverTeamFirst() != null && chl.getApproverTeamFirst() == teamFirst)
+                challengeForApprove.add(chl);
+        });
+        return challengeForApprove;
+    }
+
+    @Override
+    public void approveVersus(String challengeId, String memberId, Boolean accept) {
+        if (accept)
+            updateResultsOfVersus(challengeId, null, null, null, null, null, memberId);
+        else {
+            Challenge versusChl = chlRepo.findById(challengeId).get();
+            if (versusChl != null) {
+                if (versusChl.getWaitForApprove() != null && versusChl.getWaitForApprove()) {
+                    versusChl.setUpdateDate(new Date());
+                    versusChl.setScoreRejected(true);
+                    versusChl.setWaitForApprove(false);
+                    Member member = memberService.getMemberInfo(memberId);
+                    versusChl.setScoreRejectName(member.getName() + Constant.SPACE + member.getSurname());
+                    chlRepo.save(versusChl);
+                }
+            } else
+                Exception.throwUpdateCannotForDone();
+        }
     }
 }

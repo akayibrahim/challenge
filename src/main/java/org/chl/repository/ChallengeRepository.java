@@ -41,4 +41,7 @@ public interface ChallengeRepository extends MongoRepository<Challenge, String> 
     @Query("{ '$or' : [ { 'subject' : ?0, 'type': ?1, 'deleted': {$in: [null, false]}, 'visibility': {$in: [1, 2]}, 'done': false, 'active': true, 'dateOfUntil': {'$gte': ?2} }, " +
             "           { 'subject' : ?0, 'type': ?1, 'deleted': {$in: [null, false]}, 'visibility': {$in: [1, 2]}, 'done': true, 'active': true } ] }")
     Page<Challenge> findChallengesBySubjectAndType(String subject, Constant.TYPE type, Date sysdate, Pageable pageable);
+
+    @Query(" { 'versusAttendanceList.memberId': ?0, 'waitForApprove': true } " )
+    List<Challenge> findChallengeApproves(String memberId, Sort sort);
 }

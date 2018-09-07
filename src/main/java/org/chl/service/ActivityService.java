@@ -150,7 +150,7 @@ public class ActivityService implements IActivityService {
                     activity.setContent(getCommentMessageContent(activity.getActivityTableId()));
                     break;
                 case PROOF:
-                    Proof proof = proofRepository.findByChallengeIdAndMemberId(activity.getChallengeId(), activity.getToMemberId());
+                    Proof proof = proofRepository.findByChallengeIdAndMemberId(activity.getChallengeId(), activity.getFromMemberId());
                     activity.setMediaObjectId(proof.getProofObjectId());
                     activity.setContent(getProofMessageContent(activity.getChallengeId(), activity.getToMemberId()));
                     break;
@@ -173,6 +173,9 @@ public class ActivityService implements IActivityService {
                     break;
                 case ACCEPT_FRIEND_REQUEST:
                     activity.setContent(getAcceptFollowerRequestMessageContent(activity.getActivityTableId()));
+                    break;
+                case CHALLENGE_APPROVE:
+                    activity.setContent(getChallengeApproveMessageContent(activity.getChallengeId()));
                     break;
                 default:
 
@@ -208,6 +211,14 @@ public class ActivityService implements IActivityService {
 
     private String getAcceptFollowerRequestMessageContent(String activityTableId) {
         return Constant.ACCEPT_FOLLOWER_REQUEST;
+    }
+
+    private String getChallengeApproveMessageContent(String challengeId) {
+        Challenge challenge = challengeRepository.findById(challengeId).get();
+        if (challenge.getWaitForApprove()) {
+            return String.format(Constant.CHALLENGE_APPROVE_CONTENT, challenge.getSubject().toString());
+        }
+        return null;
     }
 
     private String getJoinMessageContent(String challengeId, String toMemberId) {

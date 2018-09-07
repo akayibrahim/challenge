@@ -17,6 +17,7 @@ public class Constant {
     public static final String SPACE = " ";
     public static final String ACCEPT_REQUEST = "request you for accept of %s challenge.";
     public static final String JOIN_REQUEST_CONTENT = "request you for join to %s challenge.";
+    public static final String CHALLENGE_APPROVE_CONTENT = "request you for confirmation of result to %s challenge.";
     public static final String JOINED_TO_CHALLENGE = "joined to %s challenge.";
     public static final String DONT_JOINED_TO_CHALLENGE = "refused %s challenge.";
     public static final String COMMENTED = "commented: ";
@@ -142,7 +143,8 @@ public class Constant {
         JOIN,
         ACCEPT,
         FRIEND_REQUEST,
-        ACCEPT_FRIEND_REQUEST;
+        ACCEPT_FRIEND_REQUEST,
+        CHALLENGE_APPROVE;
     }
 
     public enum REQUEST_TYPE {

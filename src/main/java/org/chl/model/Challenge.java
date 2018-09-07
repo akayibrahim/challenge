@@ -111,6 +111,76 @@ public class Challenge {
 
     private Boolean timesUp = false;
 
+    private Boolean waitForApprove;
+
+    private Boolean approverTeamFirst;
+
+    private String sendingApproveMemberId;
+
+    private String sendApproveName;
+
+    private String sendApproveFacebookId;
+
+    private Boolean scoreRejected;
+
+    private String scoreRejectName;
+
+    public String getScoreRejectName() {
+        return scoreRejectName;
+    }
+
+    public void setScoreRejectName(String scoreRejectName) {
+        this.scoreRejectName = scoreRejectName;
+    }
+
+    public Boolean getScoreRejected() {
+        return scoreRejected == null ? false : scoreRejected;
+    }
+
+    public void setScoreRejected(Boolean scoreRejected) {
+        this.scoreRejected = scoreRejected;
+    }
+
+    public String getSendApproveFacebookId() {
+        return sendApproveFacebookId;
+    }
+
+    public void setSendApproveFacebookId(String sendApproveFacebookId) {
+        this.sendApproveFacebookId = sendApproveFacebookId;
+    }
+
+    public String getSendingApproveMemberId() {
+        return sendingApproveMemberId;
+    }
+
+    public void setSendingApproveMemberId(String sendingApproveMemberId) {
+        this.sendingApproveMemberId = sendingApproveMemberId;
+    }
+
+    public String getSendApproveName() {
+        return sendApproveName;
+    }
+
+    public void setSendApproveName(String sendApproveName) {
+        this.sendApproveName = sendApproveName;
+    }
+
+    public Boolean getApproverTeamFirst() {
+        return approverTeamFirst;
+    }
+
+    public void setApproverTeamFirst(Boolean approverTeamFirst) {
+        this.approverTeamFirst = approverTeamFirst;
+    }
+
+    public Boolean getWaitForApprove() {
+        return waitForApprove == null ? false : waitForApprove;
+    }
+
+    public void setWaitForApprove(Boolean waitForApprove) {
+        this.waitForApprove = waitForApprove;
+    }
+
     public Boolean getTimesUp() {
         return timesUp;
     }

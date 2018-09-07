@@ -244,9 +244,9 @@ public class ChallengeController {
 
     @Transactional
     @RequestMapping(value = "/updateResultsOfVersus")
-    public void updateResultsOfVersus(String challengeId, Boolean homeWin, Boolean awayWin, String firstTeamScore, String secondTeamScore, Boolean done) throws Exception {
+    public void updateResultsOfVersus(String challengeId, Boolean homeWin, Boolean awayWin, String firstTeamScore, String secondTeamScore, Boolean done, String memberId) throws Exception {
         try {
-            chlService.updateResultsOfVersus(challengeId, homeWin, awayWin, firstTeamScore, secondTeamScore, done);
+            chlService.updateResultsOfVersus(challengeId, homeWin, awayWin, firstTeamScore, secondTeamScore, done, memberId);
         } catch (Exception e) {
             logError(challengeId, null, "updateResultsOfVersus", e, "challengeId=" + challengeId + "&firstTeamScore=" + firstTeamScore
                     + "&secondTeamScore=" + secondTeamScore);
@@ -332,5 +332,26 @@ public class ChallengeController {
             logError(challengeId, null, "getChallengerList", e, "challengeId=" + challengeId);
         }
         return null;
+    }
+
+    @Transactional
+    @RequestMapping(value = "/getChallengeApproves")
+    public List<Challenge> getChallengeApproves(String memberId) throws Exception {
+        try {
+            return chlService.getChallengeApproves(memberId);
+        } catch (Exception e) {
+            logError(null, memberId, "getChallengeApproves", e, "memberId=" + memberId);
+        }
+        return null;
+    }
+
+    @Transactional
+    @RequestMapping(value = "/approveVersus")
+    public void approveVersus(String challengeId, String memberId, Boolean accept) throws Exception {
+        try {
+            chlService.approveVersus(challengeId, memberId, accept);
+        } catch (Exception e) {
+            logError(challengeId, memberId, "approveVersus", e, "memberId=" + memberId);
+        }
     }
 }
