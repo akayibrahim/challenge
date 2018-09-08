@@ -253,4 +253,8 @@ public class MemberController {
         }
         return null;
     }
+
+    @Transactional
+    @RequestMapping(value = "/testHostConnectivity")
+    public void testHostConnectivity() {}
 }
