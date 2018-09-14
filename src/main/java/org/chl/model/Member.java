@@ -24,7 +24,7 @@ public class Member {
     private String email;
 
     private Date recordDate;
-    @NotEmpty(message="You need to pass the recordDate parameter")
+
     private String facebookID;
 
     private String phoneModel;

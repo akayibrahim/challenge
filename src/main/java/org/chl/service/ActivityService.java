@@ -190,7 +190,7 @@ public class ActivityService implements IActivityService {
         boolean stop = false;
         do {
             Sort sort = new Sort(Sort.Direction.DESC, "insertDate");
-            nextPage = activityRepo.findActivityByToMemberId(toMemberId, Util.getPageable(page, sort, Constant.DEFAULT_PAGEABLE_SIZE));
+            nextPage = activityRepo.findActivityByToMemberId(toMemberId, Util.getPageable(page, sort, 20));
             dbRecords = nextPage.getContent();
             if (dbRecords.size() > 0) {
                 return dbRecords;

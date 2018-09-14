@@ -4,6 +4,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.gridfs.GridFS;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,10 +30,15 @@ public class MongoGridFsTemplate extends AbstractMongoConfiguration {
         return new GridFS(mongoDbFactory().getLegacyDb());
     }
 
+    @Value("${spring.data.mongodb.host}")
+    private String host;
+
+    @Value("${spring.data.mongodb.port}")
+    private int port;
 
     @Override
     public MongoClient mongoClient() {
-        return new MongoClient();
+        return new MongoClient(host, port);
     }
 
     @Override
