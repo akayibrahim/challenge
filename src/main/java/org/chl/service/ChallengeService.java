@@ -602,8 +602,27 @@ public class ChallengeService implements IChallengeService {
     }
 
     @Override
-    public Iterable<Subjects> getSubjects(boolean isSelf) {
-        Iterable<Subjects> subjects = Constant.toList(Subject.values(), isSelf);
+    public List<Subjects> getSubjects(boolean isSelf) {
+        List<Subjects> subjects = new ArrayList<>();
+        if (!isSelf) {
+            List<Constant.TYPE> types = new ArrayList<>();
+            types.add(Constant.TYPE.PRIVATE);
+            types.add(Constant.TYPE.PUBLIC);
+            List<TrendChallenge> trendChallenges = trendChallengeRepository.findTrendSubjects(types, new Sort(Sort.Direction.DESC, "popularity"));
+            List<String> subjectList = trendChallenges.stream().limit(100).map(TrendChallenge::getSubject).collect(Collectors.toList());
+            subjectList.stream().forEach(sub -> {
+                Subjects subject = new Subjects();
+                subject.setName(sub);
+                subjects.add(subject);
+            });
+            if (subjects.size() < 50) {
+                List<Subjects> enumSubjects = Constant.toList(Subject.values(), isSelf);
+                enumSubjects.stream().filter(enSub -> !subjectList.contains(enSub.getName())).forEach(enSub -> {
+                    subjects.add(enSub);
+                });
+            }
+        } else
+            return Constant.toList(Subject.values(), isSelf);
         return subjects;
     }
 

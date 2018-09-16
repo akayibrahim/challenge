@@ -17,6 +17,9 @@ nohup java -jar gs-spring-boot-0.1.0.jar &
 
 ps aux | grep java
 
+average of service response time
+db.serviceResponseTime.aggregate([{$group: {_id:"$serviceName", average: {$avg:"$responseTime"} } }])
+
 > help
         db.help()                    help on db methods
         db.mycoll.help()             help on collection methods
