@@ -422,6 +422,11 @@ public class ChallengeService implements IChallengeService {
         challenge.setCanJoin(proofOfMember != null && !proofOfMember.getJoin() && !proofOfMember.getProof() ? true :
                 challenge.getToWorld() && proofOfMember == null? true : false);
         challenge.setJoined(proofOfMember != null && proofOfMember.getJoin() != null ? proofOfMember.getJoin() : false);
+        long proofSize = Optional.ofNullable(challenge.getJoinAttendanceList())
+                .orElseGet(Collections::emptyList).stream()
+                .filter(Objects::nonNull)
+                .filter(join -> join.getProof() != null && join.getProof()).collect(Collectors.toList()).size();
+        challenge.setCountOfProofs((int) proofSize);
         if (challenge.getActive()) {
             List<JoinAttendance> joinAttendances = challenge.getJoinAttendanceList();
             challenge.setJoinAttendanceList(new ArrayList<>());
@@ -442,11 +447,6 @@ public class ChallengeService implements IChallengeService {
         challenge.setSecondTeamCount(teamSize.toString());
         // else
             // challenge.setSecondTeamCount(BigDecimal.ZERO.toString());
-        long proofSize = Optional.ofNullable(challenge.getJoinAttendanceList())
-                .orElseGet(Collections::emptyList).stream()
-                .filter(Objects::nonNull)
-                .filter(join -> join.getProof()).collect(Collectors.toList()).size();
-        challenge.setCountOfProofs((int) proofSize);
     }
 
     private void prepareVersusChallenge(Challenge challenge) {
@@ -610,7 +610,7 @@ public class ChallengeService implements IChallengeService {
             types.add(Constant.TYPE.PUBLIC);
             List<TrendChallenge> trendChallenges = trendChallengeRepository.findTrendSubjects(types, new Sort(Sort.Direction.DESC, "popularity"));
             List<String> subjectList = trendChallenges.stream().limit(100).map(TrendChallenge::getSubject).collect(Collectors.toList());
-            subjectList.stream().forEach(sub -> {
+            subjectList.stream().distinct().forEach(sub -> {
                 Subjects subject = new Subjects();
                 subject.setName(sub);
                 subjects.add(subject);
