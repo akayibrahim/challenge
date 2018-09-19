@@ -914,7 +914,7 @@ public class ChallengeService implements IChallengeService {
         List<TextComment> dbRecords;
         boolean stop = false;
         do {
-            Sort sort = new Sort(Sort.Direction.DESC, "date");
+            Sort sort = new Sort(Sort.Direction.ASC, "date");
             nextPage = commentRepository.findByChallengeId(challengeId, Util.getPageable(page, sort, Constant.DEFAULT_PAGEABLE_SIZE));
             dbRecords = nextPage.getContent();
             if (dbRecords.size() > 0) {

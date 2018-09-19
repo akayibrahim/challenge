@@ -140,6 +140,15 @@ public class MemberService implements IMemberService {
         return listOfFriend;
     }
 
+    public List<String> getFollowerIdList(String memberId) {
+        List<FriendList> friendLists = friendRepo.findByFriendMemberIdAndFollowed(memberId, true);
+        List<String> listOfFriend = new ArrayList<>();
+        friendLists.stream().filter(fri -> !fri.getRequested()).forEach(friend -> {
+            listOfFriend.add(friend.getFriendMemberId());
+        });
+        return listOfFriend;
+    }
+
 
     @Override
     public Boolean checkMemberAvailable(String memberId) {
@@ -156,14 +165,20 @@ public class MemberService implements IMemberService {
     @Override
     public List<FriendList> getSuggestionsForFollowing(String memberId) {
         List<FriendList> friends = friendRepo.findByMemberIdAndFollowed(memberId, false);
-        List<String> friendList = getFollowingIdList(memberId);
-        Optional.ofNullable(friendList).orElseGet(Collections::emptyList).stream()
-                .filter(fri -> friends.size() < 10)
-            .forEach(fri -> {
-                List<FriendList> list = friendRepo.findByMemberIdAndFollowed(fri, false);
-                if (list.stream().noneMatch(friend -> !friend.getMemberId().equals(memberId)))
-                    friends.addAll(list);
-            });
+        if (friends.size() < 10) {
+            List<String> friendList = getFollowingIdList(memberId);
+            List<String> followerList = getFollowerIdList(memberId);
+            friendList.addAll(followerList);
+            Optional.ofNullable(friendList).orElseGet(Collections::emptyList).stream().forEach(fri -> {
+                List<FriendList> list = friendRepo.findByMemberIdAndFollowed(fri, true);
+                list.stream()
+                    .filter(friend -> !friend.getFriendMemberId().equals(memberId) && !isMyFriend(memberId, friend.getFriendMemberId()) &&
+                    friends.stream().noneMatch(myFriends -> myFriends.getFriendMemberId().equals(friend.getFriendMemberId())))
+                    .forEach(friend -> {
+                        friends.add(friend);
+                    });
+                });
+        }
         return friends;
     }
 

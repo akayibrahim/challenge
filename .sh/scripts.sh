@@ -6,8 +6,8 @@ killall mongod
 
 "/Users/iakay/software tools/mongodb/bin/mongo"
 
-"/Users/iakay/software tools/mongodb/bin/mongodump"
-"/Users/iakay/software tools/mongodb/bin/mongorestore"
+"/Users/iakay/software tools/mongodb/bin/db."
+"/Users/iakay/software tools/mongodb/bin/mongorestore" "/Users/iakay/dump"
 
 http://localhost:8080/downloadImage?challengeId=5b2cdaf41cb199833bc830ca&memberId=5b1a97bbcb353e79ca335a38
 
@@ -89,10 +89,10 @@ commands
     db.notification.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
     db.notification.remove( { "_id": ObjectId("5b37be761cb19960037e831e") })
 
-    db.friendList.find({ "memberId": "5b3152821cb199f1fadc0fab" })
+    db.friendList.find({ "memberId": "5b60b05ad35c6506237e6ae7" })
     db.friendList.remove({ "friendMemberId": "5b36283d1cb199413144407e" })
     db.friendList.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
-    db.friendList.remove( { "_id": ObjectId("5b7b0e87954799a691739c12") })
+    db.friendList.remove( { "_id": ObjectId("5b8a0eacd35c6509a5e3ad6c") })
 
     db.trendChallenge.find()
     db.trendChallenge.remove({})
