@@ -34,8 +34,14 @@ public class MemberService implements IMemberService {
     @Override
     public String addMember(Member member) {
         Member exist = memberRepo.findByEmail(member.getEmail());
-        if (exist != null)
+        if (exist != null) {
+            exist.setBuildVersion(member.getBuildVersion());
+            exist.setReleaseVersion(member.getReleaseVersion());
+            exist.setOsVersion(member.getOsVersion());
+            exist.setPhoneModel(member.getPhoneModel());
+            memberRepo.save(exist);
             return exist.getId();
+        }
         member.setPrivateMember(false);
         memberRepo.save(member);
         return member.getId();

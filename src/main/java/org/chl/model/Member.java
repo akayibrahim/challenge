@@ -37,6 +37,36 @@ public class Member {
 
     private int followingCount;
 
+    private String releaseVersion;
+
+    private String buildVersion;
+
+    private String osVersion;
+
+    public String getReleaseVersion() {
+        return releaseVersion;
+    }
+
+    public void setReleaseVersion(String releaseVersion) {
+        this.releaseVersion = releaseVersion;
+    }
+
+    public String getBuildVersion() {
+        return buildVersion;
+    }
+
+    public void setBuildVersion(String buildVersion) {
+        this.buildVersion = buildVersion;
+    }
+
+    public String getOsVersion() {
+        return osVersion;
+    }
+
+    public void setOsVersion(String osVersion) {
+        this.osVersion = osVersion;
+    }
+
     public Boolean getPrivateMember() {
         return privateMember;
     }

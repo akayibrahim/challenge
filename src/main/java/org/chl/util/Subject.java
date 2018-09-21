@@ -13,13 +13,13 @@ public enum Subject {
     READING(true),
     WALKING(true),
     SWIMMING(true),
-    PINBALL(false),
-    PING_PONG(false),
+    PINBALL(true),
+    PING_PONG(true),
     HOLIDAY(true),
     LANGUAGE(true),
     FOOTBALL(false),
     BASKETBALL(false),
-    GOLF(false),
+    GOLF(true),
     DRIVING(false),
     LOSING_WEIGHT(true);
 
