@@ -11,10 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -152,6 +149,10 @@ public class ActivityService implements IActivityService {
                 case PROOF:
                     Proof proof = proofRepository.findByChallengeIdAndMemberId(activity.getChallengeId(), activity.getFromMemberId());
                     activity.setMediaObjectId(proof.getProofObjectId());
+                    Challenge chl = challengeRepository.findById(proof.getChallengeId()).get();
+                    JoinAttendance proofOfChallenger = Optional.ofNullable(chl.getJoinAttendanceList())
+                            .orElseGet(Collections::emptyList).stream().filter(join -> join.getMemberId().equals(chl.getChallengerId())).findFirst().orElse(null);
+                    activity.setProvedWithImage(proofOfChallenger != null ? nvl(proofOfChallenger.getProvedWithImage(), true) : true);
                     activity.setContent(getProofMessageContent(activity.getChallengeId(), activity.getToMemberId()));
                     break;
                 case SUPPORT:
@@ -272,5 +273,9 @@ public class ActivityService implements IActivityService {
     private String getCommentMessageContent(String activityTableId) {
         Optional<TextComment> textComment = commentRepository.findById(activityTableId);
         return Constant.COMMENTED + textComment.get().getComment();
+    }
+
+    private static <T> T nvl(T value, T defaultValue) {
+        return value != null ? value : defaultValue;
     }
 }
