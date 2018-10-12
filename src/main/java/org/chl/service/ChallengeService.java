@@ -89,21 +89,6 @@ public class ChallengeService implements IChallengeService {
         return challenges.stream().sorted(Comparator.comparing(Challenge::getUpdateDate).reversed()).collect(Collectors.toList());
     }
 
-    private boolean isTimesUp(Constant.TYPE type, Boolean done, Boolean homeWin, Boolean awayWin, Boolean join, Boolean proof, Date untilDate) {
-        boolean isTimeOver = untilDate != null && untilDate.compareTo(new Date()) < 0 ? true : false;
-        if (type.equals(Constant.TYPE.SELF)) {
-            return isTimeOver && !(!done || (done && isNotNullAndTrue(homeWin)));
-        } else if (type.equals(Constant.TYPE.PRIVATE)) {
-            return isTimeOver && !(!done || (done && (isNotNullAndTrue(homeWin) || isNotNullAndTrue(awayWin))));
-        } else if (type.equals(Constant.TYPE.PUBLIC)) {
-            return isTimeOver && ((!done && join && !isNotNullAndTrue(proof) || (done && !isNotNullAndTrue(proof))));
-        }
-        return false;
-    }
-
-    private boolean isNotNullAndTrue(Boolean bool) {
-        return !Objects.isNull(bool) && bool ? true : false;
-    }
     private boolean postShowedControl(String memberId, Challenge chl) {
         List<PostShowed> postShowed = postShowedRepository.findByMemberIdAndChallengeIdAndChallengerId(memberId, chl.getId(), chl.getChallengerId());
         return postShowed.isEmpty();
@@ -389,7 +374,7 @@ public class ChallengeService implements IChallengeService {
             chl.setProvedWithImage(proofOfChallenger != null ? nvl(proofOfChallenger.getProvedWithImage(), true) : true);
             setStatusOfChallenge(chl, proofOfChallenger);
             chl.setRejectedByAllAttendance(nvl(chl.getRejectedByAllAttendance(), false));
-            chl.setTimesUp(isTimesUp(chl.getType(), chl.getDone(), chl.getHomeWin(), chl.getAwayWin(), chl.getJoined(), comeFromSelf ? chl.getProofed() : chl.getProofedByChallenger(), chl.getDateOfUntil()));
+            chl.setTimesUp(Util.isTimesUp(chl.getType(), chl.getDone(), chl.getHomeWin(), chl.getAwayWin(), chl.getJoined(), comeFromSelf ? chl.getProofed() : chl.getProofedByChallenger(), chl.getDateOfUntil()));
             if (comeFromFeeds)
                 savePostShowed(memberId, chl);
         });
@@ -621,8 +606,10 @@ public class ChallengeService implements IChallengeService {
                     subjects.add(enSub);
                 });
             }
-        } else
-            return Constant.toList(Subject.values(), isSelf);
+        } else {
+            subjects.addAll(Constant.toList(Subject.values(), isSelf));
+            subjects.addAll(Constant.toList(Constant.SelfSubject.values()));
+        }
         return subjects;
     }
 

@@ -38,7 +38,8 @@ public class ActivityService implements IActivityService {
 
     @Override
     public void createActivity(Activity activity) {
-        if (activity.getToMemberId().equals(activity.getFromMemberId()))
+        if (activity.getToMemberId().equals(activity.getFromMemberId()) &&
+                !(activity.getType().equals(Constant.ACTIVITY.UPCOMING_WARMING) || activity.getType().equals(Constant.ACTIVITY.TIMES_UP)))
             return;
         activity.setInsertDate(new Date());
         if (activity.getType().equals(Constant.ACTIVITY.PROOF)) {
@@ -117,7 +118,16 @@ public class ActivityService implements IActivityService {
                 content = nameSurname + getFollowingMessageContent(member.getName(), member.getSurname());
                 break;
             case FRIEND_REQUEST:
-                // TODO
+                title = Constant.PUSH_NOTIFICATION.FRIEND_REQUEST.getMessageTitle();
+                content = nameSurname + getAcceptFollowerRequestMessageContent(activityTableId);
+                break;
+            case UPCOMING_WARMING:
+                title = Constant.PUSH_NOTIFICATION.UPCOMING_WARMING.getMessageTitle();
+                content = getUpcomingChallengeContent(challengeId);
+                break;
+            case TIMES_UP:
+                title = Constant.PUSH_NOTIFICATION.TIMES_UP.getMessageTitle();
+                content = getTimesUpContent(challengeId);
                 break;
             default:
         }
@@ -178,6 +188,12 @@ public class ActivityService implements IActivityService {
                 case CHALLENGE_APPROVE:
                     activity.setContent(getChallengeApproveMessageContent(activity.getChallengeId()));
                     break;
+                case UPCOMING_WARMING:
+                    activity.setContent(getUpcomingChallengeContent(activity.getChallengeId()));
+                    break;
+                case TIMES_UP:
+                    activity.setContent(Constant.PUSH_NOTIFICATION.TIMES_UP.getMessageTitle() + Constant.SPACE + getTimesUpContent(activity.getChallengeId()));
+                    break;
                 default:
 
             }
@@ -234,6 +250,18 @@ public class ActivityService implements IActivityService {
                 !join.getMemberId().equals(toMemberId) && !join.getReject() && join.getJoin() && !join.getProof()))
             return String.format(Constant.JOINED_TO_CHALLENGE, challengeOfJoin.getSubject().toString());
         return null;
+    }
+
+    private String getUpcomingChallengeContent(String challengeId) {
+        Challenge challengeOfJoin = challengeRepository.findById(challengeId).get();
+        if (!challengeOfJoin.getDone())
+            return String.format(Constant.UPCOMING_CHALLENGE, challengeOfJoin.getSubject().toString());
+        else return null;
+    }
+
+    private String getTimesUpContent(String challengeId) {
+        Challenge challengeOfJoin = challengeRepository.findById(challengeId).get();
+        return String.format(Constant.TIMES_UP_CHALLENGE, challengeOfJoin.getSubject().toString());
     }
 
     private String getAcceptMessageContent(String challengeId, String toMemberId) {

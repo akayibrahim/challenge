@@ -2,6 +2,7 @@ package org.chl.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtil {
@@ -28,5 +29,19 @@ public class DateUtil {
     public static String toString(Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         return formatter.format(date);
+    }
+
+    public static Date addDay(Date date, int days) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, days);
+        return calendar.getTime();
+    }
+
+    public static Date addHours(Date date, int hours) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.HOUR, hours);
+        return calendar.getTime();
     }
 }

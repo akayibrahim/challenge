@@ -39,6 +39,8 @@ public class MemberService implements IMemberService {
             exist.setReleaseVersion(member.getReleaseVersion());
             exist.setOsVersion(member.getOsVersion());
             exist.setPhoneModel(member.getPhoneModel());
+            exist.setGender(member.getGender());
+            exist.setAge_range(member.getAge_range());
             memberRepo.save(exist);
             return exist.getId();
         }

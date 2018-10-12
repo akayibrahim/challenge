@@ -44,4 +44,7 @@ public interface ChallengeRepository extends MongoRepository<Challenge, String> 
 
     @Query(" { 'versusAttendanceList.memberId': ?0, 'waitForApprove': true } " )
     List<Challenge> findChallengeApproves(String memberId, Sort sort);
+
+    @Query("{ 'deleted': {$in: [null, false]}, 'dateOfUntil': {'$gte': ?0, '$lte': ?1}, 'done': false, 'active': true }")
+    List<Challenge> findUpcomingChallenges(Date startDate, Date endDate);
 }

@@ -15,7 +15,7 @@ public class Trends {
     @NotEmpty(message="You need to pass the name parameter")
     private String name;
     @NotEmpty(message="You need to pass the proofedMedia parameter")
-    private String proof; // TODO
+    private String proof;
     @NotEmpty(message="You need to pass the prooferFbID parameter")
     private String prooferFbID;
     @NotEmpty(message = "You need to pass the subject parameter")

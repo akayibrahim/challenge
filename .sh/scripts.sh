@@ -50,7 +50,7 @@ commands
 
     db.member.find()
     db.member.remove({})
-    db.member.update( { "_id": ObjectId("5b3152821cb199f1fadc0fab") }, { $set: {"privateMember": false} } )
+    db.member.update( { "_id": ObjectId("5bb7207ad35c6545e8bdbf2e") }, { $set: {"name": "Christian Pulisic"} } )
     db.member.remove( { "_id": ObjectId("5b9bc407d35c65101a516274") })
 
     db.joinAttendance.find()
@@ -69,6 +69,8 @@ commands
     db.challenge.remove({ "_id": ObjectId("5b6bdf4cd35c653e6a09aae0") })
     db.challenge.remove({})
     db.challenge.update( { "done": true }, { $set: {"visibility": "1"} } )
+    db.challenge.update( { "_id": ObjectId("5bbd8277d35c65483337fee2") }, { $set: {"untilDate": "12-03-2019 23:39", "dateOfUntil" : ISODate("2019-03-12T23:39:00Z")} } )
+    db.challenge.update( { "_id": ObjectId("5bbd8277d35c65483337fee2") }, { $set: {"challengerFBId": "100001009339427"} } )
     db.challenge.find( { "_id": ObjectId("5b4cd32f8d3966b51be4e871") })
     db.challenge.find({"untilDate": {"$lt": new Date()} })
     db.challenge.find({ '$or' : [ { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'dateOfUntil': {'$gte': new Date()}, 'done': false }, { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'done': true } ] })

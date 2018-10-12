@@ -33,6 +33,8 @@ public class Constant {
     public static final String PUBLIC_CHL = "public";
     public static final String TEAM_CHL = "team";
     public static final String SELF_CHL = "self";
+    public static final String UPCOMING_CHALLENGE = "You must update %s challenge, before time's up!";
+    public static final String TIMES_UP_CHALLENGE = "You don't update %s challenge.";
 
     public enum ANSWER {
         ACCEPT("1"),
@@ -103,7 +105,9 @@ public class Constant {
         JOIN("Join it!", ""),
         FOLLOWER("A new follower!", ""),
         FOLLOWING("A new following!", ""),
-        FRIEND_REQUEST("A new follower!", "");
+        FRIEND_REQUEST("A new follower!", ""),
+        UPCOMING_WARMING("Time for update challenge!", ""),
+        TIMES_UP("TIME'S UP!", "");
 
         private String messageTitle;
         private String message;
@@ -134,6 +138,16 @@ public class Constant {
         return subjects;
     }
 
+    public static List<Subjects> toList(SelfSubject[] values) {
+        List<Subjects> subjects = new ArrayList<>();
+        for (SelfSubject subject : values) {
+            Subjects sub = new Subjects();
+            sub.setName(subject.toString().replace("_", " "));
+            subjects.add(sub);
+        }
+        return subjects;
+    }
+
     public enum ACTIVITY {
         COMMENT,
         PROOF,
@@ -144,11 +158,23 @@ public class Constant {
         ACCEPT,
         FRIEND_REQUEST,
         ACCEPT_FRIEND_REQUEST,
-        CHALLENGE_APPROVE;
+        CHALLENGE_APPROVE,
+        UPCOMING_WARMING,
+        TIMES_UP;
     }
 
     public enum REQUEST_TYPE {
         JOIN,
         ACCEPT;
+    }
+
+    public enum SelfSubject {
+        PUZZLE,
+        NEW_PLACE,
+        PAINT,
+        GIVE_UP_SMOKE,
+        SAVE_MONEY,
+        PLANK,
+        NEW_YEAR_GOAL;
     }
 }

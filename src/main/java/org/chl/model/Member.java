@@ -43,6 +43,26 @@ public class Member {
 
     private String osVersion;
 
+    private String age_range;
+
+    private String gender;
+
+    public String getAge_range() {
+        return age_range;
+    }
+
+    public void setAge_range(String age_range) {
+        this.age_range = age_range;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
     public String getReleaseVersion() {
         return releaseVersion;
     }
