@@ -42,19 +42,24 @@ public class ActivityService implements IActivityService {
                 !(activity.getType().equals(Constant.ACTIVITY.UPCOMING_WARMING) || activity.getType().equals(Constant.ACTIVITY.TIMES_UP)))
             return;
         activity.setInsertDate(new Date());
-        if (activity.getType().equals(Constant.ACTIVITY.PROOF)) {
-            Activity exist = activityRepo.findExistActivity(activity.getChallengeId(), activity.getToMemberId(), activity.getFromMemberId(), activity.getType());
+        if (Util.in(activity.getType().toString(), Constant.ACTIVITY.PROOF.toString(), Constant.ACTIVITY.UPCOMING_WARMING.toString(),
+                Constant.ACTIVITY.TIMES_UP.toString(), Constant.ACTIVITY.SUPPORT.toString())) {
+            Activity exist = activityRepo.findExistActivity(activity.getChallengeId(), activity.getToMemberId(), activity.getFromMemberId(),
+                    !activity.getType().equals(Constant.ACTIVITY.PROOF) ? activity.getType() : Constant.ACTIVITY.JOIN);
             if (exist != null) {
-                exist.setType(Constant.ACTIVITY.PROOF);
-                increaseActivityCount(activity.getToMemberId());
-                activityRepo.save(exist);
-                createNotification(exist.getType(), exist.getActivityTableId(), exist.getFromMemberId(), exist.getToMemberId(), exist.getChallengeId());
-                return;
+                if (Util.in(activity.getType().toString(), Constant.ACTIVITY.UPCOMING_WARMING.toString(), Constant.ACTIVITY.TIMES_UP.toString())) {
+                    return;
+                } else if (activity.getType().equals(Constant.ACTIVITY.SUPPORT)) {
+                    activityRepo.delete(exist);
+                } else if (activity.getType().equals(Constant.ACTIVITY.PROOF)) {
+                    exist.setType(Constant.ACTIVITY.PROOF);
+                    exist.setInsertDate(new Date());
+                    increaseActivityCount(activity.getToMemberId());
+                    activityRepo.save(exist);
+                    createNotification(exist.getType(), exist.getActivityTableId(), exist.getFromMemberId(), exist.getToMemberId(), exist.getChallengeId());
+                    return;
+                }
             }
-        } else if (activity.getType().equals(Constant.ACTIVITY.SUPPORT)) {
-            Activity exist = activityRepo.findExistActivity(activity.getChallengeId(), activity.getToMemberId(), activity.getFromMemberId(), activity.getType());
-            if (exist != null)
-                activityRepo.delete(exist);
         }
         increaseCountOfActivity(activity.getToMemberId());
         activityRepo.save(activity);
@@ -192,7 +197,7 @@ public class ActivityService implements IActivityService {
                     activity.setContent(getUpcomingChallengeContent(activity.getChallengeId()));
                     break;
                 case TIMES_UP:
-                    activity.setContent(Constant.PUSH_NOTIFICATION.TIMES_UP.getMessageTitle() + Constant.SPACE + getTimesUpContent(activity.getChallengeId()));
+                    activity.setContent(Constant.SPACE + getTimesUpContent(activity.getChallengeId()));
                     break;
                 default:
 

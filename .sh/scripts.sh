@@ -69,8 +69,8 @@ commands
     db.challenge.remove({ "_id": ObjectId("5b6bdf4cd35c653e6a09aae0") })
     db.challenge.remove({})
     db.challenge.update( { "done": true }, { $set: {"visibility": "1"} } )
-    db.challenge.update( { "_id": ObjectId("5bbd8277d35c65483337fee2") }, { $set: {"untilDate": "12-03-2019 23:39", "dateOfUntil" : ISODate("2019-03-12T23:39:00Z")} } )
-    db.challenge.update( { "_id": ObjectId("5bbd8277d35c65483337fee2") }, { $set: {"challengerFBId": "100001009339427"} } )
+    db.challenge.update( { "_id": ObjectId("5bc0613dd35c657229e263cc") }, { $set: {"dateOfUntil" : ISODate("2018-10-13T13:20:00Z")} } )
+    db.challenge.update( { "_id": ObjectId("5bb7cfcdd35c6545e8bdc3b9") }, { $set: {"subject": "KIKI DANCE"} } )
     db.challenge.find( { "_id": ObjectId("5b4cd32f8d3966b51be4e871") })
     db.challenge.find({"untilDate": {"$lt": new Date()} })
     db.challenge.find({ '$or' : [ { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'dateOfUntil': {'$gte': new Date()}, 'done': false }, { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'done': true } ] })
@@ -84,12 +84,12 @@ commands
     db.activity.find()
     db.activity.remove({})
     db.activity.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
-    db.activity.remove( { "_id": ObjectId("5b51edc38fd68643dd0fdd04") })
+    db.activity.remove( { "_id": ObjectId("5bc1f2a7d35c65027e527b3c") })
 
     db.notification.find()
     db.notification.remove({})
     db.notification.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
-    db.notification.remove( { "_id": ObjectId("5b37be761cb19960037e831e") })
+    db.notification.remove( { "_id": ObjectId("5bc1f2a7d35c65027e527b3d") })
 
     db.friendList.find({ "memberId": "5b60b05ad35c6506237e6ae7" })
     db.friendList.remove({ "friendMemberId": "5b36283d1cb199413144407e" })
@@ -98,7 +98,7 @@ commands
 
     db.trendChallenge.find()
     db.trendChallenge.remove({})
-    db.trendChallenge.update( { "_id": ObjectId("5b1fb4a21cb19924cc63883d") }, { $set: {"proofed": false} } )
+    db.trendChallenge.update( { "_id": ObjectId("5bbe18d7d35c654833380020") }, { $set: {"subject": "BEST SAGRADA FAMILIA SHOT"} } )
     db.trendChallenge.remove( { "_id": ObjectId("5b39b3c11cb1997e50a35cd8") })
 
     db.error.find()

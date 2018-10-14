@@ -34,7 +34,7 @@ public class StatsFilter implements Filter {
         } finally {
             time = System.currentTimeMillis() - time;
             LOGGER.trace("{}: {} ms ", ((HttpServletRequest) req).getRequestURI(),  time);
-            System.out.println(String.format("%s: %s  ms ", ((HttpServletRequest) req).getRequestURI(),  time));
+            // System.out.println(String.format("%s: %s  ms ", ((HttpServletRequest) req).getRequestURI(),  time));
             ServiceResponseTime serviceResponseTime = new ServiceResponseTime();
             serviceResponseTime.setServiceName(((HttpServletRequest) req).getRequestURI().replace("/", ""));
             serviceResponseTime.setResponseTime(time);

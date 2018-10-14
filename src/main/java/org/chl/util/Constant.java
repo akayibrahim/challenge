@@ -33,8 +33,8 @@ public class Constant {
     public static final String PUBLIC_CHL = "public";
     public static final String TEAM_CHL = "team";
     public static final String SELF_CHL = "self";
-    public static final String UPCOMING_CHALLENGE = "You must update %s challenge, before time's up!";
-    public static final String TIMES_UP_CHALLENGE = "You don't update %s challenge.";
+    public static final String UPCOMING_CHALLENGE = "You should update %s challenge, before time's up!";
+    public static final String TIMES_UP_CHALLENGE = "Time's up for %s challenge.";
 
     public enum ANSWER {
         ACCEPT("1"),

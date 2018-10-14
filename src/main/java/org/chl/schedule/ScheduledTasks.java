@@ -38,11 +38,11 @@ public class ScheduledTasks {
         // logger.info("Fixed Rate Task :: Execution Time - {}", dateFormat.format(new Date()) );
         // for notification : before challenge ending, warm for enter score or proof challenge.
         List<Challenge> challengeList = challengeRepository.findUpcomingChallenges(DateUtil.addHours(new Date(), 11),
-                DateUtil.addHours(new Date(), 12));
+                DateUtil.addHours(new Date(), 12), false);
         challengeList.stream().forEach(this::createActivityForUpcoming);
         // for notification : notify for time's up.
         List<Challenge> timesUpChallengeList = challengeRepository.findUpcomingChallenges(DateUtil.addHours(new Date(), -1),
-                DateUtil.addHours(new Date(), 0));
+                DateUtil.addHours(new Date(), 0), true);
         timesUpChallengeList.stream()
                 .filter(chl -> Util.isTimesUp(chl.getType(), chl.getDone(), chl.getHomeWin(), chl.getAwayWin(),
                         chl.getJoined(), chl.getProofedByChallenger(), chl.getDateOfUntil()))

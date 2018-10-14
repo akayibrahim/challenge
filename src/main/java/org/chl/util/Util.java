@@ -3,6 +3,7 @@ package org.chl.util;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.Objects;
@@ -26,5 +27,15 @@ public class Util {
 
     public static boolean isNotNullAndTrue(Boolean bool) {
         return !Objects.isNull(bool) && bool ? true : false;
+    }
+
+    public static boolean in(String lookFor, String... lookIn) {
+        if (!StringUtils.hasText(lookFor) || lookIn == null)
+            return false;
+        for (String look : lookIn) {
+            if (lookFor.equals(look))
+                return true;
+        }
+        return false;
     }
 }
