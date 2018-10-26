@@ -289,8 +289,11 @@ public class ActivityService implements IActivityService {
     private String getSupportMessageContent(String activityTableId) {
         Optional<Support> support = supportRepository.findById(activityTableId);
         Challenge challenge = challengeRepository.findById(support.get().getChallengeId()).get();
-        return support.get().getSupportFirstTeam() ? (challenge.getType().compareTo(Constant.TYPE.PRIVATE) == 0 ? Constant.YOUR_TEAM : Constant.SUPPORT_YOU)
-                : support.get().getSupportSecondTeam() ? Constant.YOUR_OPPONENT_TEAM : null;
+        return support.get().getSupportFirstTeam() ?
+                (challenge.getType().compareTo(Constant.TYPE.PRIVATE) == 0 ?
+                        String.format(Constant.YOUR_TEAM, challenge.getSubject()) :
+                        String.format(Constant.SUPPORT_YOU, challenge.getSubject()))
+                : support.get().getSupportSecondTeam() ? String.format(Constant.YOUR_OPPONENT_TEAM, challenge.getSubject()) : null;
     }
 
     private String getProofMessageContent(String challengeId, String toMemberId) {
@@ -304,8 +307,9 @@ public class ActivityService implements IActivityService {
     }
 
     private String getCommentMessageContent(String activityTableId) {
-        Optional<TextComment> textComment = commentRepository.findById(activityTableId);
-        return Constant.COMMENTED + textComment.get().getComment();
+        TextComment textComment = commentRepository.findById(activityTableId).get();
+        Challenge challenge = challengeRepository.findById(textComment.getChallengeId()).get();
+        return String.format(Constant.COMMENTED, textComment.getComment(), challenge.getSubject());
     }
 
     private static <T> T nvl(T value, T defaultValue) {

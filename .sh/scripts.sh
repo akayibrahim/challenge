@@ -7,7 +7,7 @@ killall mongod
 "/Users/iakay/software tools/mongodb/bin/mongo"
 
 "/Users/iakay/software tools/mongodb/bin/db."
-"/Users/iakay/software tools/mongodb/bin/mongorestore" "/Users/iakay/dump"
+"/Users/iakay/software tools/mongodb/bin/mongorestore" "/Users/iakay/Documents/projects/dump"
 
 http://localhost:8080/downloadImage?challengeId=5b2cdaf41cb199833bc830ca&memberId=5b1a97bbcb353e79ca335a38
 
@@ -50,7 +50,7 @@ commands
 
     db.member.find()
     db.member.remove({})
-    db.member.update( { "_id": ObjectId("5bb7207ad35c6545e8bdbf2e") }, { $set: {"name": "Christian Pulisic"} } )
+    db.member.update( { "_id": ObjectId("5bb72094d35c6545e8bdbf30") }, { $set: {"facebookID": "1769598089818022"} } )
     db.member.remove( { "_id": ObjectId("5b9bc407d35c65101a516274") })
 
     db.joinAttendance.find()
@@ -70,10 +70,12 @@ commands
     db.challenge.remove({})
     db.challenge.update( { "done": true }, { $set: {"visibility": "1"} } )
     db.challenge.update( { "_id": ObjectId("5bc0613dd35c657229e263cc") }, { $set: {"dateOfUntil" : ISODate("2018-10-13T13:20:00Z")} } )
-    db.challenge.update( { "_id": ObjectId("5bb7cfcdd35c6545e8bdc3b9") }, { $set: {"subject": "KIKI DANCE"} } )
+    db.challenge.update( { "_id": ObjectId("5bcd5deed35c65306f707aef") }, { $set: {"challengerFBId": "1769598089818022"} } )
     db.challenge.find( { "_id": ObjectId("5b4cd32f8d3966b51be4e871") })
     db.challenge.find({"untilDate": {"$lt": new Date()} })
     db.challenge.find({ '$or' : [ { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'dateOfUntil': {'$gte': new Date()}, 'done': false }, { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'done': true } ] })
+    db.challenge.update( { "_id": ObjectId("5bbcfab3d35c65483337fd62"), "joinAttendanceList.memberId": "5bb72094d35c6545e8bdbf30"}, { $set: {"joinAttendanceList.$.facebookID":  "1769598089818022"} } )
+
 
     db.support.find()
     db.support.find( { "challengeId": "5b4cd32f8d3966b51be4e871" } )
@@ -116,3 +118,5 @@ commands
     db.fs.files.remove({})
     db.fs.files.update( { "memberId": "5b32959a1cb19909e464f6f5" }, { $set: {"count": "1"} } )
     db.fs.files.remove( { "_id": ObjectId("5b363e4e1cb1994c04001cf4") })
+
+    db.postShowed.find({ "memberId": "5bb71ec9d35c6545e8bdbf1b", "challengeId": "5bc4bb59d35c6503b6b8c878", "challengerId": "5bbba3dfd35c6545e8bdcf7f"})

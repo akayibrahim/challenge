@@ -1,6 +1,5 @@
 package org.chl.service;
 
-import org.apache.tomcat.util.bcel.Const;
 import org.chl.intf.IChallengeService;
 import org.chl.model.*;
 import org.chl.repository.*;
@@ -63,20 +62,33 @@ public class ChallengeService implements IChallengeService {
             setToDoneForPastChallengeForFriends(friendLists);
         List<Challenge> challenges = new ArrayList<>();
         List<Challenge> challengesAsPageable = getChallengeAsPageable(friendLists, page);
-        challengesAsPageable.stream().distinct().filter(chl -> chl.isSelf()).forEach(chl -> {
-            challenges.add(chl);
-        });
-        challengesAsPageable.stream().distinct().filter(chl -> chl.isJoin()).forEach(chl -> {
-            chl.getJoinAttendanceList().stream().filter(join -> friendLists.contains(join.getMemberId())
-                    && (join.getJoin() || join.getProof())).forEach(join -> {
-                changeChallengeWithAttendanceInfo(challenges, chl.getId(), join.getMemberId(), join.getFacebookID());
+        challengesAsPageable.stream().distinct()
+                .filter(chl -> chl.isSelf())
+                .filter(chl -> postShowedControl(memberId, chl.getId(), chl.getChallengerId(), 1))
+                .forEach(chl -> {
+                challenges.add(chl);
             });
-        });
-        challengesAsPageable.stream().distinct().filter(chl -> chl.isVersus()).forEach(chl -> {
-            chl.getVersusAttendanceList().stream().filter(versus -> friendLists.contains(versus.getMemberId())).forEach(versus -> {
-                changeChallengeWithAttendanceInfo(challenges, chl.getId(), versus.getMemberId(), versus.getFacebookID());
+        challengesAsPageable.stream().distinct()
+                .filter(chl -> chl.isJoin())
+                .forEach(chl -> {
+                chl.getJoinAttendanceList().stream()
+                        .filter(join -> friendLists.contains(join.getMemberId()))
+                        .filter(join -> join.getJoin() || join.getProof())
+                        .filter(join -> postShowedControl(memberId, chl.getId(), join.getMemberId(), chl.getJoinAttendanceList().size()))
+                        .forEach(join -> {
+                    changeChallengeWithAttendanceInfo(challenges, chl.getId(), join.getMemberId(), join.getFacebookID());
+                });
             });
-        });
+        challengesAsPageable.stream().distinct()
+                .filter(chl -> chl.isVersus())
+                .forEach(chl -> {
+                chl.getVersusAttendanceList().stream()
+                        .filter(versus -> friendLists.contains(versus.getMemberId()))
+                        .filter(versus -> postShowedControl(memberId, chl.getId(), versus.getMemberId(), chl.getVersusAttendanceList().size()))
+                        .forEach(versus -> {
+                    changeChallengeWithAttendanceInfo(challenges, chl.getId(), versus.getMemberId(), versus.getFacebookID());
+                });
+            });
         List<String> friendListsWithMember = friendLists;
         friendListsWithMember.add(memberId);
         List<String> types = new ArrayList<>();
@@ -84,14 +96,41 @@ public class ChallengeService implements IChallengeService {
         types.add(Constant.TYPE.PRIVATE.toString());
         types.add(Constant.TYPE.SELF.toString());
         List<Challenge> publicChallenges = getPublicChallenges(friendListsWithMember, page, types);
-        challenges.addAll(publicChallenges);
+        publicChallenges.stream().distinct()
+                .filter(chl -> chl.isSelf())
+                .filter(chl -> postShowedControl(memberId, chl.getId(), chl.getChallengerId(), 1))
+                .forEach(chl -> {
+            challenges.add(chl);
+        });
+        publicChallenges.stream().distinct().filter(chl -> chl.isJoin()).forEach(chl -> {
+            chl.getJoinAttendanceList().stream()
+                    .filter(join -> postShowedControl(memberId, chl.getId(), join.getMemberId(), chl.getJoinAttendanceList().size()))
+                    .forEach(join -> {
+                        changeChallengeWithAttendanceInfo(challenges, chl.getId(), join.getMemberId(), join.getFacebookID());
+                    });
+        });
+        publicChallenges.stream().distinct().filter(chl -> chl.isVersus()).forEach(chl -> {
+            chl.getVersusAttendanceList().stream()
+                    .filter(versus -> postShowedControl(memberId, chl.getId(), versus.getMemberId(), chl.getVersusAttendanceList().size()))
+                    .forEach(versus -> {
+                        changeChallengeWithAttendanceInfo(challenges, chl.getId(), versus.getMemberId(), versus.getFacebookID());
+                    });
+        });
         prepareChallengesData(memberId, challenges, false, true);
         return challenges.stream().sorted(Comparator.comparing(Challenge::getUpdateDate).reversed()).collect(Collectors.toList());
     }
 
-    private boolean postShowedControl(String memberId, Challenge chl) {
-        List<PostShowed> postShowed = postShowedRepository.findByMemberIdAndChallengeIdAndChallengerId(memberId, chl.getId(), chl.getChallengerId());
+    private boolean postShowedControl(String memberId, String challengeId, String challengerId, int count) {
+        List<PostShowed> postShowedCount = postShowedRepository.findByMemberIdAndChallengeId(memberId, challengeId);
+        if (postShowedCount.size() == count)
+            postShowedRepository.deleteAll(postShowedCount);
+        List<PostShowed> postShowed = postShowedRepository.findByMemberIdAndChallengeIdAndChallengerId(memberId, challengeId, challengerId);
         return postShowed.isEmpty();
+    }
+
+    private void deletePostShowed(String memberId) {
+        List<PostShowed> postShowed = postShowedRepository.findByMemberId(memberId);
+        postShowedRepository.deleteAll(postShowed);
     }
 
     private void changeChallengeWithAttendanceInfo(List<Challenge> challenges, String challengeId, String memberId, String facebookID) {
@@ -100,6 +139,7 @@ public class ChallengeService implements IChallengeService {
             challenge.setThinksAboutChallenge(null);
         challenge.setChallengerId(memberId);
         challenge.setChallengerFBId(facebookID);
+        challenge.setUpdateDate(new Date());
         if (challenges.stream().noneMatch(chl -> chl.getId().equals(challenge.getId())))
             challenges.add(challenge);
     }
@@ -213,7 +253,6 @@ public class ChallengeService implements IChallengeService {
                 changeChallengeWithAttendanceInfo(challenges, chl.getId(), versus.getMemberId(), versus.getFacebookID());
             });
         });
-        // challenges.addAll(challengesOfMember);
         prepareChallengesData(memberId, challenges, true, false);
         return challenges.stream().sorted(Comparator.comparing(Challenge::getChlDate).reversed()).collect(Collectors.toList());
     }
@@ -243,8 +282,18 @@ public class ChallengeService implements IChallengeService {
     public Iterable<Challenge> getExplorerChallenges(String memberId, String challengeId, Boolean addSimilarChallenges, int page) {
         List<Challenge> challenges = new ArrayList<>();
         Challenge explorerChallenge = chlRepo.findById(challengeId).get();
-        if (page == 0)
-            challenges.add(explorerChallenge);
+        if (page == 0) {
+            if (!addSimilarChallenges && explorerChallenge.isJoin()) {
+                explorerChallenge.getJoinAttendanceList().stream()
+                        .filter(join -> memberId.equals(join.getMemberId()) && (join.getJoin() || join.getProof()))
+                        .forEach(join -> {
+                            changeChallengeWithAttendanceInfo(challenges, explorerChallenge.getId(),
+                                    join.getMemberId(), join.getFacebookID());
+                        });
+            }
+            if (challenges.isEmpty())
+                challenges.add(explorerChallenge);
+        }
         addSimilarChallenges(addSimilarChallenges, challenges, explorerChallenge, page);
         prepareChallengesData(memberId, challenges, false, false);
         Iterable<Challenge> challengeIterable = challenges;
@@ -477,7 +526,7 @@ public class ChallengeService implements IChallengeService {
             postShowed.setChallengerId(chl.getChallengerId());
             postShowed.setMemberId(memberId);
             postShowed.setInsertDate(new Date());
-            // postShowedRepository.save(postShowed);
+            postShowedRepository.save(postShowed);
         }
     }
 

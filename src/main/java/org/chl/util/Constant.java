@@ -12,15 +12,15 @@ import java.util.List;
 public class Constant {
     public static final String ACCEPT = "accepted";
     public static final String REJECT = "rejected";
-    public static final String YOUR_TEAM = "supported your team.";
-    public static final String YOUR_OPPONENT_TEAM = "supported your opponent team.";
+    public static final String YOUR_TEAM = "support your team for %s.";
+    public static final String YOUR_OPPONENT_TEAM = "support your opponent team for %s.";
     public static final String SPACE = " ";
     public static final String ACCEPT_REQUEST = "request you for accept of %s challenge.";
     public static final String JOIN_REQUEST_CONTENT = "request you for join to %s challenge.";
     public static final String CHALLENGE_APPROVE_CONTENT = "request you for confirmation of result to %s challenge.";
     public static final String JOINED_TO_CHALLENGE = "joined to %s challenge.";
     public static final String DONT_JOINED_TO_CHALLENGE = "refused %s challenge.";
-    public static final String COMMENTED = "commented: ";
+    public static final String COMMENTED = "commented: %s for %s.";
     public static final String PROOFED_CHALLENGE = "proved %s challenge.";
     public static final String START_TO_FOLLOWING = "start to following %s.";
     public static final String START_TO_FOLLOW_YOU = "start to follow you.";
@@ -28,7 +28,7 @@ public class Constant {
     public static final String ZERO = "0";
     public static final String ONE = "1";
     public static final String YOU = "You";
-    public static final String SUPPORT_YOU = "supported you.";
+    public static final String SUPPORT_YOU = "support you for %s.";
     public static final int DEFAULT_PAGEABLE_SIZE = 10;
     public static final String PUBLIC_CHL = "public";
     public static final String TEAM_CHL = "team";
