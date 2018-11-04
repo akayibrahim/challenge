@@ -20,8 +20,6 @@ import java.util.stream.Collectors;
 @Service
 public class ActivityService implements IActivityService {
     @Autowired
-    NotificationRepository notificationRepository;
-    @Autowired
     ActivityCountRepository activityCountRepository;
     @Autowired
     private ActivityRepository activityRepo;
@@ -35,6 +33,8 @@ public class ActivityService implements IActivityService {
     private SupportRepository supportRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public void createActivity(Activity activity) {
@@ -92,39 +92,48 @@ public class ActivityService implements IActivityService {
         String nameSurname = member.getName() + Constant.SPACE + member.getSurname() + Constant.SPACE;
         String title = null;
         String content = null;
+        String messageContent = null;
         switch (type) {
             case COMMENT:
                 title = Constant.PUSH_NOTIFICATION.COMMENT.getMessageTitle();
-                content = nameSurname + getCommentMessageContent(activityTableId);
+                messageContent = getCommentMessageContent(activityTableId);
+                content = StringUtils.hasText(messageContent) ? nameSurname + messageContent : null;
                 break;
             case PROOF:
                 title = Constant.PUSH_NOTIFICATION.PROOF.getMessageTitle();
-                content = nameSurname + getProofMessageContent(challengeId, toMemberId);
+                messageContent = getProofMessageContent(challengeId, toMemberId);
+                content = StringUtils.hasText(messageContent) ? nameSurname + messageContent : null;
                 break;
             case SUPPORT:
                 title = Constant.PUSH_NOTIFICATION.SUPPORT.getMessageTitle();
-                content = nameSurname + getSupportMessageContent(activityTableId);
+                messageContent = getSupportMessageContent(activityTableId);
+                content = StringUtils.hasText(messageContent) ? nameSurname + messageContent : null;
                 break;
             case ACCEPT:
                 title = Constant.PUSH_NOTIFICATION.ACCEPT.getMessageTitle();
-                content = nameSurname + getAcceptMessageContent(challengeId, toMemberId);
+                messageContent = getAcceptMessageContent(challengeId, toMemberId);
+                content = StringUtils.hasText(messageContent) ? nameSurname + messageContent : null;
                 break;
             case JOIN:
                 title = Constant.PUSH_NOTIFICATION.JOIN.getMessageTitle();
-                content = nameSurname + getJoinMessageContent(challengeId, toMemberId);
+                messageContent = getJoinMessageContent(challengeId, toMemberId);
+                content = StringUtils.hasText(messageContent) ? nameSurname + messageContent : null;
                 break;
             case FOLLOWER:
                 title = Constant.PUSH_NOTIFICATION.FOLLOWER.getMessageTitle();
-                content = nameSurname + getFollowerMessageContent(activityTableId);
+                messageContent = getFollowerMessageContent(activityTableId);
+                content = StringUtils.hasText(messageContent) ? nameSurname + messageContent : null;
                 break;
             case FOLLOWING:
                 title = Constant.PUSH_NOTIFICATION.FOLLOWING.getMessageTitle();
                 nameSurname = toMember.getName() + Constant.SPACE + toMember.getSurname() + Constant.SPACE;
-                content = nameSurname + getFollowingMessageContent(member.getName(), member.getSurname());
+                messageContent = getFollowingMessageContent(member.getName(), member.getSurname());
+                content = StringUtils.hasText(messageContent) ? nameSurname + messageContent : null;
                 break;
             case FRIEND_REQUEST:
                 title = Constant.PUSH_NOTIFICATION.FRIEND_REQUEST.getMessageTitle();
-                content = nameSurname + getAcceptFollowerRequestMessageContent(activityTableId);
+                messageContent = getAcceptFollowerRequestMessageContent(activityTableId);
+                content = StringUtils.hasText(messageContent) ? nameSurname + messageContent : null;
                 break;
             case UPCOMING_WARMING:
                 title = Constant.PUSH_NOTIFICATION.UPCOMING_WARMING.getMessageTitle();
@@ -136,17 +145,20 @@ public class ActivityService implements IActivityService {
                 break;
             default:
         }
-        sendNotification(challengeId, fromMemberId, title, content);
+        if (StringUtils.hasText(content)) {
+            sendNotification(challengeId, toMemberId, title, content, toMember.getDeviceNotifyToken());
+        }
     }
 
-    private void sendNotification(String challengeId, String memberId, String title, String content) {
+    private void sendNotification(String challengeId, String memberId, String title, String content, String deviceToken) {
         PushNotification notification = new PushNotification();
         notification.setChallengeId(challengeId);
         notification.setMemberId(memberId);
         notification.setUntilDate(new Date());
         notification.setMessageTitle(title);
         notification.setMessage(content);
-        notificationRepository.save(notification);
+        notification.setDeviceToken(deviceToken);
+        notificationService.send(notification);
     }
 
     @Override
@@ -238,7 +250,7 @@ public class ActivityService implements IActivityService {
     private String getChallengeApproveMessageContent(String challengeId) {
         Challenge challenge = challengeRepository.findById(challengeId).get();
         if (challenge.getWaitForApprove()) {
-            return String.format(Constant.CHALLENGE_APPROVE_CONTENT, challenge.getSubject().toString());
+            return String.format(Constant.CHALLENGE_APPROVE_CONTENT, challenge.getSubject().toString().replace(" CHALLENGE", ""));
         }
         return null;
     }
@@ -247,41 +259,41 @@ public class ActivityService implements IActivityService {
         Challenge challengeOfJoin = challengeRepository.findById(challengeId).get();
         if (challengeOfJoin.getJoinAttendanceList().stream().anyMatch(join -> !join.getChallenger()
                 && join.getMemberId().equals(toMemberId) && !join.getReject() && !join.getJoin() && !join.getProof()))
-            return String.format(Constant.JOIN_REQUEST_CONTENT, challengeOfJoin.getSubject().toString());
+            return String.format(Constant.JOIN_REQUEST_CONTENT, challengeOfJoin.getSubject().toString().replace(" CHALLENGE", ""));
         else if (challengeOfJoin.getJoinAttendanceList().stream().anyMatch(join -> !join.getChallenger() &&
                 !join.getMemberId().equals(toMemberId) && join.getReject()))
-            return String.format(Constant.DONT_JOINED_TO_CHALLENGE, challengeOfJoin.getSubject().toString());
+            return String.format(Constant.DONT_JOINED_TO_CHALLENGE, challengeOfJoin.getSubject().toString().replace(" CHALLENGE", ""));
         else if (challengeOfJoin.getJoinAttendanceList().stream().anyMatch(join -> !join.getChallenger() &&
                 !join.getMemberId().equals(toMemberId) && !join.getReject() && join.getJoin() && !join.getProof()))
-            return String.format(Constant.JOINED_TO_CHALLENGE, challengeOfJoin.getSubject().toString());
+            return String.format(Constant.JOINED_TO_CHALLENGE, challengeOfJoin.getSubject().toString().replace(" CHALLENGE", ""));
         return null;
     }
 
     private String getUpcomingChallengeContent(String challengeId) {
         Challenge challengeOfJoin = challengeRepository.findById(challengeId).get();
         if (!challengeOfJoin.getDone())
-            return String.format(Constant.UPCOMING_CHALLENGE, challengeOfJoin.getSubject().toString());
+            return String.format(Constant.UPCOMING_CHALLENGE, challengeOfJoin.getSubject().toString().replace(" CHALLENGE", ""));
         else return null;
     }
 
     private String getTimesUpContent(String challengeId) {
         Challenge challengeOfJoin = challengeRepository.findById(challengeId).get();
-        return String.format(Constant.TIMES_UP_CHALLENGE, challengeOfJoin.getSubject().toString());
+        return String.format(Constant.TIMES_UP_CHALLENGE, challengeOfJoin.getSubject().toString().replace(" CHALLENGE", ""));
     }
 
     private String getAcceptMessageContent(String challengeId, String toMemberId) {
         Challenge challengeOfJoin = challengeRepository.findById(challengeId).get();
         if (challengeOfJoin.getVersusAttendanceList().stream()
                 .anyMatch(versus -> versus.getMemberId().equals(toMemberId) && versus.getAccept() == null)) {
-            return String.format(Constant.ACCEPT_REQUEST, challengeOfJoin.getSubject().toString());
+            return String.format(Constant.ACCEPT_REQUEST, challengeOfJoin.getSubject().toString().replace(" CHALLENGE", ""));
         } else if (challengeOfJoin.getVersusAttendanceList().stream()
                 .anyMatch(versus -> toMemberId.equals(challengeOfJoin.getChallengerId()) &&
                         !versus.getMemberId().equals(toMemberId) && versus.getAccept() != null && versus.getAccept() && !versus.getReject())) {
-            return Constant.ACCEPT + Constant.SPACE + challengeOfJoin.getSubject().toString();
+            return String.format(Constant.ACCEPT, challengeOfJoin.getSubject().toString().replace(" CHALLENGE", ""));
         } else if (challengeOfJoin.getVersusAttendanceList().stream()
                 .anyMatch(versus -> toMemberId.equals(challengeOfJoin.getChallengerId()) &&
                         !versus.getMemberId().equals(toMemberId) && versus.getAccept() != null && !versus.getAccept() && versus.getReject())) {
-            return Constant.REJECT + Constant.SPACE + challengeOfJoin.getSubject().toString();
+            return String.format(Constant.REJECT, challengeOfJoin.getSubject().toString().replace(" CHALLENGE", ""));
         }
         return null;
     }
@@ -291,9 +303,9 @@ public class ActivityService implements IActivityService {
         Challenge challenge = challengeRepository.findById(support.get().getChallengeId()).get();
         return support.get().getSupportFirstTeam() ?
                 (challenge.getType().compareTo(Constant.TYPE.PRIVATE) == 0 ?
-                        String.format(Constant.YOUR_TEAM, challenge.getSubject()) :
-                        String.format(Constant.SUPPORT_YOU, challenge.getSubject()))
-                : support.get().getSupportSecondTeam() ? String.format(Constant.YOUR_OPPONENT_TEAM, challenge.getSubject()) : null;
+                        String.format(Constant.YOUR_TEAM, challenge.getSubject().replace(" CHALLENGE", "")) :
+                        String.format(Constant.SUPPORT_YOU, challenge.getSubject().replace(" CHALLENGE", "")))
+                : support.get().getSupportSecondTeam() ? String.format(Constant.YOUR_OPPONENT_TEAM, challenge.getSubject().replace(" CHALLENGE", "")) : null;
     }
 
     private String getProofMessageContent(String challengeId, String toMemberId) {
@@ -301,7 +313,7 @@ public class ActivityService implements IActivityService {
         if (challengeOfProof.getJoinAttendanceList().stream()
                 .anyMatch(join -> join.getMemberId().equals(challengeOfProof.getChallengerId()) &&
                         join.getMemberId().equals(toMemberId) && join.getProof())) {
-            return String.format(Constant.PROOFED_CHALLENGE, challengeOfProof.getSubject().toString());
+            return String.format(Constant.PROOFED_CHALLENGE, challengeOfProof.getSubject().toString().replace(" CHALLENGE", ""));
         }
         return null;
     }
@@ -309,7 +321,7 @@ public class ActivityService implements IActivityService {
     private String getCommentMessageContent(String activityTableId) {
         TextComment textComment = commentRepository.findById(activityTableId).get();
         Challenge challenge = challengeRepository.findById(textComment.getChallengeId()).get();
-        return String.format(Constant.COMMENTED, textComment.getComment(), challenge.getSubject());
+        return String.format(Constant.COMMENTED, textComment.getComment(), challenge.getSubject().replace(" CHALLENGE", ""));
     }
 
     private static <T> T nvl(T value, T defaultValue) {

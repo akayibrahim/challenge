@@ -6,6 +6,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Date;
+
 /**
  * Created by ibrahim on 06/08/2018.
  */
@@ -24,6 +26,16 @@ public class TrendChallenge {
     private Constant.POPULARITY popularityType;
     @NotEmpty(message="You need to pass the subject parameter")
     private String subject;
+
+    private Date insertDateTime;
+
+    public Date getInsertDateTime() {
+        return insertDateTime;
+    }
+
+    public void setInsertDateTime(Date insertDateTime) {
+        this.insertDateTime = insertDateTime;
+    }
 
     public String getSubject() {
         return subject;

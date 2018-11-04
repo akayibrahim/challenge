@@ -10,6 +10,15 @@ import java.util.Date;
 @Document
 public class PushNotification extends Notification {
     private Date untilDate;
+    private String deviceToken;
+
+    public String getDeviceToken() {
+        return deviceToken;
+    }
+
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
+    }
 
     public Date getUntilDate() {
         return untilDate;

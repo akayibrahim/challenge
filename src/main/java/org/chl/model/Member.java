@@ -47,6 +47,16 @@ public class Member {
 
     private String gender;
 
+    private String deviceNotifyToken;
+
+    public String getDeviceNotifyToken() {
+        return deviceNotifyToken;
+    }
+
+    public void setDeviceNotifyToken(String deviceNotifyToken) {
+        this.deviceNotifyToken = deviceNotifyToken;
+    }
+
     public String getAge_range() {
         return age_range;
     }

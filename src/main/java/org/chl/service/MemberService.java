@@ -194,7 +194,10 @@ public class MemberService implements IMemberService {
     public List<Member> searchFriends(String searchKey, String memberId) {
         Iterable<Member> memberList = memberRepo.findByKey(searchKey.toUpperCase());
         List<Member> members = Lists.newArrayList(memberList);
-        return members.stream().filter(member -> !isMyFriend(memberId, member.getId()) && !isRequestedFriend(memberId, member.getId())).collect(Collectors.toList());
+        return members.stream()
+                .filter(member -> !isMyFriend(memberId, member.getId()))
+                .filter(member -> !isRequestedFriend(memberId, member.getId()))
+                .filter(member -> !member.getId().equals(memberId)).collect(Collectors.toList());
     }
 
     @Override

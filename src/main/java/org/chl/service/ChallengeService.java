@@ -720,6 +720,7 @@ public class ChallengeService implements IChallengeService {
             newTrendChallenge.setType(chlRepo.findById(support.getChallengeId()).get().getType());
             newTrendChallenge.setPopularityType(Constant.POPULARITY.SUPPORT);
             newTrendChallenge.setSubject(challenge.getSubject().toString());
+            newTrendChallenge.setInsertDateTime(new Date());
             trendChallengeRepository.save(newTrendChallenge);
         }
     }

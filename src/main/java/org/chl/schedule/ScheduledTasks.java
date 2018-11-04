@@ -52,12 +52,14 @@ public class ScheduledTasks {
     @Scheduled(fixedDelay = 2000)
     public void scheduleTaskWithFixedDelay() {
         // logger.info("Fixed Delay Task :: Execution Time - {}", dateFormat.format(new Date()));
+        /*
         try {
             TimeUnit.SECONDS.sleep(5);
         } catch (InterruptedException ex) {
             logger.error("Ran into an error {}", ex);
             throw new IllegalStateException(ex);
         }
+         */
     }
 
     @Scheduled(fixedRate = 2000, initialDelay = 5000)

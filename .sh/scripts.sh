@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 killall mongod
 
 "/Users/iakay/software tools/mongodb/bin/mongod"
@@ -50,6 +51,7 @@ commands
 
     db.member.find()
     db.member.remove({})
+    db.member.update( {}, { $set: {"deviceNotifyToken": "67875ccf5cebc62d06581a8ac5301fb0300c2d5762172fd5b803e4ded6e2b73d"} }, {upsert:false, multi:true} )
     db.member.update( { "_id": ObjectId("5bb72094d35c6545e8bdbf30") }, { $set: {"facebookID": "1769598089818022"} } )
     db.member.remove( { "_id": ObjectId("5b9bc407d35c65101a516274") })
 

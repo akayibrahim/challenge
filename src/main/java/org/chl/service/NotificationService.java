@@ -1,14 +1,20 @@
 package org.chl.service;
 
+import com.notnoop.apns.APNS;
+import com.notnoop.apns.ApnsService;
 import org.chl.intf.INotificationService;
+import org.chl.model.ActivityCount;
 import org.chl.model.Notification;
 import org.chl.model.PushNotification;
+import org.chl.repository.ActivityCountRepository;
+import org.chl.repository.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.io.File;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -25,6 +31,10 @@ public class NotificationService implements INotificationService {
 
     // @Autowired
     // private JmsTemplate jmsTemplate;
+    @Autowired
+    NotificationRepository notificationRepository;
+    @Autowired
+    ActivityCountRepository activityCountRepository;
 
     @Value("${jms.queue.destination:CHL-QUEUE}")
     private String destinationQueue;
@@ -32,13 +42,33 @@ public class NotificationService implements INotificationService {
     public void send(@RequestBody Notification notification) {
         if(notification instanceof PushNotification) {
             PushNotification pushNotification = (PushNotification) notification;
+            /*
             LocalDate today = LocalDate.now();
             LocalDate untilDate = pushNotification.getUntilDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             long diff = Duration.between(untilDate.atStartOfDay(), today.atStartOfDay()).toDays();
             // jmsTemplate.setDeliveryDelay(diff * oneDay);
             notification.setMessageTitle(pushNotification.getNotification().getMessageTitle());
             notification.setMessage(pushNotification.getNotification().getMessage());
+            */
+            callApns(pushNotification.getDeviceToken(), pushNotification.getMessageTitle(), pushNotification.getMessage(),
+                    pushNotification.getMemberId());
+            notificationRepository.save(pushNotification);
         }
         // jmsTemplate.convertAndSend(destinationQueue, notification);
+    }
+
+    public void callApns(String deviceToken, String title, String body, String memberId) {
+        File file = new File("Certificates.p12");
+        ApnsService service = APNS.newService()
+                .withCert(file.getAbsolutePath(), "iAkay2712")
+                .withSandboxDestination()
+                .build();
+        ActivityCount count = activityCountRepository.findByMemberId(memberId);
+        String payload = APNS.newPayload()
+                .badge(count != null ? Integer.valueOf(count.getCount()) : 1)
+                .alertBody(body).build();
+                // .alertTitle(title).build();
+
+        service.push(deviceToken, payload);
     }
 }
