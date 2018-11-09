@@ -41,10 +41,12 @@ public class MemberService implements IMemberService {
             exist.setPhoneModel(member.getPhoneModel());
             exist.setGender(member.getGender());
             exist.setAge_range(member.getAge_range());
+            exist.setDeviceNotifyToken(member.getDeviceNotifyToken());
             memberRepo.save(exist);
             return exist.getId();
         }
         member.setPrivateMember(false);
+        member.setInsertDate(new Date());
         memberRepo.save(member);
         return member.getId();
     }
@@ -204,6 +206,13 @@ public class MemberService implements IMemberService {
     public Boolean isRequestedFriend(String memberId, String friendMemberId) {
         FriendList friendList = friendRepo.findByFriendMemberIdAndMemberId(friendMemberId, memberId);
         return friendList != null && friendList.getRequested() ? true : false;
+    }
+
+    @Override
+    public void updateWithDeviceToken(String memberId, String deviceToken) {
+        Member member = memberRepo.findById(memberId).get();
+        member.setDeviceNotifyToken(deviceToken);
+        memberRepo.save(member);
     }
 
     @Override

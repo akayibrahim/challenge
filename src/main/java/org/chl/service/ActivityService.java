@@ -89,7 +89,7 @@ public class ActivityService implements IActivityService {
     private void createNotification(Constant.ACTIVITY type, String activityTableId, String fromMemberId, String toMemberId, String challengeId) {
         Member member = memberRepository.findById(fromMemberId).get();
         Member toMember = memberRepository.findById(toMemberId).get();
-        String nameSurname = member.getName() + Constant.SPACE + member.getSurname() + Constant.SPACE;
+        String nameSurname = member.getName().trim() + Constant.SPACE + member.getSurname().trim() + Constant.SPACE;
         String title = null;
         String content = null;
         String messageContent = null;
@@ -168,7 +168,7 @@ public class ActivityService implements IActivityService {
             Member member = memberRepository.findById(activity.getFromMemberId()).get();
             Member toMember = memberRepository.findById(activity.getToMemberId()).get();
             activity.setFacebookID(member.getFacebookID());
-            activity.setName(member.getName() + Constant.SPACE + member.getSurname());
+            activity.setName(member.getName().trim() + Constant.SPACE + member.getSurname().trim());
             switch (activity.getType()) {
                 case COMMENT:
                     activity.setContent(getCommentMessageContent(activity.getActivityTableId()));

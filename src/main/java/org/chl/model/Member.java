@@ -49,6 +49,16 @@ public class Member {
 
     private String deviceNotifyToken;
 
+    private Date insertDate;
+
+    public Date getInsertDate() {
+        return insertDate;
+    }
+
+    public void setInsertDate(Date insertDate) {
+        this.insertDate = insertDate;
+    }
+
     public String getDeviceNotifyToken() {
         return deviceNotifyToken;
     }

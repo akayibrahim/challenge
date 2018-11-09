@@ -255,6 +255,16 @@ public class MemberController {
     }
 
     @Transactional
+    @RequestMapping(value = "/updateWithDeviceToken")
+    public void updateWithDeviceToken(String memberId, String deviceToken) throws Exception {
+        try {
+            memberService.updateWithDeviceToken(memberId, deviceToken);
+        } catch (Exception e) {
+            logError(null, memberId, "updateWithDeviceToken", e, "memberId=" + memberId + "&deviceToken=" + deviceToken);
+        }
+    }
+
+    @Transactional
     @RequestMapping(value = "/testHostConnectivity")
     public void testHostConnectivity() {}
 }

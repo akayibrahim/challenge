@@ -42,5 +42,7 @@ public interface IMemberService {
     void changeAccountPrivacy(String memberId, Boolean toPrivate);
 
     public Boolean isRequestedFriend(String memberId, String friendMemberId);
+
+    void updateWithDeviceToken(String memberId, String deviceToken);
 }
 

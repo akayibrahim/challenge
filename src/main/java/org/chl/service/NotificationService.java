@@ -35,6 +35,8 @@ public class NotificationService implements INotificationService {
     NotificationRepository notificationRepository;
     @Autowired
     ActivityCountRepository activityCountRepository;
+    @Autowired
+    private ErrorService errorService;
 
     @Value("${jms.queue.destination:CHL-QUEUE}")
     private String destinationQueue;
@@ -50,14 +52,23 @@ public class NotificationService implements INotificationService {
             notification.setMessageTitle(pushNotification.getNotification().getMessageTitle());
             notification.setMessage(pushNotification.getNotification().getMessage());
             */
-            callApns(pushNotification.getDeviceToken(), pushNotification.getMessageTitle(), pushNotification.getMessage(),
-                    pushNotification.getMemberId());
+            try {
+                callApns(pushNotification.getDeviceToken(), pushNotification.getMessageTitle(), pushNotification.getMessage(),
+                        pushNotification.getMemberId());
+            } catch (Exception e) {
+                // logged already in errorService.logError(
+            }
             notificationRepository.save(pushNotification);
         }
         // jmsTemplate.convertAndSend(destinationQueue, notification);
     }
 
-    public void callApns(String deviceToken, String title, String body, String memberId) {
+    public void callApns(String deviceToken, String title, String body, String memberId) throws Exception {
+        if (deviceToken == null) {
+            errorService.logError(null, memberId, "callApns",null, "deviceToken=null, title=" + title
+            + ", body=" + body + ", memberid=" + memberId);
+            return;
+        }
         File file = new File("Certificates.p12");
         ApnsService service = APNS.newService()
                 .withCert(file.getAbsolutePath(), "iAkay2712")

@@ -51,7 +51,7 @@ commands
 
     db.member.find()
     db.member.remove({})
-    db.member.update( {}, { $set: {"deviceNotifyToken": "67875ccf5cebc62d06581a8ac5301fb0300c2d5762172fd5b803e4ded6e2b73d"} }, {upsert:false, multi:true} )
+    db.member.update( { "region": null }, { $set: {"deviceNotifyToken": "67b2a654a815999696af1f3d1096099f9ea6bdb66a1d1310e84799e50a5fb0f8"} }, {upsert:false, multi:true} )
     db.member.update( { "_id": ObjectId("5bb72094d35c6545e8bdbf30") }, { $set: {"facebookID": "1769598089818022"} } )
     db.member.remove( { "_id": ObjectId("5b9bc407d35c65101a516274") })
 
