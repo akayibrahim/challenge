@@ -125,6 +125,16 @@ public class Challenge {
 
     private String scoreRejectName;
 
+    private String nameOfApprovedBy;
+
+    public String getNameOfApprovedBy() {
+        return nameOfApprovedBy;
+    }
+
+    public void setNameOfApprovedBy(String nameOfApprovedBy) {
+        this.nameOfApprovedBy = nameOfApprovedBy;
+    }
+
     public String getScoreRejectName() {
         return scoreRejectName;
     }

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.chl.model.ServiceResponseTime;
 import org.chl.repository.ServiceResponseTimeRepository;
+import org.chl.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class StatsFilter implements Filter {
             ServiceResponseTime serviceResponseTime = new ServiceResponseTime();
             serviceResponseTime.setServiceName(((HttpServletRequest) req).getRequestURI().replace("/", ""));
             serviceResponseTime.setResponseTime(time);
-            serviceResponseTime.setInsertDateTime(new Date());
+            serviceResponseTime.setInsertDateTime(DateUtil.getCurrentDatePlusThreeHour());
             serviceResponseTimeRepository.save(serviceResponseTime);
         }
     }

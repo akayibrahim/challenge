@@ -3,6 +3,7 @@ package org.chl.service;
 import org.chl.intf.IErrorService;
 import org.chl.model.Error;
 import org.chl.repository.ErrorRepository;
+import org.chl.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +33,7 @@ public class ErrorService implements IErrorService {
         e.printStackTrace(new PrintWriter(sw));
         error.setStack(sw.toString());
         error.setInputs(inputs);
-        error.setInsertTime(new Date());
+        error.setInsertTime(DateUtil.getCurrentDatePlusThreeHour());
         errorRepository.save(error);
         System.out.println(sw.toString());
         throw new java.lang.Exception(e.toString());
@@ -41,7 +42,7 @@ public class ErrorService implements IErrorService {
     @Override
     public void save(Error error) {
         error.setFe(true);
-        error.setInsertTime(new Date());
+        error.setInsertTime(DateUtil.getCurrentDatePlusThreeHour());
         errorRepository.save(error);
     }
 }

@@ -65,16 +65,22 @@ commands
     db.versusAttendance.update( { "_id": ObjectId("5b1fb4a21cb19924cc638840") }, { $set: {"join": true, "proof": false} } )
     db.versusAttendance.remove( { "challengeId": "5b3e310c1cb1995e53e42a63" })
 
-    db.challenge.find()
+    db.challenge.find( { "challengerId" : "5bbba41bd35c6545e8bdcf83", "deleted": {$in: [null, false]}, "visibility": {$in: [1, 2, 3]}, "active": {$in: [true, false]}, "dateOfUntil": {"$lte": ISODate("2018-11-11T13:59:00Z")}, "done": false } )
+    db.challenge.find( { "deleted": {$in: [null, false]}, "dateOfUntil": {"$gte": ISODate("2018-11-11T12:05:00Z"), '$lte': ISODate("2018-11-11T13:05:00Z")}, 'done': false, 'active': true } )
     db.challenge.find({ "versusAttendanceList.memberId": "5b3152821cb199f1fadc0fab" })
+    db.challenge.find({ "deleted": {$in: [null, false]}, "dateOfUntil": {"$gte": ISODate("2018-11-11T13:17:00Z"), "$lte": ISODate("2018-11-11T14:17:00Z")}, "done": true, "active": true })
     db.challenge.find({ "challengerId": { $nin: ["5b3152d31cb199f1fadc0fb02"] } })
     db.challenge.remove({ "_id": ObjectId("5b6bdf4cd35c653e6a09aae0") })
     db.challenge.remove({})
     db.challenge.update( { "done": true }, { $set: {"visibility": "1"} } )
-    db.challenge.update( { "_id": ObjectId("5bc0613dd35c657229e263cc") }, { $set: {"dateOfUntil" : ISODate("2018-10-13T13:20:00Z")} } )
+    db.challenge.update( { "_id": ObjectId("5be82725f7cf55292ea9e469") }, { $set: {"dateOfUntil" : ISODate("2018-11-11T15:30:00Z")} } )
+    db.challenge.update( { "_id": ObjectId("5be82725f7cf55292ea9e469") }, { $set: {"untilDate" : "11-11-2018 16:00"} } )
+    db.challenge.update( { "_id": ObjectId("5be88d18d35c655857df2a02") }, { $set: {"dateOfUntil" : ISODate("2018-11-11T23:00:52.783Z"), "untilDate" : "11-11-2018 23:00", "done": false, "chlDate" : ISODate("2018-11-11T23:00:52.783Z"), "updateDate" : ISODate("2018-11-11T23:00:52.783Z") }} )
+    db.challenge.update( { "_id": ObjectId("5bd39c2bd35c657f2b980532") }, { $set: {"done" : false} } )
     db.challenge.update( { "_id": ObjectId("5bcd5deed35c65306f707aef") }, { $set: {"challengerFBId": "1769598089818022"} } )
     db.challenge.find( { "_id": ObjectId("5b4cd32f8d3966b51be4e871") })
     db.challenge.find({"untilDate": {"$lt": new Date()} })
+    db.challenge.find({"dateOfUntil": {"$lt": ISODate("2018-11-15T23:24:00Z")}, "done": false })
     db.challenge.find({ '$or' : [ { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'dateOfUntil': {'$gte': new Date()}, 'done': false }, { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'done': true } ] })
     db.challenge.update( { "_id": ObjectId("5bbcfab3d35c65483337fd62"), "joinAttendanceList.memberId": "5bb72094d35c6545e8bdbf30"}, { $set: {"joinAttendanceList.$.facebookID":  "1769598089818022"} } )
 
@@ -101,7 +107,7 @@ commands
     db.friendList.remove( { "_id": ObjectId("5b8a0eacd35c6509a5e3ad6c") })
 
     db.trendChallenge.find()
-    db.trendChallenge.remove({})
+    db.trendChallenge.remove({"challengerId": "5bb72094d35c6545e8bdbf30"})
     db.trendChallenge.update( { "_id": ObjectId("5bbe18d7d35c654833380020") }, { $set: {"subject": "BEST SAGRADA FAMILIA SHOT"} } )
     db.trendChallenge.remove( { "_id": ObjectId("5b39b3c11cb1997e50a35cd8") })
 

@@ -7,6 +7,7 @@ import org.chl.service.ActivityService;
 import org.chl.service.ErrorService;
 import org.chl.service.MemberService;
 import org.chl.util.Constant;
+import org.chl.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
@@ -164,12 +165,7 @@ public class MemberController {
     @RequestMapping(value = "/getSuggestionsForFollowing")
     public List<Member> getSuggestionsForFollowing(String memberId) throws Exception {
         try {
-            List<Member> memberList = new ArrayList<>();
-            List<FriendList> friendList = memberService.getSuggestionsForFollowing(memberId);
-            friendList.stream().filter(fri -> !fri.getRequested()).forEach(fri -> {
-                memberList.add(memberService.getMemberInfo(fri.getFriendMemberId()));
-            });
-            return memberList;
+            return memberService.getSuggestionsForFollowing(memberId);
         } catch (Exception e) {
             logError(null, memberId, "getSuggestionsForFollowing", e, "memberId=" + memberId);
         }
@@ -184,7 +180,7 @@ public class MemberController {
     @RequestMapping(value = "/errorLog")
     public void errorLog(@Valid @RequestBody Error error) {
         error.setFe(true);
-        error.setInsertTime(new Date());
+        error.setInsertTime(DateUtil.getCurrentDatePlusThreeHour());
         errorService.save(error);
     }
 
@@ -231,12 +227,7 @@ public class MemberController {
     @RequestMapping(value = "/getFollowerRequests")
     public List<Member> getFollowerRequests(String memberId) throws Exception {
         try {
-            List<Member> memberList = new ArrayList<>();
-            List<FriendList> friendList = memberService.getFollowerList(memberId, false);
-            friendList.stream().filter(fri -> fri.getRequested()).forEach(fri -> {
-                memberList.add(memberService.getMemberInfo(fri.getMemberId()));
-            });
-            return memberList;
+            return memberService.getFollowerRequests(memberId);
         } catch (Exception e) {
             logError(null, memberId, "getFollowerRequests", e, "memberId=" + memberId);
         }
@@ -262,6 +253,27 @@ public class MemberController {
         } catch (Exception e) {
             logError(null, memberId, "updateWithDeviceToken", e, "memberId=" + memberId + "&deviceToken=" + deviceToken);
         }
+    }
+
+    @Transactional
+    @RequestMapping(value = "/getFriendInfo")
+    public FriendInfo getFriendInfo(String memberId, String friendMemberId) throws Exception {
+        try {
+            FriendInfo friendInfo = new FriendInfo();
+            Member memberInfo = memberService.getMemberInfo(friendMemberId);
+            friendInfo.setFollowerCount(getFollowerList(friendMemberId).size());
+            friendInfo.setFollowingCount(getFollowingList(friendMemberId).size());
+            friendInfo.setName(memberInfo.getName());
+            friendInfo.setSurname(memberInfo.getSurname());
+            friendInfo.setFacebookID(memberInfo.getFacebookID());
+            friendInfo.setPrivateMember(memberInfo.getPrivateMember());
+            friendInfo.setMyFriend(isMyFriend(memberId, friendMemberId));
+            friendInfo.setRequestFriend(isRequestedFriend(memberId, friendMemberId));
+            return friendInfo;
+        } catch (Exception e) {
+            logError(null, memberId, "getFriendInfo", e, "memberId=" + memberId + "friendMemberId" + friendMemberId);
+        }
+        return null;
     }
 
     @Transactional

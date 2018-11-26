@@ -4,6 +4,7 @@ import org.chl.intf.IActivityService;
 import org.chl.model.*;
 import org.chl.repository.*;
 import org.chl.util.Constant;
+import org.chl.util.DateUtil;
 import org.chl.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -41,7 +42,7 @@ public class ActivityService implements IActivityService {
         if (activity.getToMemberId().equals(activity.getFromMemberId()) &&
                 !(activity.getType().equals(Constant.ACTIVITY.UPCOMING_WARMING) || activity.getType().equals(Constant.ACTIVITY.TIMES_UP)))
             return;
-        activity.setInsertDate(new Date());
+        activity.setInsertDate(DateUtil.getCurrentDatePlusThreeHour());
         if (Util.in(activity.getType().toString(), Constant.ACTIVITY.PROOF.toString(), Constant.ACTIVITY.UPCOMING_WARMING.toString(),
                 Constant.ACTIVITY.TIMES_UP.toString(), Constant.ACTIVITY.SUPPORT.toString())) {
             Activity exist = activityRepo.findExistActivity(activity.getChallengeId(), activity.getToMemberId(), activity.getFromMemberId(),
@@ -53,7 +54,7 @@ public class ActivityService implements IActivityService {
                     activityRepo.delete(exist);
                 } else if (activity.getType().equals(Constant.ACTIVITY.PROOF)) {
                     exist.setType(Constant.ACTIVITY.PROOF);
-                    exist.setInsertDate(new Date());
+                    exist.setInsertDate(DateUtil.getCurrentDatePlusThreeHour());
                     increaseActivityCount(activity.getToMemberId());
                     activityRepo.save(exist);
                     createNotification(exist.getType(), exist.getActivityTableId(), exist.getFromMemberId(), exist.getToMemberId(), exist.getChallengeId());
@@ -132,7 +133,7 @@ public class ActivityService implements IActivityService {
                 break;
             case FRIEND_REQUEST:
                 title = Constant.PUSH_NOTIFICATION.FRIEND_REQUEST.getMessageTitle();
-                messageContent = getAcceptFollowerRequestMessageContent(activityTableId);
+                messageContent = getFriendshipRequestMessageContent(activityTableId);
                 content = StringUtils.hasText(messageContent) ? nameSurname + messageContent : null;
                 break;
             case UPCOMING_WARMING:
@@ -142,6 +143,19 @@ public class ActivityService implements IActivityService {
             case TIMES_UP:
                 title = Constant.PUSH_NOTIFICATION.TIMES_UP.getMessageTitle();
                 content = getTimesUpContent(challengeId);
+                break;
+            case CHALLENGE_APPROVE:
+                title = Constant.PUSH_NOTIFICATION.CHALLENGE_APPROVE.getMessageTitle();
+                messageContent = getChallengeApproveMessageContent(challengeId);
+                content = StringUtils.hasText(messageContent) ? nameSurname + messageContent : null;
+                break;
+            case CHALLENGE_REJECT:
+                title = Constant.PUSH_NOTIFICATION.CHALLENGE_REJECT.getMessageTitle();
+                content = getChallengeRejectMessageContent(challengeId);
+                break;
+            case CHALLENGE_APPROVED:
+                title = Constant.PUSH_NOTIFICATION.CHALLENGE_APPROVED.getMessageTitle();
+                content = getChallengeApprovedMessageContent(challengeId, nameSurname);
                 break;
             default:
         }
@@ -154,7 +168,7 @@ public class ActivityService implements IActivityService {
         PushNotification notification = new PushNotification();
         notification.setChallengeId(challengeId);
         notification.setMemberId(memberId);
-        notification.setUntilDate(new Date());
+        notification.setUntilDate(DateUtil.getCurrentDatePlusThreeHour());
         notification.setMessageTitle(title);
         notification.setMessage(content);
         notification.setDeviceToken(deviceToken);
@@ -202,8 +216,17 @@ public class ActivityService implements IActivityService {
                 case ACCEPT_FRIEND_REQUEST:
                     activity.setContent(getAcceptFollowerRequestMessageContent(activity.getActivityTableId()));
                     break;
+                case FRIEND_REQUEST:
+                    activity.setContent(getFriendshipRequestMessageContent(activity.getActivityTableId()));
+                    break;
                 case CHALLENGE_APPROVE:
                     activity.setContent(getChallengeApproveMessageContent(activity.getChallengeId()));
+                    break;
+                case CHALLENGE_REJECT:
+                    activity.setContent(getChallengeRejectMessageContent(activity.getChallengeId()));
+                    break;
+                case CHALLENGE_APPROVED:
+                    activity.setContent(getChallengeApprovedMessageContent(activity.getChallengeId(), activity.getName()));
                     break;
                 case UPCOMING_WARMING:
                     activity.setContent(getUpcomingChallengeContent(activity.getChallengeId()));
@@ -247,10 +270,27 @@ public class ActivityService implements IActivityService {
         return Constant.ACCEPT_FOLLOWER_REQUEST;
     }
 
+    private String getFriendshipRequestMessageContent(String activityTableId) {
+        return Constant.FRIENDSHIP_FOLLOWER_REQUEST;
+    }
+
     private String getChallengeApproveMessageContent(String challengeId) {
         Challenge challenge = challengeRepository.findById(challengeId).get();
+        return String.format(Constant.CHALLENGE_APPROVE_CONTENT, challenge.getSubject().toString().replace(" CHALLENGE", ""));
+    }
+
+    private String getChallengeRejectMessageContent(String challengeId) {
+        Challenge challenge = challengeRepository.findById(challengeId).get();
         if (challenge.getWaitForApprove()) {
-            return String.format(Constant.CHALLENGE_APPROVE_CONTENT, challenge.getSubject().toString().replace(" CHALLENGE", ""));
+            return String.format(Constant.CHALLENGE_REJECT_CONTENT, challenge.getSubject().toString().replace(" CHALLENGE", ""), challenge.getScoreRejectName());
+        }
+        return null;
+    }
+
+    private String getChallengeApprovedMessageContent(String challengeId, String name) {
+        Challenge challenge = challengeRepository.findById(challengeId).get();
+        if (challenge.getWaitForApprove()) {
+            return String.format(Constant.CHALLENGE_APPROVED_CONTENT, challenge.getSubject().toString().replace(" CHALLENGE", ""), name);
         }
         return null;
     }
@@ -288,7 +328,7 @@ public class ActivityService implements IActivityService {
             return String.format(Constant.ACCEPT_REQUEST, challengeOfJoin.getSubject().toString().replace(" CHALLENGE", ""));
         } else if (challengeOfJoin.getVersusAttendanceList().stream()
                 .anyMatch(versus -> toMemberId.equals(challengeOfJoin.getChallengerId()) &&
-                        !versus.getMemberId().equals(toMemberId) && versus.getAccept() != null && versus.getAccept() && !versus.getReject())) {
+                        !versus.getMemberId().equals(toMemberId) && (versus.getAccept() == null || (versus.getAccept() != null && versus.getAccept())) && !versus.getReject())) {
             return String.format(Constant.ACCEPT, challengeOfJoin.getSubject().toString().replace(" CHALLENGE", ""));
         } else if (challengeOfJoin.getVersusAttendanceList().stream()
                 .anyMatch(versus -> toMemberId.equals(challengeOfJoin.getChallengerId()) &&

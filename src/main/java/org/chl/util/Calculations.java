@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 public class Calculations {
     public static String calculateUntilDate(Date untilDate) {
         String untilDateStr = "LAST ";
-        long diff = getDateDiff(new Date(), untilDate,TimeUnit.DAYS);
-        long diffOfHours = getDateDiff(new Date() ,untilDate ,TimeUnit.HOURS);
+        long diff = getDateDiff(DateUtil.getCurrentDatePlusThreeHour(), untilDate,TimeUnit.DAYS);
+        long diffOfHours = getDateDiff(DateUtil.getCurrentDatePlusThreeHour(), untilDate, TimeUnit.HOURS);
         if (diff == 0) {
             untilDateStr += diffOfHours + " HOURS!";
         } else if (diff <= 7) {
@@ -26,11 +26,11 @@ public class Calculations {
 
     public static String calculateInsertTime(Date insertDate) {
         String insertDateStr = "";
-        long diff = getDateDiff(insertDate, new Date(),TimeUnit.DAYS);
+        long diff = getDateDiff(insertDate, DateUtil.getCurrentDatePlusThreeHour(), TimeUnit.DAYS);
         if (diff == 0) {
-            long diffOfHours = getDateDiff(insertDate, new Date(),TimeUnit.HOURS);
+            long diffOfHours = getDateDiff(insertDate, DateUtil.getCurrentDatePlusThreeHour(),TimeUnit.HOURS);
             if (diffOfHours == 0) {
-                long diffOfMin = getDateDiff(insertDate, new Date(), TimeUnit.MINUTES);
+                long diffOfMin = getDateDiff(insertDate, DateUtil.getCurrentDatePlusThreeHour(), TimeUnit.MINUTES);
                 insertDateStr = diffOfMin + " MINUTES AGO";
             } else {
                 insertDateStr = diffOfHours + " HOURS AGO";
@@ -48,7 +48,7 @@ public class Calculations {
     }
 
     public static void main(String[] args) {
-        Date dt = new Date();
+        Date dt = DateUtil.getCurrentDatePlusThreeHour();
         Calendar c = Calendar.getInstance();
         c.setTime(dt);
         c.add(Calendar.DATE, -1);

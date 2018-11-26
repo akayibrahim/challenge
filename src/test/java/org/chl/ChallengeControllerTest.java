@@ -7,6 +7,7 @@ import org.chl.service.ChallengeService;
 import org.chl.service.MemberService;
 import org.chl.service.NotificationService;
 import org.chl.util.Constant;
+import org.chl.util.DateUtil;
 import org.chl.util.Subject;
 import org.junit.Before;
 import org.junit.Test;
@@ -82,7 +83,7 @@ public class ChallengeControllerTest {
     public void verifyLikeChallenge() throws  Exception{
         Support support = new Support();
         support.setChallengeId(VERSUS_CHALLENGER_ID);
-        support.setDate(new Date());
+        support.setDate(DateUtil.getCurrentDatePlusThreeHour());
         support.setMemberId(memberId);
         challengeController.likeChallenge(support);
     }
@@ -139,7 +140,7 @@ public class ChallengeControllerTest {
         TextComment comment = new TextComment();
         comment.setComment("wonderfull!");
         comment.setChallengeId(CHALLENGE_ID);
-        comment.setDate(new Date());
+        comment.setDate(DateUtil.getCurrentDatePlusThreeHour());
         comment.setMemberId(memberId);
         challengeController.commentToChallange(comment);
     }
@@ -148,7 +149,7 @@ public class ChallengeControllerTest {
         SelfChallenge selfChl = new SelfChallenge();
         selfChl.setChallengerFBId("HIOANSJDHAODPASMNDASUDASL");
         selfChl.setChallengerId("lkasjdaiskdalsdsaid");
-        selfChl.setChlDate(new Date());
+        selfChl.setChlDate(DateUtil.getCurrentDatePlusThreeHour());
         selfChl.setDone(false);
         selfChl.setFirstTeamCount("0");
         selfChl.setSecondTeamCount("0");
@@ -189,7 +190,7 @@ public class ChallengeControllerTest {
         joinChl.setJoinAttendanceList(joinAttList);
         joinChl.setChallengerFBId("HIOANSJDHAODPASMNDASUDASL");
         joinChl.setChallengerId("lkasjdaiskdalsdsaid");
-        joinChl.setChlDate(new Date());
+        joinChl.setChlDate(DateUtil.getCurrentDatePlusThreeHour());
         joinChl.setDone(false);
         joinChl.setFirstTeamCount("1");
         joinChl.setSecondTeamCount("2");
@@ -239,7 +240,7 @@ public class ChallengeControllerTest {
         versusChl.setVersusAttendanceList(versusAttendanceList);
         versusChl.setChallengerFBId(CHALLENGER_FB_ID);
         versusChl.setChallengerId(VERSUS_CHALLENGER_ID);
-        versusChl.setChlDate(new Date());
+        versusChl.setChlDate(DateUtil.getCurrentDatePlusThreeHour());
         versusChl.setDone(false);
         versusChl.setFirstTeamCount("2");
         versusChl.setSecondTeamCount("2");

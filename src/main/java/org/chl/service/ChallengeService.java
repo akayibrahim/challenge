@@ -14,7 +14,9 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -139,7 +141,7 @@ public class ChallengeService implements IChallengeService {
             challenge.setThinksAboutChallenge(null);
         challenge.setChallengerId(memberId);
         challenge.setChallengerFBId(facebookID);
-        challenge.setUpdateDate(new Date());
+        challenge.setUpdateDate(DateUtil.getCurrentDatePlusThreeHour());
         if (challenges.stream().noneMatch(chl -> chl.getId().equals(challenge.getId())))
             challenges.add(challenge);
     }
@@ -150,7 +152,7 @@ public class ChallengeService implements IChallengeService {
         boolean stop = false;
         do {
             Sort sort = new Sort(Sort.Direction.DESC, "updateDate");
-            nextPage = chlRepo.findChallenges(friendLists, Constant.TYPE.PUBLIC, new Date(), Util.getPageable(page, sort, 7));
+            nextPage = chlRepo.findChallenges(friendLists, Constant.TYPE.PUBLIC, DateUtil.getCurrentDatePlusThreeHour(), Util.getPageable(page, sort, 7));
             dbRecords = nextPage.getContent();
             if (dbRecords.size() > 0) {
                 return dbRecords;
@@ -167,7 +169,7 @@ public class ChallengeService implements IChallengeService {
         boolean stop = false;
         do {
             Sort sort = new Sort(Sort.Direction.DESC, "updateDate");
-            nextPage = chlRepo.findPublicChallenges(friendLists, types, new Date(), Util.getPageable(page, sort, 3));
+            nextPage = chlRepo.findPublicChallenges(friendLists, types, DateUtil.getCurrentDatePlusThreeHour(), Util.getPageable(page, sort, 3));
             dbRecords = nextPage.getContent();
             if (dbRecords.size() > 0) {
                 return dbRecords;
@@ -257,16 +259,16 @@ public class ChallengeService implements IChallengeService {
         return challenges.stream().sorted(Comparator.comparing(Challenge::getChlDate).reversed()).collect(Collectors.toList());
     }
 
-    private void setToDoneForPastChallenge(String memberId) {
+    public void setToDoneForPastChallenge(String memberId) {
         List<Integer> visibilities = fullVisibility();
         Boolean actives[] = {true, false};
-        List<Challenge> challengesByMemberId = chlRepo.findChallengesByMemberId(memberId, visibilities, Arrays.asList(actives), new Date(), new Sort(Sort.Direction.DESC, "updateDate"));
+        List<Challenge> challengesByMemberId = chlRepo.findChallengesByMemberId(memberId, visibilities, Arrays.asList(actives), DateUtil.getCurrentDatePlusThreeHour(), new Sort(Sort.Direction.DESC, "updateDate"));
         challengesByMemberId
                 .stream()
                 .forEach(challenge -> {
                     Challenge exist = chlRepo.findById(challenge.getId()).get();
                     exist.setDone(true);
-                    exist.setUpdateDate(new Date());
+                    exist.setUpdateDate(DateUtil.getCurrentDatePlusThreeHour());
                     chlRepo.save(exist);
                 });
     }
@@ -318,7 +320,7 @@ public class ChallengeService implements IChallengeService {
         boolean stop = false;
         do {
             Sort sort = new Sort(Sort.Direction.DESC, "updateDate");
-            nextPage = chlRepo.findChallengesBySubjectAndType(subject, Constant.TYPE.PUBLIC, new Date(), Util.getPageable(page, sort, Constant.DEFAULT_PAGEABLE_SIZE));
+            nextPage = chlRepo.findChallengesBySubjectAndType(subject, Constant.TYPE.PUBLIC, DateUtil.getCurrentDatePlusThreeHour(), Util.getPageable(page, sort, Constant.DEFAULT_PAGEABLE_SIZE));
             dbRecords = nextPage.getContent();
             if (dbRecords.size() > 0) {
                 return dbRecords;
@@ -525,7 +527,7 @@ public class ChallengeService implements IChallengeService {
             postShowed.setChallengeId(chl.getId());
             postShowed.setChallengerId(chl.getChallengerId());
             postShowed.setMemberId(memberId);
-            postShowed.setInsertDate(new Date());
+            postShowed.setInsertDate(DateUtil.getCurrentDatePlusThreeHour());
             postShowedRepository.save(postShowed);
         }
     }
@@ -591,8 +593,8 @@ public class ChallengeService implements IChallengeService {
 
     private void initializeJoinChallenge(Challenge challenge) {
         challenge.setType(Constant.TYPE.PUBLIC);
-        challenge.setChlDate(new Date());
-        challenge.setUpdateDate(new Date());
+        challenge.setChlDate(DateUtil.getCurrentDatePlusThreeHour());
+        challenge.setUpdateDate(DateUtil.getCurrentDatePlusThreeHour());
         if (challenge.getJoinAttendanceList() == null || challenge.getJoinAttendanceList().size() == 0) {
             challenge.setActive(true);
             challenge.setToWorld(true);
@@ -608,8 +610,8 @@ public class ChallengeService implements IChallengeService {
 
     private void initializeVersusChallenge(Challenge challenge) {
         challenge.setType(Constant.TYPE.PRIVATE);
-        challenge.setUpdateDate(new Date());
-        challenge.setChlDate(new Date());
+        challenge.setUpdateDate(DateUtil.getCurrentDatePlusThreeHour());
+        challenge.setChlDate(DateUtil.getCurrentDatePlusThreeHour());
         challenge.setActive(false);
         if (challenge.getActive())
             challenge.setDateOfUntil(DateUtil.covertToDate(challenge.getUntilDate()));
@@ -618,8 +620,8 @@ public class ChallengeService implements IChallengeService {
 
     private void initializeSelfChallenge(Challenge challenge) {
         challenge.setType(Constant.TYPE.SELF);
-        challenge.setUpdateDate(new Date());
-        challenge.setChlDate(new Date());
+        challenge.setUpdateDate(DateUtil.getCurrentDatePlusThreeHour());
+        challenge.setChlDate(DateUtil.getCurrentDatePlusThreeHour());
         challenge.setActive(true);
         if (!challenge.getDone())
             challenge.setDateOfUntil(DateUtil.covertToDate(challenge.getUntilDate()));
@@ -720,7 +722,7 @@ public class ChallengeService implements IChallengeService {
             newTrendChallenge.setType(chlRepo.findById(support.getChallengeId()).get().getType());
             newTrendChallenge.setPopularityType(Constant.POPULARITY.SUPPORT);
             newTrendChallenge.setSubject(challenge.getSubject().toString());
-            newTrendChallenge.setInsertDateTime(new Date());
+            newTrendChallenge.setInsertDateTime(DateUtil.getCurrentDatePlusThreeHour());
             trendChallengeRepository.save(newTrendChallenge);
         }
     }
@@ -733,7 +735,7 @@ public class ChallengeService implements IChallengeService {
             selfChl.setHomeWin(homeWin);
             selfChl.setResult(result);
             selfChl.setGoal(goal);
-            selfChl.setUpdateDate(new Date());
+            selfChl.setUpdateDate(DateUtil.getCurrentDatePlusThreeHour());
             chlRepo.save(selfChl);
         } else
             Exception.throwUpdateCannotForDone();
@@ -743,12 +745,17 @@ public class ChallengeService implements IChallengeService {
     public void updateResultsOfVersus(String challengeId, Boolean homeWin, Boolean awayWin, String firstTeamScore, String secondTeamScore, Boolean done, String memberId) {
         Validation.doneValidationForVersus(done, homeWin, awayWin);
         Challenge versusChl = chlRepo.findById(challengeId).get();
+        Member member = memberService.getMemberInfo(memberId);
         if (versusChl.getScoreRejected())
             return;
         if (versusChl != null) {
             if (versusChl.getWaitForApprove() != null && versusChl.getWaitForApprove()) {
                 versusChl.setActive(true);
                 versusChl.setWaitForApprove(false);
+                versusChl.setNameOfApprovedBy(member.getName() + Constant.SPACE + member.getSurname());
+                versusChl.getVersusAttendanceList().stream().filter(ver -> !ver.getMemberId().equals(memberId)).forEach(versus -> {
+                    activityService.createActivity(Mappers.prepareActivity(null, versusChl.getId(), memberId, versus.getMemberId(), Constant.ACTIVITY.CHALLENGE_APPROVED));
+                });
             } else if (!versusChl.getDone()) {
                 VersusAttendance versusAttendance = versusChl.getVersusAttendanceList().stream().filter(ver -> ver.getMemberId().equals(memberId)).findFirst().get();
                 versusChl.setHomeWin(homeWin);
@@ -759,16 +766,14 @@ public class ChallengeService implements IChallengeService {
                 versusChl.setActive(false);
                 versusChl.setWaitForApprove(true);
                 versusChl.setApproverTeamFirst(versusAttendance.getFirstTeamMember() ? false : true);
-                versusChl.getVersusAttendanceList().stream().filter(ver -> ver.getFirstTeamMember() == !versusAttendance.getFirstTeamMember()
-                        && ver.getSecondTeamMember() == !versusAttendance.getSecondTeamMember()).forEach(versus -> {
+                versusChl.getVersusAttendanceList().stream().filter(ver -> ver.getFirstTeamMember() != versusAttendance.getFirstTeamMember()).forEach(versus -> {
                     activityService.createActivity(Mappers.prepareActivity(null, versusChl.getId(), memberId, versus.getMemberId(), Constant.ACTIVITY.CHALLENGE_APPROVE));
                 });
                 versusChl.setSendingApproveMemberId(versusAttendance.getMemberId());
-                Member member = memberService.getMemberInfo(memberId);
                 versusChl.setSendApproveName(member.getName() + Constant.SPACE + member.getSurname());
                 versusChl.setSendApproveFacebookId(versusAttendance.getFacebookID());
             }
-            versusChl.setUpdateDate(new Date());
+            versusChl.setUpdateDate(DateUtil.getCurrentDatePlusThreeHour());
             chlRepo.save(versusChl);
         } else
             Exception.throwUpdateCannotForDone();
@@ -848,7 +853,7 @@ public class ChallengeService implements IChallengeService {
     }
 
     private Date addDayToToday(String challengeTime) {
-        Date current = new Date();
+        Date current = DateUtil.getCurrentDatePlusThreeHour();
         LocalDateTime localDateTime = current.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         localDateTime = localDateTime.plusMinutes(Integer.valueOf(challengeTime));
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
@@ -928,7 +933,7 @@ public class ChallengeService implements IChallengeService {
 
     @Override
     public void commentAsTextToChallange(TextComment textComment) {
-        textComment.setDate(new Date());
+        textComment.setDate(DateUtil.getCurrentDatePlusThreeHour());
         commentRepository.save(textComment);
         Challenge challenge = chlRepo.findById(textComment.getChallengeId()).get();
         activityService.createActivity(Mappers.prepareActivity(textComment.getId(), textComment.getChallengeId(), textComment.getMemberId()
@@ -1048,11 +1053,14 @@ public class ChallengeService implements IChallengeService {
             Challenge versusChl = chlRepo.findById(challengeId).get();
             if (versusChl != null) {
                 if (versusChl.getWaitForApprove() != null && versusChl.getWaitForApprove()) {
-                    versusChl.setUpdateDate(new Date());
+                    versusChl.setUpdateDate(DateUtil.getCurrentDatePlusThreeHour());
                     versusChl.setScoreRejected(true);
                     versusChl.setWaitForApprove(false);
                     Member member = memberService.getMemberInfo(memberId);
                     versusChl.setScoreRejectName(member.getName() + Constant.SPACE + member.getSurname());
+                    versusChl.getVersusAttendanceList().stream().filter(versus -> !versus.getMemberId().equals(memberId)).forEach(versus -> {
+                        activityService.createActivity(Mappers.prepareActivity(null, versusChl.getId(), memberId, versus.getMemberId(), Constant.ACTIVITY.CHALLENGE_REJECT));
+                    });
                     chlRepo.save(versusChl);
                 }
             } else

@@ -14,7 +14,7 @@ public class Util {
     }
 
     public static boolean isTimesUp(Constant.TYPE type, Boolean done, Boolean homeWin, Boolean awayWin, Boolean join, Boolean proof, Date untilDate) {
-        boolean isTimeOver = untilDate != null && untilDate.compareTo(new Date()) < 0 ? true : false;
+        boolean isTimeOver = untilDate != null && untilDate.compareTo(DateUtil.getCurrentDatePlusThreeHour()) < 0 ? true : false;
         if (type.equals(Constant.TYPE.SELF)) {
             return isTimeOver && !(!done || (done && isNotNullAndTrue(homeWin)));
         } else if (type.equals(Constant.TYPE.PRIVATE)) {

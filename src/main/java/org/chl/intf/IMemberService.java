@@ -21,7 +21,7 @@ public interface IMemberService {
 
     Member getMemberInfoByEmail(@Valid @NotEmpty String email);
 
-    Iterable<Member> getMembers();
+    List<Member> getMembers();
 
     void followingFriend(@Valid @NotEmpty String friendMemberId, String memberId, Boolean follow);
 
@@ -33,7 +33,7 @@ public interface IMemberService {
 
     Boolean checkMemberAvailable(String memberId);
 
-    List<FriendList> getSuggestionsForFollowing(String memberId);
+    List<Member> getSuggestionsForFollowing(String memberId);
 
     Boolean isMyFriend(String memberId, String friendMemberId);
 
@@ -44,5 +44,7 @@ public interface IMemberService {
     public Boolean isRequestedFriend(String memberId, String friendMemberId);
 
     void updateWithDeviceToken(String memberId, String deviceToken);
+
+    List<Member> getFollowerRequests(String memberId) throws Exception;
 }
 

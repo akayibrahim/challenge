@@ -18,6 +18,8 @@ public class Constant {
     public static final String ACCEPT_REQUEST = "request you for accept of %s challenge.";
     public static final String JOIN_REQUEST_CONTENT = "request you for join to %s challenge.";
     public static final String CHALLENGE_APPROVE_CONTENT = "request you for confirmation of result to %s challenge.";
+    public static final String CHALLENGE_REJECT_CONTENT = "%s challenge rejected by %s.";
+    public static final String CHALLENGE_APPROVED_CONTENT = "%s challenge approved by %s.";
     public static final String JOINED_TO_CHALLENGE = "joined to %s challenge.";
     public static final String DONT_JOINED_TO_CHALLENGE = "refused %s challenge.";
     public static final String COMMENTED = "commented: %s for %s challenge.";
@@ -25,6 +27,7 @@ public class Constant {
     public static final String START_TO_FOLLOWING = "start to following %s.";
     public static final String START_TO_FOLLOW_YOU = "start to follow you.";
     public static final String ACCEPT_FOLLOWER_REQUEST = "accept your following request.";
+    public static final String FRIENDSHIP_FOLLOWER_REQUEST = "request you for friendship.";
     public static final String ZERO = "0";
     public static final String ONE = "1";
     public static final String YOU = "You";
@@ -52,10 +55,10 @@ public class Constant {
     }
 
     public enum STATUS {
-        FINISH("has finished %s challenge"),
-        JOIN("has joined challenge"),
-        PROOF("has proved challenge"),
-        NEW_PROOF("has a new proved challenge"),
+        FINISH("has finished a %s challenge"),
+        JOIN("has joined to a public challenge"),
+        PROOF("has proved a public challenge"),
+        NEW_PROOF("has a new public challenge"),
         NEW("has a new %s challenge");
 
         private String status;
@@ -107,7 +110,10 @@ public class Constant {
         FOLLOWING("A new following!", ""),
         FRIEND_REQUEST("A new follower!", ""),
         UPCOMING_WARMING("Time for update challenge!", ""),
-        TIMES_UP("TIME'S UP!", "");
+        TIMES_UP("TIME'S UP!", ""),
+        CHALLENGE_APPROVE("Approved!", ""),
+        CHALLENGE_REJECT("Rejected!", ""),
+        CHALLENGE_APPROVED("Approved!", "");
 
         private String messageTitle;
         private String message;
@@ -159,6 +165,8 @@ public class Constant {
         FRIEND_REQUEST,
         ACCEPT_FRIEND_REQUEST,
         CHALLENGE_APPROVE,
+        CHALLENGE_REJECT,
+        CHALLENGE_APPROVED,
         UPCOMING_WARMING,
         TIMES_UP;
     }

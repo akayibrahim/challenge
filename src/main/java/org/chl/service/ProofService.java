@@ -7,6 +7,7 @@ import org.chl.model.Challenge;
 import org.chl.model.Proof;
 import org.chl.repository.ProofRepository;
 import org.chl.util.Constant;
+import org.chl.util.DateUtil;
 import org.chl.util.Exception;
 import org.chl.util.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +66,7 @@ public class ProofService implements IProofService {
         proof.setProofObjectId(objectId);
         proof.setChallengeId(challengeId);
         proof.setMemberId(memberId);
-        proof.setInsertDate(new Date());
+        proof.setInsertDate(DateUtil.getCurrentDatePlusThreeHour());
         proofRepository.save(proof);
         Challenge challenge = challengeService.getChallengeById(challengeId);
         if (!memberId.equals(challenge.getChallengerId()))

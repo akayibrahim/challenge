@@ -2,11 +2,9 @@ package org.chl.controller;
 
 import org.chl.model.*;
 import org.chl.model.Error;
-import org.chl.service.ActivityService;
-import org.chl.service.ChallengeService;
-import org.chl.service.ErrorService;
-import org.chl.service.ProofService;
+import org.chl.service.*;
 import org.chl.util.Constant;
+import org.chl.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -32,6 +30,8 @@ public class ChallengeController {
     private ErrorService errorService;
     @Autowired
     ProofService proofService;
+    @Autowired
+    MemberService memberService;
 
     @Transactional
     @RequestMapping(value = "/getChallenges")
@@ -212,7 +212,7 @@ public class ChallengeController {
     @RequestMapping(value = "/supportChallenge")
     public void likeChallenge(@Valid @RequestBody Support support) throws Exception {
         try {
-            support.setDate(new Date());
+            support.setDate(DateUtil.getCurrentDatePlusThreeHour());
             chlService.supportChallange(support);
         } catch (Exception e) {
             logError(support.getChallengeId(), support.getMemberId(), "supportChallenge", e, "memberId=" + support.getMemberId() + "&challengeId=" + support.getChallengeId()
@@ -353,5 +353,25 @@ public class ChallengeController {
         } catch (Exception e) {
             logError(challengeId, memberId, "approveVersus", e, "memberId=" + memberId);
         }
+    }
+
+    @Transactional
+    @RequestMapping(value = "/getAllActivitiesCount")
+    public ActivitySectionsCount getAllActivitiesCount(String memberId) throws Exception {
+        try {
+            ActivitySectionsCount activitySectionsCount = new ActivitySectionsCount();
+            List<ChallengeRequest> challengeRequests = getChallengeRequest(memberId);
+            activitySectionsCount.setChallengeRequestCount(challengeRequests != null ? challengeRequests.size() : 0);
+            List<Challenge> challenges = getChallengeApproves(memberId);
+            activitySectionsCount.setChallengeApproveCount(challenges != null ? challenges.size() : 0);
+            List<Member> members = memberService.getFollowerRequests(memberId);
+            activitySectionsCount.setFollowerRequestCount(members != null ? members.size() : 0);
+            List<Member> memberList = memberService.getSuggestionsForFollowing(memberId);
+            activitySectionsCount.setNewFriendSuggestionCount(memberList != null ? memberList.size() : 0);
+            return  activitySectionsCount;
+        } catch (Exception e) {
+            logError(null, memberId, "getAllActivitiesCount", e, "memberId=" + memberId);
+        }
+        return null;
     }
 }

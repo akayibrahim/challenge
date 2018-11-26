@@ -15,6 +15,9 @@ import org.springframework.jms.support.converter.MessageType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
+import java.util.TimeZone;
+
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
 @Configuration
 @EnableAutoConfiguration
@@ -27,6 +30,11 @@ public class Application {
     @RequestMapping(value = "/")
     public String home() {
         return "Docker! " + userBucketPath;
+    }
+
+    @PostConstruct
+    public void init(){
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
 
     public static void main(String[] args) {

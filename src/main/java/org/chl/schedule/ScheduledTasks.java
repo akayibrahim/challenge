@@ -1,8 +1,11 @@
 package org.chl.schedule;
 
 import org.chl.model.Challenge;
+import org.chl.model.Member;
 import org.chl.repository.ChallengeRepository;
 import org.chl.service.ActivityService;
+import org.chl.service.ChallengeService;
+import org.chl.service.MemberService;
 import org.chl.util.Constant;
 import org.chl.util.DateUtil;
 import org.chl.util.Mappers;
@@ -32,17 +35,23 @@ public class ScheduledTasks {
     private ChallengeRepository challengeRepository;
     @Autowired
     ActivityService activityService;
+    @Autowired
+    MemberService memberService;
+    @Autowired
+    ChallengeService challengeService;
 
     @Scheduled(fixedRate = 1000 * 60 * 60)
     public void scheduleTaskWithFixedRate() {
         // logger.info("Fixed Rate Task :: Execution Time - {}", dateFormat.format(new Date()) );
         // for notification : before challenge ending, warm for enter score or proof challenge.
-        List<Challenge> challengeList = challengeRepository.findUpcomingChallenges(DateUtil.addHours(new Date(), 11),
-                DateUtil.addHours(new Date(), 12), false);
+        List<Member> members = memberService.getMembers();
+        members.stream().forEach(member -> challengeService.setToDoneForPastChallenge(member.getId()));
+        List<Challenge> challengeList = challengeRepository.findUpcomingChallenges(DateUtil.addHours(DateUtil.getCurrentDatePlusThreeHour(), 11),
+                DateUtil.addHours(DateUtil.getCurrentDatePlusThreeHour(), 12), false);
         challengeList.stream().forEach(this::createActivityForUpcoming);
         // for notification : notify for time's up.
-        List<Challenge> timesUpChallengeList = challengeRepository.findUpcomingChallenges(DateUtil.addHours(new Date(), -1),
-                DateUtil.addHours(new Date(), 0), true);
+        List<Challenge> timesUpChallengeList = challengeRepository.findUpcomingChallenges(DateUtil.addHours(DateUtil.getCurrentDatePlusThreeHour(), -1),
+                DateUtil.addHours(DateUtil.getCurrentDatePlusThreeHour(), 0), true);
         timesUpChallengeList.stream()
                 .filter(chl -> Util.isTimesUp(chl.getType(), chl.getDone(), chl.getHomeWin(), chl.getAwayWin(),
                         chl.getJoined(), chl.getProofedByChallenger(), chl.getDateOfUntil()))

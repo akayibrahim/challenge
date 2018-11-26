@@ -7,6 +7,7 @@ import org.chl.model.Member;
 import org.chl.repository.FriendListRepository;
 import org.chl.repository.MemberRepository;
 import org.chl.util.Constant;
+import org.chl.util.DateUtil;
 import org.chl.util.Exception;
 import org.chl.util.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class MemberService implements IMemberService {
             return exist.getId();
         }
         member.setPrivateMember(false);
-        member.setInsertDate(new Date());
+        member.setInsertDate(DateUtil.getCurrentDatePlusThreeHour());
         memberRepo.save(member);
         return member.getId();
     }
@@ -67,7 +68,7 @@ public class MemberService implements IMemberService {
     }
 
     @Override
-    public Iterable<Member> getMembers() {
+    public List<Member> getMembers() {
         return memberRepo.findAll();
     }
 
@@ -76,6 +77,7 @@ public class MemberService implements IMemberService {
         Member member = memberRepo.findById(friendMemberId).get();
         FriendList exist = friendRepo.findByFriendMemberIdAndMemberId(friendMemberId, memberId);
         Boolean existFollow = !Objects.isNull(exist) ? exist.getFollowed() : false;
+        boolean isRequested = !Objects.isNull(exist) ? exist.getRequested() : false;
         String activityTableId;
         if (exist != null) {
             if (exist.getRequested()) {
@@ -112,7 +114,7 @@ public class MemberService implements IMemberService {
             if (!follow)
                 activityService.increaseActivityCount(memberId);
         }
-        if (follow && !existFollow) {
+        if (follow && !existFollow && !isRequested) {
             // activityService.createActivity(Mappers.prepareActivity(activityTableId, null, friendMemberId, memberId, Constant.ACTIVITY.FOLLOWING));
             activityService.createActivity(Mappers.prepareActivity(activityTableId, null, memberId, friendMemberId, Constant.ACTIVITY.FOLLOWER));
         }
@@ -173,7 +175,16 @@ public class MemberService implements IMemberService {
     }
 
     @Override
-    public List<FriendList> getSuggestionsForFollowing(String memberId) {
+    public List<Member> getSuggestionsForFollowing(String memberId) {
+        List<Member> memberList = new ArrayList<>();
+        List<FriendList> friendList = getSuggestions(memberId);
+        friendList.stream().filter(fri -> !fri.getRequested()).forEach(fri -> {
+            memberList.add(getMemberInfo(fri.getFriendMemberId()));
+        });
+        return memberList;
+    }
+
+    private List<FriendList> getSuggestions(String memberId) {
         List<FriendList> friends = friendRepo.findByMemberIdAndFollowed(memberId, false);
         if (friends.size() < 10) {
             List<String> friendList = getFollowingIdList(memberId);
@@ -182,12 +193,12 @@ public class MemberService implements IMemberService {
             Optional.ofNullable(friendList).orElseGet(Collections::emptyList).stream().forEach(fri -> {
                 List<FriendList> list = friendRepo.findByMemberIdAndFollowed(fri, true);
                 list.stream()
-                    .filter(friend -> !friend.getFriendMemberId().equals(memberId) && !isMyFriend(memberId, friend.getFriendMemberId()) &&
-                    friends.stream().noneMatch(myFriends -> myFriends.getFriendMemberId().equals(friend.getFriendMemberId())))
-                    .forEach(friend -> {
-                        friends.add(friend);
-                    });
-                });
+                        .filter(friend -> !friend.getFriendMemberId().equals(memberId) && !isMyFriend(memberId, friend.getFriendMemberId()) &&
+                                friends.stream().noneMatch(myFriends -> myFriends.getFriendMemberId().equals(friend.getFriendMemberId())))
+                        .forEach(friend -> {
+                            friends.add(friend);
+                        });
+            });
         }
         return friends;
     }
@@ -213,6 +224,16 @@ public class MemberService implements IMemberService {
         Member member = memberRepo.findById(memberId).get();
         member.setDeviceNotifyToken(deviceToken);
         memberRepo.save(member);
+    }
+
+    @Override
+    public List<Member> getFollowerRequests(String memberId) throws java.lang.Exception {
+        List<Member> memberList = new ArrayList<>();
+        List<FriendList> friendList = getFollowerList(memberId, false);
+        friendList.stream().filter(fri -> fri.getRequested()).forEach(fri -> {
+            memberList.add(getMemberInfo(fri.getMemberId()));
+        });
+        return memberList;
     }
 
     @Override

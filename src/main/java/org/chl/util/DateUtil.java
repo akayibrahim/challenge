@@ -44,4 +44,8 @@ public class DateUtil {
         calendar.add(Calendar.HOUR, hours);
         return calendar.getTime();
     }
+
+    public static Date getCurrentDatePlusThreeHour() {
+        return addHours(new Date(), 3);
+    }
 }
