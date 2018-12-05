@@ -129,7 +129,7 @@ public class ChallengeController {
             joinChl.setProofed(proofed);
             joinChl.setJoinAttendanceList(joinAttendanceList);
             Challenge challenge = chlService.addJoinChallenge(joinChl);
-            proofService.uploadImage(file, challenge.getId(), challengerId);
+            proofService.uploadImage(file, challenge.getId(), challengerId, false);
             return challenge.getId();
         } catch (Exception e) {
             logError(null, challengerId, "addJoinChallenge", e, "memberId=" + challengerId);

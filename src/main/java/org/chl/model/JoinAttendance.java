@@ -24,6 +24,16 @@ public class JoinAttendance extends Attendance {
 
     private Boolean provedWithImage;
 
+    private Boolean wide;
+
+    public Boolean getWide() {
+        return wide == null ? false : wide;
+    }
+
+    public void setWide(Boolean wide) {
+        this.wide = wide;
+    }
+
     public Boolean getProvedWithImage() {
         return provedWithImage;
     }

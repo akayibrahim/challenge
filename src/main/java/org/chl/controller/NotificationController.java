@@ -17,7 +17,7 @@ public class NotificationController {
         File file = new File("Certificates.p12");
         ApnsService service = APNS.newService()
                 .withCert(file.getAbsolutePath(), "iAkay2712")
-                .withSandboxDestination()
+                .withAppleDestination(true)
                 .build();
 
         String payload = APNS.newPayload()
@@ -25,7 +25,7 @@ public class NotificationController {
                 .alertBody("Can’t be simpler than this!")
  .alertTitle("test alert title").build();
 
-        String token = "67875ccf5cebc62d06581a8ac5301fb0300c2d5762172fd5b803e4ded6e2b73d";
+        String token = "0475446453005a9bae085867d17846c1ee9032cd296dcb0a1f964200df39ab4c";
 
         service.push(token, payload);
 

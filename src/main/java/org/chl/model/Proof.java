@@ -21,6 +21,15 @@ public class Proof {
     private String memberId;
     private Date insertDate;
     private Boolean provedWithImage;
+    private Boolean wide;
+
+    public Boolean getWide() {
+        return wide == null ? false : wide;
+    }
+
+    public void setWide(Boolean wide) {
+        this.wide = wide;
+    }
 
     public Boolean getProvedWithImage() {
         return provedWithImage;

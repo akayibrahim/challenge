@@ -51,7 +51,7 @@ commands
 
     db.member.find()
     db.member.remove({})
-    db.member.update( { "region": null }, { $set: {"deviceNotifyToken": "67b2a654a815999696af1f3d1096099f9ea6bdb66a1d1310e84799e50a5fb0f8"} }, {upsert:false, multi:true} )
+    db.member.update( { "region": null }, { $set: {"deviceNotifyToken": "0475446453005a9bae085867d17846c1ee9032cd296dcb0a1f964200df39ab4c"} }, {upsert:false, multi:true} )
     db.member.update( { "_id": ObjectId("5bb72094d35c6545e8bdbf30") }, { $set: {"facebookID": "1769598089818022"} } )
     db.member.remove( { "_id": ObjectId("5b9bc407d35c65101a516274") })
 
@@ -70,7 +70,7 @@ commands
     db.challenge.find({ "versusAttendanceList.memberId": "5b3152821cb199f1fadc0fab" })
     db.challenge.find({ "deleted": {$in: [null, false]}, "dateOfUntil": {"$gte": ISODate("2018-11-11T13:17:00Z"), "$lte": ISODate("2018-11-11T14:17:00Z")}, "done": true, "active": true })
     db.challenge.find({ "challengerId": { $nin: ["5b3152d31cb199f1fadc0fb02"] } })
-    db.challenge.remove({ "_id": ObjectId("5b6bdf4cd35c653e6a09aae0") })
+    db.challenge.remove({ "_id": ObjectId("5c03a236d35c657c52fc3557") })
     db.challenge.remove({})
     db.challenge.update( { "done": true }, { $set: {"visibility": "1"} } )
     db.challenge.update( { "_id": ObjectId("5be82725f7cf55292ea9e469") }, { $set: {"dateOfUntil" : ISODate("2018-11-11T15:30:00Z")} } )
@@ -78,12 +78,14 @@ commands
     db.challenge.update( { "_id": ObjectId("5be88d18d35c655857df2a02") }, { $set: {"dateOfUntil" : ISODate("2018-11-11T23:00:52.783Z"), "untilDate" : "11-11-2018 23:00", "done": false, "chlDate" : ISODate("2018-11-11T23:00:52.783Z"), "updateDate" : ISODate("2018-11-11T23:00:52.783Z") }} )
     db.challenge.update( { "_id": ObjectId("5bd39c2bd35c657f2b980532") }, { $set: {"done" : false} } )
     db.challenge.update( { "_id": ObjectId("5bcd5deed35c65306f707aef") }, { $set: {"challengerFBId": "1769598089818022"} } )
+    db.challenge.update( { "_id": ObjectId("5bea5d3ed35c6567e0a04958") }, { $set: {"wide" : null} } )
+    db.challenge.update( { "_id": ObjectId("5c0436ecd35c657fa8178023") }, { $set: {"visibility" : 3} } )
     db.challenge.find( { "_id": ObjectId("5b4cd32f8d3966b51be4e871") })
     db.challenge.find({"untilDate": {"$lt": new Date()} })
     db.challenge.find({"dateOfUntil": {"$lt": ISODate("2018-11-15T23:24:00Z")}, "done": false })
     db.challenge.find({ '$or' : [ { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'dateOfUntil': {'$gte': new Date()}, 'done': false }, { '$or' : [{'challengerId' : {$in : ['5b3152701cb199f1fadc0faa']} }, {'type' : 'PUBLIC'} ], 'deleted': {$in: [null, false]}, 'done': true } ] })
     db.challenge.update( { "_id": ObjectId("5bbcfab3d35c65483337fd62"), "joinAttendanceList.memberId": "5bb72094d35c6545e8bdbf30"}, { $set: {"joinAttendanceList.$.facebookID":  "1769598089818022"} } )
-
+    db.challenge.update( { "_id": ObjectId("5bea5d3ed35c6567e0a04958"), "joinAttendanceList.memberId": "5bb72094d35c6545e8bdbf30"}, { $set: {"joinAttendanceList.$.wide":  true} } )
 
     db.support.find()
     db.support.find( { "challengeId": "5b4cd32f8d3966b51be4e871" } )

@@ -8,17 +8,13 @@ import org.chl.model.Notification;
 import org.chl.model.PushNotification;
 import org.chl.repository.ActivityCountRepository;
 import org.chl.repository.NotificationRepository;
+import org.chl.util.Exception;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.File;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 
 /**
  * Created by ibrahim on 12/9/2017.
@@ -55,15 +51,15 @@ public class NotificationService implements INotificationService {
             try {
                 callApns(pushNotification.getDeviceToken(), pushNotification.getMessageTitle(), pushNotification.getMessage(),
                         pushNotification.getMemberId());
-            } catch (Exception e) {
-                // logged already in errorService.logError(
+            } catch (Throwable e) {
+                //Exception.throwCannotSendNotify();
             }
             notificationRepository.save(pushNotification);
         }
         // jmsTemplate.convertAndSend(destinationQueue, notification);
     }
 
-    public void callApns(String deviceToken, String title, String body, String memberId) throws Exception {
+    public void callApns(String deviceToken, String title, String body, String memberId) throws Throwable {
         if (deviceToken == null) {
             errorService.logError(null, memberId, "callApns",null, "deviceToken=null, title=" + title
             + ", body=" + body + ", memberid=" + memberId);
@@ -72,7 +68,7 @@ public class NotificationService implements INotificationService {
         File file = new File("Certificates.p12");
         ApnsService service = APNS.newService()
                 .withCert(file.getAbsolutePath(), "iAkay2712")
-                .withSandboxDestination()
+                .withAppleDestination(true)
                 .build();
         ActivityCount count = activityCountRepository.findByMemberId(memberId);
         String payload = APNS.newPayload()

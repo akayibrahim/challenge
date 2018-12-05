@@ -385,6 +385,8 @@ public class ChallengeService implements IChallengeService {
                 .orElseGet(Collections::emptyList).stream().filter(join -> join.getMemberId().equals(challenge.getChallengerId())).findFirst().orElse(null);
         trend.setProvedWithImage(proofOfChallenger != null && proofOfChallenger.getProvedWithImage() != null
                 ? proofOfChallenger.getProvedWithImage() : true);
+        trend.setWide(proofOfChallenger != null && proofOfChallenger.getWide() != null
+                ? proofOfChallenger.getWide() : false);
         return trend;
     }
 
@@ -423,6 +425,7 @@ public class ChallengeService implements IChallengeService {
                     .orElseGet(Collections::emptyList).stream().filter(join -> join.getMemberId().equals(chl.getChallengerId())).findFirst().orElse(null);
             chl.setProofedByChallenger(proofOfChallenger != null ? proofOfChallenger.getProof() : false);
             chl.setProvedWithImage(proofOfChallenger != null ? nvl(proofOfChallenger.getProvedWithImage(), true) : true);
+            chl.setWide(proofOfChallenger != null ? nvl(proofOfChallenger.getWide(), false) : false);
             setStatusOfChallenge(chl, proofOfChallenger);
             chl.setRejectedByAllAttendance(nvl(chl.getRejectedByAllAttendance(), false));
             chl.setTimesUp(Util.isTimesUp(chl.getType(), chl.getDone(), chl.getHomeWin(), chl.getAwayWin(), chl.getJoined(), comeFromSelf ? chl.getProofed() : chl.getProofedByChallenger(), chl.getDateOfUntil()));

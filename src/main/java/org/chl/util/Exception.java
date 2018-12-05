@@ -31,4 +31,8 @@ public class Exception {
     public static void throwCannotAddProofAgain() {
         throw new IllegalArgumentException("Already, you proofed it.");
     }
+
+    public static void throwCannotSendNotify() {
+        throw new IllegalArgumentException("Notify error.");
+    }
 }

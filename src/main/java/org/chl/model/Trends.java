@@ -25,6 +25,16 @@ public class Trends {
 
     private Boolean provedWithImage;
 
+    private Boolean wide;
+
+    public Boolean getWide() {
+        return wide;
+    }
+
+    public void setWide(Boolean wide) {
+        this.wide = wide;
+    }
+
     public Boolean getProvedWithImage() {
         return provedWithImage;
     }

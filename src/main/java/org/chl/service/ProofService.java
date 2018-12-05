@@ -34,7 +34,7 @@ public class ProofService implements IProofService {
     private ProofRepository proofRepository;
 
     @Override
-    public String uploadImage(MultipartFile file, String challengeId, String memberId) throws IOException {
+    public String uploadImage(MultipartFile file, String challengeId, String memberId, Boolean wide) throws IOException {
         Challenge challenge = challengeService.getChallengeById(challengeId);
         challenge.getJoinAttendanceList().stream().filter(chl -> chl.getMemberId().equals(memberId)).findFirst()
                 .ifPresent(joinAttendance -> {
@@ -55,6 +55,7 @@ public class ProofService implements IProofService {
                     joinAttendance.setJoin(false);
                     joinAttendance.setProof(true);
                     joinAttendance.setProvedWithImage("image".equals(type[0]) ? true : false);
+                    joinAttendance.setWide(wide);
                     addProof(challengeId, memberId, imageFileId);
                 });
         challengeService.save(challenge);

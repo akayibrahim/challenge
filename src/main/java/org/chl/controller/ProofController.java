@@ -7,6 +7,7 @@ import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.chl.model.Challenge;
+import org.chl.model.JoinAttendance;
 import org.chl.model.Member;
 import org.chl.model.Proof;
 import org.chl.repository.ProofRepository;
@@ -30,7 +31,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class ProofController {
@@ -58,9 +61,9 @@ public class ProofController {
 
     @Transactional
     @RequestMapping(value = "/uploadImage")
-    public String uploadImage(MultipartFile file, String challengeId, String memberId) throws IOException, java.lang.Exception {
+    public String uploadImage(MultipartFile file, String challengeId, String memberId, Boolean wide) throws IOException, java.lang.Exception {
         try {
-            proofService.uploadImage(file, challengeId, memberId);
+            proofService.uploadImage(file, challengeId, memberId, wide);
         } catch (java.lang.Exception e) {
             deleteChallenge(challengeId);
             logError(challengeId, memberId, "uploadImage", e, "memberId=" + memberId + "&challengeId=" + challengeId);
@@ -187,6 +190,10 @@ public class ProofController {
                 proof.setFbID(member.getFacebookID());
                 GridFSFile fsFile =  gridOperations.findOne(new Query(Criteria.where("_id").is(file.getProofObjectId())));
                 proof.setProvedWithImage(fsFile != null ? "image".equals(fsFile.getMetadata().get("type")) : true);
+                Challenge chl = challengeService.getChallengeById(challengeId);
+                JoinAttendance proofOfChallenger = Optional.ofNullable(chl.getJoinAttendanceList())
+                        .orElseGet(Collections::emptyList).stream().filter(join -> join.getMemberId().equals(chl.getChallengerId())).findFirst().orElse(null);
+                proof.setWide(proofOfChallenger != null ? proofOfChallenger.getWide() : false);
                 proofs.add(proof);
             });
             return proofs;

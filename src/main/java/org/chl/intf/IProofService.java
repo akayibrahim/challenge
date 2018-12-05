@@ -8,5 +8,5 @@ import java.io.IOException;
  * Created by ibrahim on 15/07/2018.
  */
 public interface IProofService {
-    String uploadImage(MultipartFile file, String challengeId, String memberId) throws IOException;
+    String uploadImage(MultipartFile file, String challengeId, String memberId, Boolean wide) throws IOException;
 }

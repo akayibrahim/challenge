@@ -127,6 +127,16 @@ public class Challenge {
 
     private String nameOfApprovedBy;
 
+    private Boolean wide;
+
+    public Boolean getWide() {
+        return wide == null ? false : wide;
+    }
+
+    public void setWide(Boolean wide) {
+        this.wide = wide;
+    }
+
     public String getNameOfApprovedBy() {
         return nameOfApprovedBy;
     }
