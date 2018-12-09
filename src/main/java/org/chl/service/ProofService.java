@@ -58,6 +58,7 @@ public class ProofService implements IProofService {
                     joinAttendance.setWide(wide);
                     addProof(challengeId, memberId, imageFileId);
                 });
+        challenge.setUpdateDate(DateUtil.getCurrentDatePlusThreeHour());
         challengeService.save(challenge);
         return "Done ";
     }
