@@ -51,6 +51,16 @@ public class Member {
 
     private Date insertDate;
 
+    private Boolean botFlag;
+
+    public Boolean getBotFlag() {
+        return botFlag == null ? false : botFlag;
+    }
+
+    public void setBotFlag(Boolean botFlag) {
+        this.botFlag = botFlag;
+    }
+
     public Date getInsertDate() {
         return insertDate;
     }

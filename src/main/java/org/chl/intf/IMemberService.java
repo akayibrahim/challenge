@@ -46,5 +46,7 @@ public interface IMemberService {
     void updateWithDeviceToken(String memberId, String deviceToken);
 
     List<Member> getFollowerRequests(String memberId) throws Exception;
+
+    List<Member> getBots(Boolean botFlag) throws Exception;
 }
 

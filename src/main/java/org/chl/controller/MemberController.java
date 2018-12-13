@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -205,7 +208,7 @@ public class MemberController {
     @RequestMapping(value = "/searchFriends")
     public List<Member> searchFriends(@Valid String searchKey, String memberId) throws Exception {
         try {
-            List<Member> members = memberService.searchFriends(searchKey, memberId);
+            List<Member> members = memberService.searchFriends(searchKey.replace(".", " "), memberId);
             return members;
         } catch (Exception e) {
             logError(null, null, "searchFriends", e, "searchKey=" + searchKey);
@@ -279,4 +282,18 @@ public class MemberController {
     @Transactional
     @RequestMapping(value = "/testHostConnectivity")
     public void testHostConnectivity() {}
+
+    @Transactional
+    @RequestMapping(value = "/fetchBots")
+    public List<Bots> fetchBots() throws Exception {
+        List<Member> members = memberService.getBots(true);
+        List<Bots> bots = new ArrayList<>();
+        members.stream().forEach(member -> {
+            Bots bot = new Bots();
+            bot.setMemberId(member.getId());
+            bot.setName(member.getName());
+            bots.add(bot);
+        });
+        return bots;
+    }
 }

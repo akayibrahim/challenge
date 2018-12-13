@@ -4,6 +4,7 @@ import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
 import org.chl.intf.INotificationService;
 import org.chl.model.ActivityCount;
+import org.chl.model.Member;
 import org.chl.model.Notification;
 import org.chl.model.PushNotification;
 import org.chl.repository.ActivityCountRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.File;
+import java.util.logging.Logger;
 
 /**
  * Created by ibrahim on 12/9/2017.
@@ -33,6 +35,10 @@ public class NotificationService implements INotificationService {
     ActivityCountRepository activityCountRepository;
     @Autowired
     private ErrorService errorService;
+    @Autowired
+    private MemberService memberService;
+
+    Logger logger = Logger.getLogger("NotificationService");
 
     @Value("${jms.queue.destination:CHL-QUEUE}")
     private String destinationQueue;
@@ -53,6 +59,7 @@ public class NotificationService implements INotificationService {
                         pushNotification.getMemberId());
             } catch (Throwable e) {
                 //Exception.throwCannotSendNotify();
+                logger.info(e.getMessage());
             }
             notificationRepository.save(pushNotification);
         }
@@ -60,6 +67,15 @@ public class NotificationService implements INotificationService {
     }
 
     public void callApns(String deviceToken, String title, String body, String memberId) throws Throwable {
+        try {
+            Member adminMember = memberService.getMemberInfoByEmail("that_see@hotmail.com");
+            Member member = memberService.getMemberInfo(memberId);
+            if (member.getBotFlag()) {
+                deviceToken = adminMember.getDeviceNotifyToken();
+            }
+        } catch (Throwable e) {
+            logger.info(e.getMessage());
+        }
         if (deviceToken == null) {
             errorService.logError(null, memberId, "callApns",null, "deviceToken=null, title=" + title
             + ", body=" + body + ", memberid=" + memberId);

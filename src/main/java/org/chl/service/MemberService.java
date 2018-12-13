@@ -187,6 +187,8 @@ public class MemberService implements IMemberService {
     private List<FriendList> getSuggestions(String memberId) {
         List<FriendList> friends = friendRepo.findByMemberIdAndFollowed(memberId, false);
         if (friends.size() < 10) {
+            List<Member> members = getMembers();
+            /*
             List<String> friendList = getFollowingIdList(memberId);
             List<String> followerList = getFollowerIdList(memberId);
             friendList.addAll(followerList);
@@ -199,13 +201,34 @@ public class MemberService implements IMemberService {
                             friends.add(friend);
                         });
             });
+            */
+            members.stream()
+                    .filter(member -> !member.getId().equals(memberId) &&
+                            !isMyFriend(memberId, member.getId()) &&
+                                    !isRequestedFriend(memberId, member.getId()))
+                    .forEach(member -> {
+                        FriendList friendList = new FriendList();
+                        friendList.setMemberId(memberId);
+                        friendList.setFriendMemberId(member.getId());
+                        friendList.setFollowed(isMyFriend(memberId, member.getId()));
+                        friendList.setRequested(isRequestedFriend(memberId, member.getId()));
+                        friendList.setDeleted(false);
+                        friendList.setFriendMemberInfo(member);
+                        friends.add(friendList);
+                    });
         }
         return friends;
     }
 
     @Override
     public List<Member> searchFriends(String searchKey, String memberId) {
-        Iterable<Member> memberList = memberRepo.findByKey(searchKey.toUpperCase());
+        Iterable<Member> memberList = null;
+        String[] keys = searchKey.split(Constant.SPACE);
+        if (keys.length > 1) {
+            memberList = memberRepo.findByNameAndSurname(keys[0].toUpperCase(), keys[keys.length-1].toUpperCase());
+        } else {
+            memberList = memberRepo.findByKey(searchKey.toUpperCase());
+        }
         List<Member> members = Lists.newArrayList(memberList);
         return members.stream()
                 .filter(member -> !isMyFriend(memberId, member.getId()))
@@ -234,6 +257,11 @@ public class MemberService implements IMemberService {
             memberList.add(getMemberInfo(fri.getMemberId()));
         });
         return memberList;
+    }
+
+    @Override
+    public List<Member> getBots(Boolean botFlag) throws java.lang.Exception {
+        return memberRepo.findByBotFlag(botFlag);
     }
 
     @Override
