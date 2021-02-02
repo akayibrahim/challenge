@@ -2,6 +2,8 @@ CHALLENGE
 
 Social Network For Competition
 
+<img src="https://github.com/akayibrahim/challenge/blob/tst/B26171CE-AB95-47ED-A130-2FF51F44CD43.jpeg" width="30%" height="30%"> 
+
 I developed CHALLENGE application on iOS that people can challenge with friends, themself or between teams. It is provide to people create challenges and complete it.  You can join trends, stalk others and proof themself. It is a competitive social media platform.
 
 Now people can follow and support their favorite football team, tennis player, basketball player. Or if they can’t motivate themself about gym, learning new language or discover new places, they can just create a challenge to themself and motivate themself with their friend supports. 
@@ -30,4 +32,4 @@ Some Features of App
 
 FOR UI: https://github.com/akayibrahim/challenge-ui
 
-<img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot1.png" width="30%" height="30%"> <img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot2.png" width="30%" height="30%"> <img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot3.png" width="30%" height="30%"> <img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot4.png" width="30%" height="30%"> <img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot5.png" width="30%" height="30%"> <img src="https://github.com/akayibrahim/challenge/blob/tst/B26171CE-AB95-47ED-A130-2FF51F44CD43.jpeg" width="30%" height="30%"> 
+<img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot1.png" width="30%" height="30%"> <img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot2.png" width="30%" height="30%"> <img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot3.png" width="30%" height="30%"> <img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot4.png" width="30%" height="30%"> <img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot5.png" width="30%" height="30%">
