@@ -28,4 +28,6 @@ Some Features of App
 * Login via facebook/google
 * Monitoring friends challenges
 
+FOR UI: https://github.com/akayibrahim/challenge-ui
+
 <img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot1.png" width="30%" height="30%"> <img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot2.png" width="30%" height="30%"> <img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot3.png" width="30%" height="30%"> <img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot4.png" width="30%" height="30%"> <img src="https://github.com/akayibrahim/challenge/blob/tst/3.5-inch%20(iPhone4)-Screenshot5.png" width="30%" height="30%"> 
